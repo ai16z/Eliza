@@ -47,6 +47,7 @@
         "@elizaos/plugin-echochambers": "workspace:*",
         "@elizaos/plugin-flow": "workspace:*",
         "@elizaos/plugin-gitbook": "workspace:*",
+        "@elizaos/plugin-gecko": "workspace:*",
         "@elizaos/plugin-story": "workspace:*",
         "@elizaos/plugin-goat": "workspace:*",
         "@elizaos/plugin-icp": "workspace:*",
