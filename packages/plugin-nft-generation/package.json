@@ -27,7 +27,7 @@
         "@metaplex-foundation/umi": "^0.9.2",
         "@metaplex-foundation/umi-bundle-defaults": "^0.9.2",
         "@solana-developers/helpers": "^2.5.6",
-        "@solana/web3.js": "1.95.5",
+        "@solana/web3.js": "npm:@solana/web3.js@1.95.5",
         "bs58": "6.0.0",
         "express": "4.21.1",
         "node-cache": "5.1.2",

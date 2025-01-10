@@ -24,7 +24,7 @@
         "@elizaos/plugin-tee": "workspace:*",
         "@coral-xyz/anchor": "0.30.1",
         "@solana/spl-token": "0.4.9",
-        "@solana/web3.js": "1.95.8",
+        "@solana/web3.js": "npm:@solana/web3.js@1.95.8",
         "bignumber": "1.1.0",
         "bignumber.js": "9.1.2",
         "bs58": "6.0.0",
