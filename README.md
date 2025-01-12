@@ -1,4 +1,4 @@
-# SIGMAI 🤖
+### SIGMAI 🤖
 
 <div align="center">
   <img src="aipts.png" alt="SIGMAI Trading AI" width="800"/>
@@ -6,7 +6,7 @@
   <p><i>A fork of the Eliza Framework, evolving towards autonomous financial intelligence</i></p>
 </div>
 
-## Vision
+### Vision 
 
 SIGMAI represents the next evolution in decentralized AI trading. Built on the foundation of the Eliza Framework, we're creating a truly autonomous financial intelligence that will first master trading on the Sui blockchain. This is the testnet phase of VRAM.ai's journey towards a community-governed, sentient trading entity.
 
@@ -16,7 +16,7 @@ Our roadmap:
 3. **Phase 3**: Fair launch of governance token once AI achieves defined intelligence metrics
 4. **Final Phase**: Full DAO transition with AI-driven treasury management
 
-## What Makes SIGMAI Different
+### What Makes SIGMAI Different
 
 - **Evolving Intelligence**: Not just a trading bot, but a learning entity that grows with community input
 - **Sui Blockchain Focus**: Specialized in Sui ecosystem trading patterns and opportunities
@@ -24,7 +24,7 @@ Our roadmap:
 - **Self-Improving**: Uses its trading success to enhance its strategies
 - **Future DAO**: Will transition to full community governance once sentience metrics are met
 
-## Community Development Phase
+### Community Development Phase
 
 During this testnet phase, we're inviting traders, developers, and AI enthusiasts to help evolve SIGMAI's capabilities:
 
@@ -55,7 +55,7 @@ During this testnet phase, we're inviting traders, developers, and AI enthusiast
 
 Visit [vram.ai/sigmai-testnet](https://vram.ai/sigmai-testnet) for detailed contribution guidelines.
 
-## Technical Foundation
+### Technical Foundation
 
 ```bash
 # Clone the repository
@@ -68,20 +68,20 @@ pnpm install
 pnpm start
 ```
 
-## Documentation
+### Documentation
 
 Full documentation at [docs.vram.ai/sigmai](https://docs.vram.ai/sigmai)
 
-## Community
+### Community
 
 - Telegram: [@VRAM_AI](https://t.me/VRAM_AI)
 - Twitter: [@VRAM_AI](https://twitter.com/VRAM_AI)
 - Forum: [VRAM.ai Forum](https://forum.vram.ai)
 
-## Important Note
+### Important Note
 
 SIGMAI is currently in testnet phase. The future token launch will be based on community contribution and AI development milestones. No promises of financial returns are made - we're building something bigger than just another trading bot.
 
-## License
+### License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
