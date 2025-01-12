@@ -54,6 +54,7 @@ AWS_SECRET_ACCESS_KEY=your_aws_secret_key
 AWS_REGION=your_aws_region
 AWS_S3_BUCKET=your_s3_bucket
 AWS_S3_UPLOAD_PATH=your_upload_path
+AWS_S3_ENDPOINT=your_custom_s3_endpoint # Optional (e.g., if using local S3)
 ```
 
 ## Usage
@@ -72,7 +73,7 @@ elizaos.registerPlugin(nodePlugin);
 
 ### AwsS3Service
 
-Handles file uploads and management with AWS S3.
+Handles file uploads and management with AWS S3 or S3-compatible tools.
 
 ### BrowserService
 
@@ -358,7 +359,7 @@ This plugin integrates with and builds upon several key technologies:
 - [FFmpeg](https://ffmpeg.org/) - Media processing capabilities
 - [ElevenLabs](https://elevenlabs.io/) - Voice synthesis
 - [OpenAI](https://openai.com/) - Transcription and AI services
-- [AWS S3](https://aws.amazon.com/s3/) - Cloud storage
+- [AWS S3](https://aws.amazon.com/s3/) - Cloud storage (or other S3-compatible tools)
 - [Playwright](https://playwright.dev/) - Browser automation
 - [LLaMA](https://github.com/facebookresearch/llama) - Local language models
 - [VITS](https://github.com/jaywalnut310/vits) - Voice synthesis
