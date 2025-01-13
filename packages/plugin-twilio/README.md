@@ -30,29 +30,56 @@ For more information, visit [Twilio Plugin Documentation](https://www.boolkeys.c
 pnpm add @elizaos/plugin-twilio
 ```
 
-## Configuration
+## Plugin Configuration
 
-1. Create a `.env` file based on `.env.example`:
+1. Add the plugin to your character file (e.g., characters/your-character.json):
+
+```json
+{
+    "name": "Your Character",
+    "settings": {
+        // ... other settings ...
+    },
+    "plugins": [
+        "@elizaos/plugin-twilio"  // Add this line to enable the plugin
+    ]
+}
+```
+
+For local development, you can use a relative path:
+```json
+{
+    "plugins": [
+        "../packages/plugin-twilio"
+    ]
+}
+```
+
+2. Add these variables to your project's root `.env` file:
 
 ```env
-# Anthropic Configuration
+# Add these to your existing .env file in the project root
+
+# Anthropic Configuration (if not already set)
 ANTHROPIC_API_KEY=your_anthropic_key
 
 # Twilio Configuration
 TWILIO_ACCOUNT_SID=your_account_sid
 TWILIO_AUTH_TOKEN=your_auth_token
 TWILIO_PHONE_NUMBER=your_twilio_phone_number
-TWILIO_CHARACTER=character.json
+TWILIO_CHARACTER=your-character.json  # Must match your character file name
 
 # Webhook Configuration
 WEBHOOK_PORT=3004
-WEBHOOK_BASE_URL=your_webhook_url
+WEBHOOK_BASE_URL=your_webhook_url  # Will be set after starting ngrok
 ```
+
+Note: Do not create a new .env file in the plugin directory. Instead, add these variables to your existing .env file at the project root.
 
 ## Webhook Setup
 
 ### Local Development
-1. Start your Eliza agent:
+1. Start your Eliza agent with your configured character:
 ```bash
 pnpm start --character="characters/your-character.json"
 ```
@@ -146,6 +173,8 @@ tail -f eliza.log | grep "Twilio Plugin"
 - Port already in use: Change WEBHOOK_PORT in .env
 - Webhook not receiving messages: Check ngrok/domain configuration
 - Wrong character responses: Delete SQLite database and restart
+- Plugin not loading: Ensure it's properly listed in character file plugins array
+- Character not responding: Check TWILIO_CHARACTER in .env matches your character file name
 
 ## Environment Variables
 
