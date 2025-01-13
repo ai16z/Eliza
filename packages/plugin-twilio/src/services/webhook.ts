@@ -88,7 +88,7 @@ export class WebhookService implements Service {
 
     // Add voice configuration
     private static readonly VOICE_CONFIG: { [key: string]: VoiceConfig } = {
-        // English voices
+        // Standard voices
         'en-male': {
             voice: 'Polly.Matthew-Neural',
             language: 'en-US',
@@ -557,13 +557,24 @@ Example bad responses:
     }
 
     private getVoiceConfig(characterConfig: any): VoiceConfig {
-        // If no settings at all or no voice settings, use defaults
+        // If no settings at all, use defaults
         if (!characterConfig.settings || !characterConfig.settings.voice) {
             const voiceKey = `${WebhookService.DEFAULT_VOICE.language}-${WebhookService.DEFAULT_VOICE.gender}`;
             return WebhookService.VOICE_CONFIG[voiceKey] || WebhookService.VOICE_CONFIG.default;
         }
 
         const voiceSettings = characterConfig.settings.voice;
+
+        // Check for custom voice first
+        if (voiceSettings.custom) {
+            return {
+                voice: voiceSettings.custom,
+                language: 'en-US',  // Default to US English for custom voices
+                recognitionLanguage: 'en-US'
+            };
+        }
+
+        // Fall back to standard voice configuration
         const language = voiceSettings.language || WebhookService.DEFAULT_VOICE.language;
         const gender = voiceSettings.gender || WebhookService.DEFAULT_VOICE.gender;
 

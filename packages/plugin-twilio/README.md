@@ -103,6 +103,30 @@ Available voice combinations:
 - Japanese: male (Takumi) or female (Mizuki)
 - Korean: male/female (Seoyeon)
 
+#### Custom Amazon Polly Voices
+You can use any voice available in Amazon Polly by specifying the voice ID directly:
+```json
+{
+    "name": "Your Character",
+    "settings": {
+        "voice": {
+            "custom": "Polly.Aria-Neural"  // Use any Polly voice ID
+        }
+    }
+}
+```
+
+Available Neural Voices:
+- US English: Aria, Ivy, Joanna, Kendra, Ruth
+- British English: Amy, Emma, Brian
+- Australian English: Olivia
+- Indian English: Kajal, Raveena
+- And many more...
+
+See [Amazon Polly's voice list](https://docs.aws.amazon.com/polly/latest/dg/voicelist.html) for all available voices.
+
+Note: Using custom voices requires Twilio's Pay-As-You-Go pricing for Amazon Polly.
+
 ## Prerequisites
 
 - Twilio account with:
