@@ -190,6 +190,18 @@ Note: Do not create a new .env file in the plugin directory. Instead, add these 
 
 ## Webhook Setup
 
+You have two options for webhook URLs:
+
+1. **Development/Testing**: Use ngrok to create a temporary public URL
+   ```bash
+   ngrok http 3004  # Creates URL like https://abc123.ngrok.io
+   ```
+
+2. **Production**: Use your own domain
+   ```env
+   WEBHOOK_BASE_URL=https://your-domain.com  # e.g., https://api.yourapp.com
+   ```
+
 ### Twilio Console Configuration
 1. Go to [Twilio Console](https://console.twilio.com/)
 2. Navigate to Phone Numbers > Manage > Active Numbers
