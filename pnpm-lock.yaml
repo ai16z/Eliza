@@ -1017,7 +1017,7 @@ importers:
         version: 10.0.0
       ai:
         specifier: 3.4.33
-        version: 3.4.33(openai@4.73.0(encoding@0.1.13)(zod@3.23.8))(react@19.0.0)(sswr@2.1.0(svelte@5.17.3))(svelte@5.17.3)(vue@3.5.13(typescript@5.6.3))(zod@3.23.8)
+        version: 3.4.33(openai@4.73.0(encoding@0.1.13)(zod@3.23.8))(react@19.0.0)(sswr@2.1.0(svelte@5.17.4))(svelte@5.17.4)(vue@3.5.13(typescript@5.6.3))(zod@3.23.8)
       anthropic-vertex-ai:
         specifier: 1.0.2
         version: 1.0.2(encoding@0.1.13)(zod@3.23.8)
@@ -2840,7 +2840,7 @@ importers:
         specifier: ^4.18.2
         version: 4.21.1
       twilio:
-        specifier: ^4.19.0
+        specifier: ^4.20.0
         version: 4.23.0
       typeid-ts:
         specifier: ^0.3.0
@@ -2855,6 +2855,9 @@ importers:
       '@types/node':
         specifier: ^20.0.0
         version: 20.17.9
+      '@types/twilio':
+        specifier: ^3.19.3
+        version: 3.19.3
       '@types/uuid':
         specifier: ^9.0.0
         version: 9.0.8
@@ -2871,7 +2874,7 @@ importers:
         specifier: ^4.7.0
         version: 4.19.2
       typescript:
-        specifier: ^5.3.3
+        specifier: ^5.0.0
         version: 5.6.3
 
   packages/plugin-twitter:
@@ -10019,6 +10022,10 @@ packages:
 
   '@types/trusted-types@2.0.7':
     resolution: {integrity: sha512-ScaPdn1dQczgbl0QFTeTOmVHFULt394XJgOQNoyVhZ6r2vLnMLJfBPd53SB52T/3G36VI1/g2MZaX0cwDuXsfw==}
+
+  '@types/twilio@3.19.3':
+    resolution: {integrity: sha512-W53Z0TDCu6clZ5CzTWHRPnpQAad+AANglx6WiQ4Mkxxw21o4BYBx5EhkfR6J4iYqY58rtWB3r8kDGJ4y1uTUGQ==}
+    deprecated: This is a stub types definition. twilio provides its own type definitions, so you do not need this installed.
 
   '@types/unist@2.0.11':
     resolution: {integrity: sha512-CmBKiL6NNo/OqgmMn95Fk9Whlp2mtvIv+KNpQKN2F4SjvrEesubTRWGYSg+BnWZOnlCaSTU1sMpsBOzgbYhnsA==}
@@ -20451,8 +20458,8 @@ packages:
     resolution: {integrity: sha512-ot0WnXS9fgdkgIcePe6RHNk1WA8+muPa6cSjeR3V8K27q9BB1rTE3R1p7Hv0z1ZyAc8s6Vvv8DIyWf681MAt0w==}
     engines: {node: '>= 0.4'}
 
-  svelte@5.17.3:
-    resolution: {integrity: sha512-eLgtpR2JiTgeuNQRCDcLx35Z7Lu9Qe09GPOz+gvtR9nmIZu5xgFd6oFiLGQlxLD0/u7xVyF5AUkjDVyFHe6Bvw==}
+  svelte@5.17.4:
+    resolution: {integrity: sha512-ne4IhhVBwzpUByjo1ocxQnqRoWsRilc9Ry1j+0uPWhHmg4jS/nnlSwYYfx7Ium8okCZ4hYM89rg0B5G0hQzk+g==}
     engines: {node: '>=18'}
 
   svg-parser@2.0.4:
@@ -22796,13 +22803,13 @@ snapshots:
     transitivePeerDependencies:
       - zod
 
-  '@ai-sdk/svelte@0.0.57(svelte@5.17.3)(zod@3.23.8)':
+  '@ai-sdk/svelte@0.0.57(svelte@5.17.4)(zod@3.23.8)':
     dependencies:
       '@ai-sdk/provider-utils': 1.0.22(zod@3.23.8)
       '@ai-sdk/ui-utils': 0.0.50(zod@3.23.8)
-      sswr: 2.1.0(svelte@5.17.3)
+      sswr: 2.1.0(svelte@5.17.4)
     optionalDependencies:
-      svelte: 5.17.3
+      svelte: 5.17.4
     transitivePeerDependencies:
       - zod
 
@@ -34034,6 +34041,13 @@ snapshots:
 
   '@types/trusted-types@2.0.7': {}
 
+  '@types/twilio@3.19.3':
+    dependencies:
+      twilio: 4.23.0
+    transitivePeerDependencies:
+      - debug
+      - supports-color
+
   '@types/unist@2.0.11': {}
 
   '@types/unist@3.0.3': {}
@@ -35551,13 +35565,13 @@ snapshots:
       clean-stack: 2.2.0
       indent-string: 4.0.0
 
-  ai@3.4.33(openai@4.73.0(encoding@0.1.13)(zod@3.23.8))(react@19.0.0)(sswr@2.1.0(svelte@5.17.3))(svelte@5.17.3)(vue@3.5.13(typescript@5.6.3))(zod@3.23.8):
+  ai@3.4.33(openai@4.73.0(encoding@0.1.13)(zod@3.23.8))(react@19.0.0)(sswr@2.1.0(svelte@5.17.4))(svelte@5.17.4)(vue@3.5.13(typescript@5.6.3))(zod@3.23.8):
     dependencies:
       '@ai-sdk/provider': 0.0.26
       '@ai-sdk/provider-utils': 1.0.22(zod@3.23.8)
       '@ai-sdk/react': 0.0.70(react@19.0.0)(zod@3.23.8)
       '@ai-sdk/solid': 0.0.54(zod@3.23.8)
-      '@ai-sdk/svelte': 0.0.57(svelte@5.17.3)(zod@3.23.8)
+      '@ai-sdk/svelte': 0.0.57(svelte@5.17.4)(zod@3.23.8)
       '@ai-sdk/ui-utils': 0.0.50(zod@3.23.8)
       '@ai-sdk/vue': 0.0.59(vue@3.5.13(typescript@5.6.3))(zod@3.23.8)
       '@opentelemetry/api': 1.9.0
@@ -35569,8 +35583,8 @@ snapshots:
     optionalDependencies:
       openai: 4.73.0(encoding@0.1.13)(zod@3.23.8)
       react: 19.0.0
-      sswr: 2.1.0(svelte@5.17.3)
-      svelte: 5.17.3
+      sswr: 2.1.0(svelte@5.17.4)
+      svelte: 5.17.4
       zod: 3.23.8
     transitivePeerDependencies:
       - solid-js
@@ -48212,9 +48226,9 @@ snapshots:
     dependencies:
       minipass: 7.1.2
 
-  sswr@2.1.0(svelte@5.17.3):
+  sswr@2.1.0(svelte@5.17.4):
     dependencies:
-      svelte: 5.17.3
+      svelte: 5.17.4
       swrev: 4.0.0
 
   stable-hash@0.0.4: {}
@@ -48513,7 +48527,7 @@ snapshots:
 
   supports-preserve-symlinks-flag@1.0.0: {}
 
-  svelte@5.17.3:
+  svelte@5.17.4:
     dependencies:
       '@ampproject/remapping': 2.3.0
       '@jridgewell/sourcemap-codec': 1.5.0

@@ -311,7 +311,10 @@ Example bad responses:
 
                     if (messageText) {
                         SafeLogger.info(`Sending SMS to ${fromNumber}: ${messageText}`);
-                        await twilioService.sendMessage(fromNumber, messageText);
+                        await twilioService.sendSms({
+                            to: fromNumber,
+                            body: messageText
+                        });
                     }
 
                     res.type('text/xml');

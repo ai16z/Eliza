@@ -2,7 +2,41 @@
 
 A plugin for Eliza OS that enables SMS and voice call interactions using Twilio.
 
-For more information, visit [Twilio Plugin Documentation](https://www.boolkeys.com/eliza/plugin-twilio/)
+## Important: A2P 10DLC Compliance
+
+If you're sending SMS messages to US numbers, you **must** register for A2P 10DLC (Application-to-Person 10-Digit Long Code). This is a requirement from US carriers for all application-based messaging.
+
+### What is A2P 10DLC?
+- A2P: Application-to-Person messaging (any messages sent from an application)
+- 10DLC: 10-Digit Long Code (standard US phone numbers)
+
+### Who needs to register?
+Anyone using this plugin to send SMS messages to US numbers must register, including:
+- Businesses of any size
+- Individual developers
+- Hobbyists
+
+### Benefits of Registration
+- Lower message filtering
+- Higher throughput rates
+- Avoid additional carrier fees for unregistered traffic
+
+### Registration Process
+1. Determine your type:
+   - Direct Brand (business with Tax ID)
+   - Sole Proprietor (individual/hobbyist)
+   - ISV (software vendor)
+
+2. Choose your Brand type based on volume:
+   - Sole Proprietor: Up to 1,000 SMS/day to T-Mobile
+   - Low Volume Standard: Up to 2,000 SMS/day to T-Mobile
+   - Standard: 2,000+ SMS/day to T-Mobile
+
+3. Register through Twilio Console:
+   - Create a Brand (sender verification)
+   - Create a Campaign (message purpose & opt-in/out details)
+
+For detailed registration instructions, visit [Twilio's A2P 10DLC Documentation](https://www.twilio.com/docs/messaging/compliance/a2p-10dlc).
 
 ## Features
 
@@ -11,9 +45,63 @@ For more information, visit [Twilio Plugin Documentation](https://www.boolkeys.c
 - Configurable voice settings (language, gender)
 - Message sanitization and logging
 - Environment-based configuration
-- Phone number verification
 - Message delivery tracking
 - International number support
+
+## Available Actions
+
+### SEND_SMS
+Sends an SMS message to a specified phone number.
+
+```typescript
+// Example usage:
+"Send SMS to +1234567890: Hello from Eliza!"
+"Text +1234567890: How are you doing?"
+"SMS +1234567890 Let's meet tomorrow"
+```
+
+- **Triggers**: `SEND_SMS`, `SEND_MESSAGE`, `TEXT`, `SMS`
+- **Format**: Include a phone number (with country code) and the message
+- **Validation**: Requires valid phone number in E.164 format (+XXXXXXXXXXX)
+- **Response**: Confirms message delivery with message SID
+
+### CALL_VOICE
+Initiates a voice call to a specified phone number and speaks the provided message.
+
+```typescript
+// Example usage:
+"Call +1234567890 and say: Hello from Eliza!"
+"Make a call to +1234567890 saying Welcome aboard"
+"Dial +1234567890 tell them: The meeting starts in 5 minutes"
+```
+
+- **Triggers**: `CALL_VOICE`, `MAKE_CALL`, `PHONE_CALL`, `DIAL`
+- **Format**: Include a phone number and the message to speak
+- **Validation**: Requires valid phone number in E.164 format (+XXXXXXXXXXX)
+- **Voice Settings**: Uses the voice configuration from character file
+
+### Voice Configuration
+Configure voice settings in your character file:
+```json
+{
+    "name": "Your Character",
+    "settings": {
+        "voice": {
+            "language": "en",  // Available: en, zh, fr, de, es, ja, ko
+            "gender": "male"   // Available: male, female
+        }
+    }
+}
+```
+
+Available voice combinations:
+- English: male (Matthew) or female (Joanna)
+- Chinese: male/female (Zhiyu)
+- French: male (Mathieu) or female (Lea)
+- German: male (Hans) or female (Marlene)
+- Spanish: male (Miguel) or female (Lucia)
+- Japanese: male (Takumi) or female (Mizuki)
+- Korean: male/female (Seoyeon)
 
 ## Prerequisites
 
@@ -78,6 +166,19 @@ Note: Do not create a new .env file in the plugin directory. Instead, add these 
 
 ## Webhook Setup
 
+### Twilio Console Configuration
+1. Go to [Twilio Console](https://console.twilio.com/)
+2. Navigate to Phone Numbers > Manage > Active Numbers
+3. Click on your phone number
+4. Under "Voice & Fax" configuration:
+   - Choose "Webhook" for "Configure With"
+   - For "A Call Comes In", select "Webhook"
+   - Set the URL to: `${WEBHOOK_BASE_URL}/webhook/voice`
+5. Under "Messaging" configuration:
+   - Choose "Webhook" for "Configure With"
+   - For "A Message Comes In", select "Webhook"
+   - Set the URL to: `${WEBHOOK_BASE_URL}/webhook/sms`
+
 ### Local Development
 1. Start your Eliza agent with your configured character:
 ```bash
@@ -94,9 +195,10 @@ ngrok http 3004
 WEBHOOK_BASE_URL=https://your-ngrok-url
 ```
 
-4. The plugin will automatically configure these webhook endpoints in Twilio:
-- SMS: `${WEBHOOK_BASE_URL}/webhook/sms`
-- Voice: `${WEBHOOK_BASE_URL}/webhook/voice`
+4. Update your webhook URLs in Twilio Console with the new ngrok URL
+5. Test your webhooks:
+   - SMS: Send a message to your Twilio number
+   - Voice: Make a call to your Twilio number
 
 ### Server Installation
 1. Set your server's domain in .env:
@@ -120,29 +222,7 @@ location /webhook/ {
 }
 ```
 
-## Voice Configuration
-
-Available voice combinations:
-- English: male (Matthew) or female (Joanna)
-- Chinese: male/female (Zhiyu)
-- French: male (Mathieu) or female (Lea)
-- German: male (Hans) or female (Marlene)
-- Spanish: male (Miguel) or female (Lucia)
-- Japanese: male (Takumi) or female (Mizuki)
-- Korean: male/female (Seoyeon)
-
-Configure voice settings in your character file:
-```json
-{
-    "name": "Assistant",
-    "settings": {
-        "voice": {
-            "language": "en",  // Available: en, zh, fr, de, es, ja, ko
-            "gender": "male"   // Available: male, female
-        }
-    }
-}
-```
+4. Update your webhook URLs in Twilio Console with your domain
 
 ## Development
 

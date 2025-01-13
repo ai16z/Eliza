@@ -6,6 +6,7 @@ import { twilioService } from './services/twilio.js';
 import { webhookConfig } from './config/webhookConfig.js';
 import { webhookHandler } from './services/webhookHandler.js';
 import { SafeLogger } from './utils/logger.js';
+import { actions } from './actions/index.js';
 
 export interface TwilioPlugin extends Plugin {
   webhooks?: {
@@ -15,6 +16,7 @@ export interface TwilioPlugin extends Plugin {
   initialize?: (runtime: any) => Promise<void>;
   version?: string;
   services: any[];
+  actions: any[];
 }
 
 export const plugin: TwilioPlugin = {
@@ -22,6 +24,7 @@ export const plugin: TwilioPlugin = {
   description: 'Twilio plugin for SMS and voice calls',
   version: '0.1.0',
   services: [webhookService, twilioService],
+  actions,
   webhooks: {
     config: webhookConfig,
     handler: webhookHandler

@@ -25,7 +25,7 @@
     "dependencies": {
         "@elizaos/core": "workspace:*",
         "express": "^4.18.2",
-        "twilio": "^4.19.0",
+        "twilio": "^4.20.0",
         "uuid": "^9.0.0",
         "@anthropic-ai/sdk": "^0.18.0",
         "typeid-ts": "^0.3.0"
@@ -38,7 +38,8 @@
         "glob": "^10.0.0",
         "rimraf": "^5.0.5",
         "tsx": "^4.7.0",
-        "typescript": "^5.3.3"
+        "typescript": "^5.0.0",
+        "@types/twilio": "^3.19.3"
     },
     "peerDependencies": {
         "@elizaos/core": "workspace:*"
