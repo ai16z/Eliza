@@ -9,6 +9,7 @@ import {
     GetObjectCommand,
     PutObjectCommand,
     S3Client,
+    S3ClientConfig,
 } from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 import * as fs from "fs";
@@ -48,6 +49,7 @@ export class AwsS3Service extends Service implements IAwsS3Service {
         );
         const AWS_REGION = this.runtime.getSetting("AWS_REGION");
         const AWS_S3_BUCKET = this.runtime.getSetting("AWS_S3_BUCKET");
+        const AWS_S3_ENDPOINT = this.runtime.getSetting("AWS_S3_ENDPOINT");
 
         if (
             !AWS_ACCESS_KEY_ID ||
@@ -58,13 +60,19 @@ export class AwsS3Service extends Service implements IAwsS3Service {
             return false;
         }
 
-        this.s3Client = new S3Client({
+        const clientConfig: S3ClientConfig = {
             region: AWS_REGION,
             credentials: {
                 accessKeyId: AWS_ACCESS_KEY_ID,
                 secretAccessKey: AWS_SECRET_ACCESS_KEY,
             },
-        });
+        };
+        if (AWS_S3_ENDPOINT) {
+            clientConfig.endpoint = AWS_S3_ENDPOINT;
+            clientConfig.forcePathStyle = true;
+        }
+
+        this.s3Client = new S3Client(clientConfig);
         this.bucket = AWS_S3_BUCKET;
         return true;
     }
@@ -117,7 +125,14 @@ export class AwsS3Service extends Service implements IAwsS3Service {
 
             // If not using signed URL, return public access URL
             if (!useSignedUrl) {
-                result.url = `https://${this.bucket}.s3.${process.env.AWS_REGION}.amazonaws.com/${fileName}`;
+                // Use the endpoint directly (e.g., local S3) if a custom value was set
+                if (this.s3Client.config.endpoint) {
+                    const endpoint = await this.s3Client.config.endpoint();
+                    const port = endpoint.port ? `:${endpoint.port}` : "";
+                    result.url = `${endpoint.protocol}//${endpoint.hostname}${port}${endpoint.path}${this.bucket}/${fileName}`;
+                } else {
+                    result.url = `https://${this.bucket}.s3.${process.env.AWS_REGION}.amazonaws.com/${fileName}`;
+                }
             } else {
                 const getObjectCommand = new GetObjectCommand({
                     Bucket: this.bucket,
@@ -239,7 +254,14 @@ export class AwsS3Service extends Service implements IAwsS3Service {
 
             // Return corresponding URL based on requirements
             if (!useSignedUrl) {
-                result.url = `https://${this.bucket}.s3.${process.env.AWS_REGION}.amazonaws.com/${key}`;
+                // Use the endpoint directly (e.g., local S3) if a custom value was set
+                if (this.s3Client.config.endpoint) {
+                    const endpoint = await this.s3Client.config.endpoint();
+                    const port = endpoint.port ? `:${endpoint.port}` : "";
+                    result.url = `${endpoint.protocol}//${endpoint.hostname}${port}${endpoint.path}${this.bucket}/${key}`;
+                } else {
+                    result.url = `https://${this.bucket}.s3.${process.env.AWS_REGION}.amazonaws.com/${key}`;
+                }
             } else {
                 const getObjectCommand = new GetObjectCommand({
                     Bucket: this.bucket,
