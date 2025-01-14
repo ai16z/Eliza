@@ -39,6 +39,7 @@
         "@elizaos/plugin-coingecko": "workspace:*",
         "@elizaos/plugin-coinmarketcap": "workspace:*",
         "@elizaos/plugin-binance": "workspace:*",
+        "@elizaos/plugin-dexscreener": "workspace:*",
         "@elizaos/plugin-avail": "workspace:*",
         "@elizaos/plugin-bootstrap": "workspace:*",
         "@elizaos/plugin-cosmos": "workspace:*",

@@ -220,6 +220,9 @@ importers:
       '@elizaos/plugin-depin':
         specifier: workspace:*
         version: link:../packages/plugin-depin
+      '@elizaos/plugin-dexscreener':
+        specifier: workspace:*
+        version: link:../packages/plugin-dexscreener
       '@elizaos/plugin-echochambers':
         specifier: workspace:*
         version: link:../packages/plugin-echochambers
@@ -1732,6 +1735,18 @@ importers:
       axios:
         specifier: ^1.7.9
         version: 1.7.9(debug@4.4.0)
+      tsup:
+        specifier: 8.3.5
+        version: 8.3.5(@swc/core@1.10.7(@swc/helpers@0.5.15))(jiti@2.4.2)(postcss@8.5.0)(tsx@4.19.2)(typescript@5.7.3)(yaml@2.7.0)
+      whatwg-url:
+        specifier: 7.1.0
+        version: 7.1.0
+
+  packages/plugin-dexscreener:
+    dependencies:
+      '@elizaos/core':
+        specifier: workspace:*
+        version: link:../core
       tsup:
         specifier: 8.3.5
         version: 8.3.5(@swc/core@1.10.7(@swc/helpers@0.5.15))(jiti@2.4.2)(postcss@8.5.0)(tsx@4.19.2)(typescript@5.7.3)(yaml@2.7.0)
@@ -8954,9 +8969,9 @@ packages:
     resolution: {integrity: sha512-JzBqdVIyqm2FRQCulY6nbQzMpJJpSiJ8XXWMhtOX9eKgaXXpfNOF53lzQEjIydlStnd/eFtuC1dW4VYdD93oRg==}
     engines: {node: ^16.14.0 || >=18.0.0}
 
-  '@sigstore/protobuf-specs@0.3.3':
-    resolution: {integrity: sha512-RpacQhBlwpBWd7KEJsRKcBQalbV28fvkxwTOJIqhIuDysMMaJW47V4OqW30iJB9uRpqOSxxEAQFdr8tTattReQ==}
-    engines: {node: ^18.17.0 || >=20.5.0}
+  '@sigstore/protobuf-specs@0.3.2':
+    resolution: {integrity: sha512-c6B0ehIWxMI8wiS/bj6rHMPqeFvngFV7cDU/MY+B16P9Z3Mp9k8L93eYZ7BYzSickzuqAQqAq0V956b3Ju6mLw==}
+    engines: {node: ^16.14.0 || >=18.0.0}
 
   '@sigstore/sign@2.3.2':
     resolution: {integrity: sha512-5Vz5dPVuunIIvC5vBb0APwo7qKA4G9yM48kPWJT+OEERs40md5GoUR1yedwpekWZ4m0Hhw44m6zU+ObsON+iDA==}
@@ -32327,17 +32342,17 @@ snapshots:
 
   '@sigstore/bundle@2.3.2':
     dependencies:
-      '@sigstore/protobuf-specs': 0.3.3
+      '@sigstore/protobuf-specs': 0.3.2
 
   '@sigstore/core@1.1.0': {}
 
-  '@sigstore/protobuf-specs@0.3.3': {}
+  '@sigstore/protobuf-specs@0.3.2': {}
 
   '@sigstore/sign@2.3.2':
     dependencies:
       '@sigstore/bundle': 2.3.2
       '@sigstore/core': 1.1.0
-      '@sigstore/protobuf-specs': 0.3.3
+      '@sigstore/protobuf-specs': 0.3.2
       make-fetch-happen: 13.0.1
       proc-log: 4.2.0
       promise-retry: 2.0.1
@@ -32346,7 +32361,7 @@ snapshots:
 
   '@sigstore/tuf@2.3.4':
     dependencies:
-      '@sigstore/protobuf-specs': 0.3.3
+      '@sigstore/protobuf-specs': 0.3.2
       tuf-js: 2.2.1
     transitivePeerDependencies:
       - supports-color
@@ -32355,7 +32370,7 @@ snapshots:
     dependencies:
       '@sigstore/bundle': 2.3.2
       '@sigstore/core': 1.1.0
-      '@sigstore/protobuf-specs': 0.3.3
+      '@sigstore/protobuf-specs': 0.3.2
 
   '@simplewebauthn/typescript-types@7.4.0': {}
 
@@ -48220,7 +48235,7 @@ snapshots:
     dependencies:
       '@sigstore/bundle': 2.3.2
       '@sigstore/core': 1.1.0
-      '@sigstore/protobuf-specs': 0.3.3
+      '@sigstore/protobuf-specs': 0.3.2
       '@sigstore/sign': 2.3.2
       '@sigstore/tuf': 2.3.4
       '@sigstore/verify': 1.2.1
