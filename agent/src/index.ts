@@ -91,7 +91,7 @@ import { letzAIPlugin } from "@elizaos/plugin-letzai";
 import { thirdwebPlugin } from "@elizaos/plugin-thirdweb";
 import { hyperliquidPlugin } from "@elizaos/plugin-hyperliquid";
 import { zksyncEraPlugin } from "@elizaos/plugin-zksync-era";
-
+import { raggraphPlugin } from "@elizaos/plugin-raggraph";
 import { OpacityAdapter } from "@elizaos/plugin-opacity";
 import { openWeatherPlugin } from "@elizaos/plugin-open-weather";
 import { stargazePlugin } from "@elizaos/plugin-stargaze";
@@ -875,6 +875,11 @@ export async function createAgent(
                 : null,
             getSecret(character, "OPEN_WEATHER_API_KEY")
                 ? openWeatherPlugin
+                : null,
+            getSecret(character, "NEO4J_URI") &&
+            getSecret(character, "NEO4J_USER") &&
+            getSecret(character, "NEO4J_PASSWORD")
+                ? raggraphPlugin
                 : null,
             getSecret(character, "OBSIDIAN_API_TOKEN") ? obsidianPlugin : null,
             getSecret(character, "ARTHERA_PRIVATE_KEY")?.startsWith("0x")
