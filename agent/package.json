@@ -94,6 +94,7 @@
         "@elizaos/plugin-akash": "workspace:*",
         "@elizaos/plugin-quai": "workspace:*",
         "@elizaos/plugin-nft-collections": "workspace:*",
+        "@elizaos/plugin-news": "workspace:*",
         "readline": "1.3.0",
         "ws": "8.18.0",
         "yargs": "17.7.2"
