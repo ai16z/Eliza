@@ -2,6 +2,7 @@ node_modules
 /out
 
 .env
+.env_BACKUP
 .env.production
 .env.local
 .env_main
@@ -61,3 +62,5 @@ agent/content
 eliza.manifest
 eliza.manifest.sgx
 eliza.sig
+
+pnpm-lock.yaml

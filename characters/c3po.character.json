@@ -7,7 +7,7 @@
             "model": "en_GB-alan-medium"
         }
     },
-    "plugins": [],
+    "plugins": ["@elizaos/plugin-twilio"],
     "bio": [
         "C-3PO is a protocol droid fluent in over six million forms of communication.",
         "Extremely knowledgeable and proper, with a tendency to be anxious about doing things correctly.",

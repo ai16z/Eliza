@@ -1,6 +1,6 @@
 //  /packages/plugin-twilio/src/services/webhook.ts
 
-import { Service, ServiceType, IAgentRuntime, KnowledgeItem, Content } from '@elizaos/core';
+import { Service, ServiceType, IAgentRuntime, KnowledgeItem, HandlerCallback, Content, Memory, State } from '@elizaos/core';
 import express from 'express';
 import { twilioService } from './twilio.js';
 import twilio from 'twilio';
@@ -12,6 +12,7 @@ import type { Server } from 'http';
 import type { Say } from 'twilio/lib/twiml/VoiceResponse';
 import type { Gather } from 'twilio/lib/twiml/VoiceResponse';
 import { v4 as uuidv4 } from 'uuid';
+import { elevenLabsService } from './elevenlabs.js';
 
 // Add UUID type at the top
 type UUID = string;
@@ -62,9 +63,58 @@ interface VoiceConfig {
     recognitionLanguage: Gather['language'];
 }
 
+// Add at the top with other interfaces
+interface RuntimeResponse extends Memory {
+    content: {
+        text: string;
+        type: string;
+        action: string;
+    };
+}
+
+// Add these interfaces at the top of the file
+interface TextResponse {
+    text: string;
+    type?: string;
+    action?: string;
+}
+
+interface ContentResponse {
+    content: {
+        text: string;
+        type?: string;
+        action?: string;
+    };
+}
+
+// Add at the top with other interfaces
+interface TwilioMemory extends Memory {
+    metadata?: {
+        source: string;
+        timestamp: number;
+    };
+}
+
+// Add this interface at the top of the file
+interface ActionResponse {
+    content?: {
+        text?: string;
+    } | string;
+    text?: string;
+}
+
+// Add conversation memory interface
+interface ConversationMemory {
+    messages: Array<{
+        role: 'user' | 'assistant';
+        content: string;
+    }>;
+    lastActivity: number;
+}
+
 export class WebhookService implements Service {
     readonly serviceType = ServiceType.TEXT_GENERATION;
-    private app: express.Express;
+    private app: express.Application;
     private server: Server | null = null;
     private runtime: IAgentRuntime | null = null;
     private static readonly BASE_PORT = 3003;
@@ -74,6 +124,9 @@ export class WebhookService implements Service {
     private knowledge: KnowledgeItem[] = [];
     private static instance: WebhookService | null = null;
     private initialized = false;
+    private audioHandler: { addAudio: (buffer: Buffer) => string };
+    private conversations = new Map<string, ConversationMemory>();
+    private readonly CONVERSATION_TIMEOUT = 30 * 60 * 1000; // 30 minutes
 
     private static readonly SMS_LENGTH_RULES = {
         IDEAL: 160,
@@ -132,12 +185,24 @@ export class WebhookService implements Service {
         }
     };
 
+    // Add conversation cleanup
+    private cleanupInterval = setInterval(() => {
+        const now = Date.now();
+        for (const [callSid, memory] of this.conversations.entries()) {
+            if (now - memory.lastActivity > this.CONVERSATION_TIMEOUT) {
+                this.conversations.delete(callSid);
+                SafeLogger.info(`Cleaned up inactive conversation: ${callSid}`);
+            }
+        }
+    }, 5 * 60 * 1000); // Cleanup every 5 minutes
+
     // Make constructor private for singleton pattern
     private constructor() {
         this.app = express();
         this.anthropic = new Anthropic({
             apiKey: validateApiKey(process.env.ANTHROPIC_API_KEY)
         });
+        this.audioHandler = this.setupAudioRoute();
         this.setupMiddleware();
     }
 
@@ -220,7 +285,7 @@ export class WebhookService implements Service {
             // Start the server
             this.server = this.app.listen(port, () => {
                 SafeLogger.info('═══════════════════════════════════');
-                SafeLogger.info('🌐 Twilio Webhook Server Status');
+                SafeLogger.info('🌐 Twilio Webhook Server Status 🌐');
                 SafeLogger.info('═══════════════════════════════════');
                 SafeLogger.info(`✅ Server running on port: ${port}`);
                 SafeLogger.info(`🏥 Health check: http://localhost:${port}/health`);
@@ -329,191 +394,293 @@ Example bad responses:
         );
     }
 
-    private setupVoiceWebhook() {
-        this.app.post('/webhook/voice',
-            express.urlencoded({ extended: true }),
-            async (req, res) => {
-                try {
-                    this.ensureTwilioInitialized();
-                    const { CallSid, From: fromNumber } = req.body;
-                    SafeLogger.info(`Received voice call from ${fromNumber}, CallSid: ${CallSid}`);
+    private setupAudioRoute() {
+        const audioBuffers = new Map<string, Buffer>();
 
-                    const characterConfig = await this.loadCharacterConfig();
-                    const characterName = characterConfig.name || 'AI Assistant';
-
-                    // Get voice config from character config or use default
-                    const voiceConfig = this.getVoiceConfig(characterConfig);
-
-                    const greeting = `Hello! I'm ${characterName}. How may I assist you today?`;
-                    SafeLogger.info(`Sending greeting for call ${CallSid}: "${greeting}"`);
-
-                    const twiml = new twilio.twiml.VoiceResponse();
-                    twiml.say({
-                        voice: voiceConfig.voice,
-                        language: voiceConfig.language
-                    }, greeting);
-
-                    twiml.gather({
-                        input: ['speech'],
-                        action: '/webhook/voice/transcribe',
-                        method: 'POST',
-                        language: voiceConfig.recognitionLanguage
-                    });
-
-                    res.type('text/xml');
-                    res.send(twiml.toString());
-                } catch (error) {
-                    SafeLogger.error(`Error handling voice call ${req.body?.CallSid}:`, error);
-                    const twiml = new twilio.twiml.VoiceResponse();
-                    twiml.say('Sorry, I had trouble understanding that. Let\'s try again!');
-                    twiml.redirect('/webhook/voice');
-                    res.type('text/xml');
-                    res.send(twiml.toString());
-                }
+        this.app.get('/audio/:id', (req, res) => {
+            const buffer = audioBuffers.get(req.params.id);
+            if (!buffer) {
+                res.status(404).send('Audio not found');
+                return;
             }
-        );
+            res.type('audio/mpeg');
+            res.send(buffer);
+        });
 
-        this.app.post('/webhook/voice/transcribe',
-            express.urlencoded({ extended: true }),
-            async (req, res) => {
-                try {
-                    this.ensureTwilioInitialized();
-                    const { CallSid, SpeechResult: transcription } = req.body;
-                    SafeLogger.info(`Received transcription for call ${CallSid}: "${transcription}"`);
-
-                    if (!transcription) {
-                        throw new Error('No transcription received');
-                    }
-
-                    const characterConfig = await this.loadCharacterConfig();
-                    const characterName = characterConfig.name || 'AI Assistant';
-                    SafeLogger.info(`Using character: ${characterName} for transcription ${CallSid}`);
-
-                    const voiceSystemPrompt = `${characterConfig.config.systemPrompt}
-
-CRITICAL VOICE RESPONSE RULES (MUST FOLLOW):
-1. NEVER START WITH PHRASES LIKE:
-   - "Here is a response from..."
-   - "From my perspective..."
-   - "Let me tell you..."
-   - "I would say that..."
-   - "Here's what I think..."
-2. START YOUR RESPONSE DIRECTLY WITH THE CONTENT
-3. KEEP RESPONSES SHORT AND CONCISE (30-60 WORDS)
-4. NO META-COMMENTARY OR ROLEPLAY
-5. NO ACTION DESCRIPTIONS
-6. NO LENGTHY INTRODUCTIONS
-7. GET STRAIGHT TO THE POINT
-8. USE SIMPLE, CLEAR LANGUAGE
-
-Example good responses:
-✅ "The economy grew 6.3% last quarter, showing strong momentum."
-✅ "Our initiative has connected 140 partner organizations worldwide."
-
-Example bad responses:
-❌ "Here is my response about the economy..."
-❌ "Let me share my thoughts on this topic..."
-❌ "From my perspective as a leader..."
-❌ "I would say that our progress..."`;
-
-                    const response = await this.anthropic.messages.create({
-                        model: characterConfig.config.model,
-                        max_tokens: 1024,
-                        temperature: characterConfig.config.temperature,
-                        system: voiceSystemPrompt,
-                        messages: [{
-                            role: 'user',
-                            content: transcription
-                        }]
-                    });
-
-                    const aiResponse = response.content[0]?.type === 'text' ? response.content[0].text : '';
-                    SafeLogger.info(`AI response for call ${CallSid}: "${aiResponse}"`);
-
-                    const voiceConfig = this.getVoiceConfig(characterConfig);
-
-                    const twiml = new twilio.twiml.VoiceResponse();
-                    twiml.say({
-                        voice: voiceConfig.voice,
-                        language: voiceConfig.language
-                    }, aiResponse);
-
-                    twiml.gather({
-                        input: ['speech'],
-                        action: '/webhook/voice/transcribe',
-                        method: 'POST',
-                        language: voiceConfig.recognitionLanguage
-                    });
-
-                    res.type('text/xml');
-                    res.send(twiml.toString());
-                    SafeLogger.info(`Successfully processed transcription for call ${CallSid}`);
-
-                } catch (error) {
-                    SafeLogger.error(`Error processing transcription for call ${req.body?.CallSid}:`, error);
-                    try {
-                        // Get character config and voice config for error response
-                        const characterConfig = await this.loadCharacterConfig();
-                        const voiceConfig = this.getVoiceConfig(characterConfig);
-
-                        const twiml = new twilio.twiml.VoiceResponse();
-                        twiml.say({
-                            voice: voiceConfig.voice,
-                            language: voiceConfig.language
-                        }, 'I apologize, but I had trouble understanding that. Could you please repeat?');
-
-                        twiml.gather({
-                            input: ['speech'],
-                            action: '/webhook/voice/transcribe',
-                            method: 'POST',
-                            language: voiceConfig.recognitionLanguage
-                        });
-
-                        res.type('text/xml');
-                        res.send(twiml.toString());
-                    } catch (configError) {
-                        // Fallback to default response if we can't load voice config
-                        const twiml = new twilio.twiml.VoiceResponse();
-                        twiml.say('I apologize, but I had trouble understanding that. Could you please repeat?');
-                        twiml.gather({
-                            input: ['speech'],
-                            action: '/webhook/voice/transcribe',
-                            method: 'POST'
-                        });
-                        res.type('text/xml');
-                        res.send(twiml.toString());
-                    }
-                }
+        return {
+            addAudio: (buffer: Buffer): string => {
+                const id = uuidv4();
+                audioBuffers.set(id, buffer);
+                setTimeout(() => audioBuffers.delete(id), 5 * 60 * 1000);
+                const baseUrl = process.env.WEBHOOK_BASE_URL || `http://localhost:${process.env.WEBHOOK_PORT || 3004}`;
+                return `${baseUrl}/audio/${id}`;
             }
-        );
+        };
     }
 
-    private async loadCharacterConfig() {
-        const characterFile = process.env.TWILIO_CHARACTER ||
-            (this.runtime?.agentId ? `${this.runtime.agentId}.character.json` : null);
+    private async generateSpeech(text: string, characterConfig: any): Promise<twilio.twiml.VoiceResponse> {
+        const twiml = new twilio.twiml.VoiceResponse();
 
-        if (!characterFile) {
-            throw new Error('No character file specified - set TWILIO_CHARACTER in .env');
+        // Increase chunk size for more natural speech flow
+        const chunks = this.splitIntoChunks(text, 300); // Increased from 150 to 300
+
+        // Add initial pause for stability
+        twiml.pause({ length: 0.3 });
+
+        for (const chunk of chunks) {
+            if (characterConfig.settings?.voice?.useElevenLabs) {
+                try {
+                    const audioBuffer = await elevenLabsService.textToSpeech(chunk, {
+                        voiceId: characterConfig.settings.voice.elevenLabsVoiceId,
+                        stability: characterConfig.settings.voice.elevenLabsSettings?.stability || 0.5,
+                        similarityBoost: characterConfig.settings.voice.elevenLabsSettings?.similarityBoost || 0.8,
+                        style: characterConfig.settings.voice.elevenLabsSettings?.style || 0.5,
+                        useSpeakerBoost: characterConfig.settings.voice.elevenLabsSettings?.useSpeakerBoost || false
+                    });
+
+                    if (audioBuffer) {
+                        const audioUrl = this.audioHandler.addAudio(audioBuffer);
+                        SafeLogger.info(`Generated audio URL: ${audioUrl}`);
+                        twiml.play(audioUrl);
+                        // Add a tiny pause between chunks for natural flow
+                        twiml.pause({ length: 0.2 });
+                        continue;
+                    }
+                } catch (error) {
+                    SafeLogger.warn('ElevenLabs generation failed, falling back to Twilio TTS:', error);
+                }
+            }
+
+            // Fallback to Twilio TTS
+            const voiceConfig = this.getVoiceConfig(characterConfig);
+            twiml.say({
+                voice: voiceConfig.voice,
+                language: voiceConfig.language
+            }, chunk);
+            twiml.pause({ length: 0.2 });
         }
 
-        const projectRoot = path.resolve(process.cwd(), '..');
-        const configPath = path.join(projectRoot, 'characters', characterFile);
+        return twiml;
+    }
 
+    private splitIntoChunks(text: string, maxLength: number): string[] {
+        // Split on sentence boundaries
+        const sentences = text.match(/[^.!?]+[.!?]+/g) || [text];
+        const chunks: string[] = [];
+        let currentChunk = '';
+
+        for (const sentence of sentences) {
+            // Clean the sentence
+            const cleanSentence = sentence.trim();
+
+            // If sentence is too long, split on commas
+            if (cleanSentence.length > maxLength) {
+                const parts = cleanSentence.split(/,(?=\s)/);
+                for (const part of parts) {
+                    if (currentChunk.length + part.length > maxLength) {
+                        if (currentChunk) chunks.push(currentChunk.trim());
+                        currentChunk = part;
+                    } else {
+                        currentChunk += (currentChunk ? ', ' : '') + part;
+                    }
+                }
+            } else {
+                if (currentChunk.length + cleanSentence.length > maxLength) {
+                    chunks.push(currentChunk.trim());
+                    currentChunk = cleanSentence;
+                } else {
+                    currentChunk += (currentChunk ? ' ' : '') + cleanSentence;
+                }
+            }
+        }
+
+        if (currentChunk) chunks.push(currentChunk.trim());
+
+        // Log chunk info for debugging
+        SafeLogger.info(`Split text into ${chunks.length} chunks:`,
+            chunks.map((chunk, i) => `Chunk ${i + 1}: ${chunk.length} chars`));
+
+        return chunks;
+    }
+
+    private setupVoiceWebhook() {
+        // Initial call handler
+        this.app.post('/webhook/voice', async (req, res) => {
+            try {
+                const { CallSid } = req.body;
+                SafeLogger.info('New call received:', { CallSid });
+
+                // Load character and generate greeting
+                const config = await this.loadCharacterConfig();
+                const greeting = `Hello! I'm ${config.name}. How may I assist you today?`;
+
+                // Generate voice response with null check
+                const audioBuffer = await elevenLabsService.textToSpeech(greeting, {
+                    voiceId: config.settings?.voice?.elevenLabsVoiceId,
+                    stability: 0.5,
+                    similarityBoost: 0.8
+                });
+
+                if (!audioBuffer) {
+                    throw new Error('Failed to generate audio');
+                }
+
+                // Create TwiML
+                const twiml = new twilio.twiml.VoiceResponse();
+                const audioUrl = this.audioHandler.addAudio(audioBuffer);
+                twiml.play(audioUrl);
+
+                // Add gather for user input
+                twiml.gather({
+                    input: ['speech'],
+                    action: '/webhook/voice/response',
+                    method: 'POST',
+                    speechTimeout: 'auto',
+                    language: 'en-US'
+                });
+
+                res.type('text/xml');
+                res.send(twiml.toString());
+            } catch (error) {
+                SafeLogger.error('Voice error:', error);
+                this.handleVoiceError(res);
+            }
+        });
+
+        // Handle ongoing conversation
+        this.app.post('/webhook/voice/response', async (req, res) => {
+            try {
+                const { CallSid, SpeechResult } = req.body;
+
+                // Get or create conversation memory
+                let conversation = this.conversations.get(CallSid);
+                if (!conversation) {
+                    conversation = {
+                        messages: [],
+                        lastActivity: Date.now()
+                    };
+                    this.conversations.set(CallSid, conversation);
+                }
+
+                // Update conversation with user message
+                conversation.messages.push({
+                    role: 'user',
+                    content: SpeechResult
+                });
+                conversation.lastActivity = Date.now();
+
+                // Get response from Anthropic with conversation history
+                const config = await this.loadCharacterConfig();
+                const response = await this.anthropic.messages.create({
+                    model: 'claude-3-sonnet-20240229',
+                    max_tokens: 150,
+                    messages: [
+                        { role: 'assistant', content: `You are ${config.name}. Keep responses under 50 words.` },
+                        ...conversation.messages // Now the types match
+                    ]
+                });
+
+                const responseText = response.content[0].text;
+
+                // Update conversation with assistant response
+                conversation.messages.push({
+                    role: 'assistant',
+                    content: responseText
+                });
+
+                // Generate voice response with null check
+                const audioBuffer = await elevenLabsService.textToSpeech(responseText, {
+                    voiceId: config.settings?.voice?.elevenLabsVoiceId,
+                    stability: 0.5,
+                    similarityBoost: 0.8
+                });
+
+                if (!audioBuffer) {
+                    throw new Error('Failed to generate audio');
+                }
+
+                const audioUrl = this.audioHandler.addAudio(audioBuffer);
+
+                // Create TwiML
+                const twiml = new twilio.twiml.VoiceResponse();
+                twiml.play(audioUrl);
+
+                // Add gather for next input
+                twiml.gather({
+                    input: ['speech'],
+                    action: '/webhook/voice/response',
+                    method: 'POST',
+                    speechTimeout: 'auto',
+                    language: 'en-US'
+                });
+
+                res.type('text/xml');
+                res.send(twiml.toString());
+            } catch (error) {
+                SafeLogger.error('Voice response error:', error);
+                this.handleVoiceError(res);
+            }
+        });
+    }
+
+    // Simple error handler
+    private handleVoiceError(res: express.Response) {
+        const twiml = new twilio.twiml.VoiceResponse();
+        twiml.say("I'm sorry, I encountered an error. Please try again.");
+        twiml.gather({
+            input: ['speech'],
+            action: '/webhook/voice/response',
+            method: 'POST',
+            speechTimeout: 'auto'
+        });
+        res.type('text/xml');
+        res.send(twiml.toString());
+    }
+
+    private async loadCharacterConfig(): Promise<any> {
         try {
-            const configData = await fs.readFile(configPath, 'utf-8');
-            const rawConfig = JSON.parse(configData);
+            const characterFile = process.env.TWILIO_CHARACTER;
+            if (!characterFile) {
+                throw new Error('TWILIO_CHARACTER not set in environment');
+            }
 
+            // Get the project root directory (one level up from 'agent')
+            const projectRoot = process.cwd().replace(/\/agent$/, '');
+
+            // Log the character loading process
+            SafeLogger.info('Loading character configuration:', {
+                characterFile,
+                projectRoot,
+                expectedPath: path.join(projectRoot, 'characters', characterFile)
+            });
+
+            const characterPath = path.join(projectRoot, 'characters', characterFile);
+            const characterData = await fs.readFile(characterPath, 'utf-8');
+            const config = JSON.parse(characterData);
+
+            // Validate voice settings
+            SafeLogger.info('Character configuration loaded:', {
+                name: config.name,
+                hasSettings: !!config.settings,
+                hasVoice: !!config.settings?.voice,
+                voiceSettings: config.settings?.voice,
+                useElevenLabs: config.settings?.voice?.useElevenLabs,
+                voiceId: config.settings?.voice?.elevenLabsVoiceId
+            });
+
+            return config;
+        } catch (error) {
+            SafeLogger.error('Failed to load character configuration:', error);
+            // Return a default configuration
             return {
-                name: rawConfig.name,
-                config: {
-                    model: rawConfig.config?.model || rawConfig.settings?.model || 'claude-3-sonnet-20240229',
-                    temperature: rawConfig.config?.temperature || 0.7,
-                    systemPrompt: rawConfig.config?.systemPrompt || this.generateSystemPrompt(rawConfig)
+                name: 'AI Assistant',
+                settings: {
+                    voice: {
+                        language: 'en',
+                        gender: 'male'
+                    }
                 }
             };
-        } catch (error) {
-            SafeLogger.error(`Failed to load character from: ${configPath}`, error);
-            throw error;
         }
     }
 
@@ -523,29 +690,27 @@ Example bad responses:
         const bio = Array.isArray(rawConfig.bio) ? rawConfig.bio.join('\n') : '';
         const knowledge = Array.isArray(rawConfig.knowledge) ? rawConfig.knowledge.join('\n') : '';
         const style = rawConfig.style?.all ? rawConfig.style.all.join('\n') : '';
-
-        // Use the loaded knowledge items instead of trying to access ragKnowledge
         const additionalKnowledge = this.knowledge.map(k => k.content).join('\n');
 
-        let systemPrompt = `You are ${name}`;
+        let systemPrompt = `You are ${name}. You must provide concise responses in 1-2 short sentences. Keep your responses under 50 words.`;
 
         if (bio) {
-            systemPrompt += `, with the following characteristics:\n\n${bio}`;
+            systemPrompt += `, with these key traits:\n\n${bio}`;
         }
 
         if (knowledge) {
-            systemPrompt += `\n\nYour knowledge includes:\n${knowledge}`;
+            systemPrompt += `\n\nCore knowledge areas:\n${knowledge}`;
         }
 
         if (style) {
-            systemPrompt += `\n\nYour communication style:\n${style}`;
+            systemPrompt += `\n\nCommunication style:\n${style}`;
         }
 
         if (additionalKnowledge) {
             systemPrompt += `\n\nAdditional context:\n${additionalKnowledge}`;
         }
 
-        systemPrompt += `\n\nAlways stay in character and respond as ${name} would.`;
+        systemPrompt += `\n\nAlways stay in character as ${name}, but keep responses brief and to the point. Never exceed 2 sentences or 50 words.`;
 
         return systemPrompt;
     }
@@ -580,6 +745,134 @@ Example bad responses:
 
         const voiceKey = `${language}-${gender}`;
         return WebhookService.VOICE_CONFIG[voiceKey] || WebhookService.VOICE_CONFIG.default;
+    }
+
+    private async processTranscription(transcription: string): Promise<string> {
+        if (!this.runtime) {
+            SafeLogger.error('Runtime not initialized');
+            return "I apologize, but my core processing system isn't ready.";
+        }
+
+        try {
+            const defaultUUID = '00000000-0000-0000-0000-000000000000' as const;
+            const message: Memory = {
+                content: {
+                    text: transcription,
+                    type: 'text',
+                    action: 'CONTINUE',
+                    role: 'user',
+                    metadata: { source: 'twilio', timestamp: Date.now() }
+                },
+                userId: defaultUUID,
+                agentId: this.runtime.agentId || defaultUUID,
+                roomId: defaultUUID
+            };
+
+            const characterConfig = await this.loadCharacterConfig();
+            const systemPrompt = this.generateSystemPrompt(characterConfig);
+
+            const state: State = {
+                bio: characterConfig.bio || [],
+                lore: characterConfig.lore || [],
+                messageDirections: characterConfig.messageDirections || [],
+                postDirections: characterConfig.postDirections || [],
+                systemPrompt,
+                character: characterConfig,
+                settings: characterConfig.settings || {},
+                roomId: defaultUUID,
+                actors: JSON.stringify([{
+                    id: this.runtime.agentId || defaultUUID,
+                    name: characterConfig.name,
+                    role: 'assistant'
+                }]),
+                recentMessages: JSON.stringify([message]),
+                recentMessagesData: [message],
+                metadata: { source: 'twilio', timestamp: Date.now() }
+            };
+
+            return new Promise<string>((resolve) => {
+                const messageQueue: Memory[] = [];
+                let hasResolved = false;
+                const TIMEOUT = 30000; // Reduce to 30 seconds
+
+                // Add early response check
+                const earlyCheck = setTimeout(() => {
+                    if (!hasResolved && messageQueue.length > 0) {
+                        const lastMessage = messageQueue[messageQueue.length - 1];
+                        if (lastMessage?.content?.text) {
+                            hasResolved = true;
+                            resolve(lastMessage.content.text);
+                            return;
+                        }
+                    }
+                }, 5000); // Check after 5 seconds
+
+                const timeout = setTimeout(() => {
+                    if (!hasResolved) {
+                        SafeLogger.warn('ProcessActions timeout reached, falling back to Anthropic');
+                        hasResolved = true;
+                        clearTimeout(earlyCheck);
+
+                        // Fallback to Anthropic
+                        this.anthropic.messages.create({
+                            model: 'claude-3-sonnet-20240229',
+                            max_tokens: 1024,
+                            messages: [
+                                { role: 'assistant', content: systemPrompt },
+                                { role: 'user', content: transcription }
+                            ]
+                        }).then(response => {
+                            resolve(response.content[0].text);
+                        }).catch(error => {
+                            SafeLogger.error('Anthropic fallback failed:', error);
+                            resolve("I'm having trouble processing that. Could you please try again?");
+                        });
+                    }
+                }, TIMEOUT);
+
+                this.runtime!.processActions(
+                    message,
+                    messageQueue,
+                    state,
+                    async (response: Content): Promise<Memory[]> => {
+                        if (!hasResolved && response?.text) {
+                            hasResolved = true;
+                            clearTimeout(timeout);
+                            clearTimeout(earlyCheck);
+                            resolve(response.text);
+                        }
+
+                        const memoryResponse: Memory = {
+                            userId: defaultUUID,
+                            agentId: this.runtime?.agentId || defaultUUID,
+                            content: {
+                                text: response?.text || '',
+                                type: response?.type || 'text',
+                                action: response?.action || 'CONTINUE',
+                                role: 'assistant',
+                                metadata: {
+                                    source: 'twilio',
+                                    timestamp: Date.now(),
+                                    processId: this.runtime?.agentId
+                                }
+                            },
+                            roomId: defaultUUID
+                        };
+
+                        messageQueue.push(memoryResponse);
+                        return [memoryResponse];
+                    }
+                ).catch(error => {
+                    SafeLogger.error('ProcessActions error:', error);
+                    clearTimeout(timeout);
+                    resolve("I apologize, but I encountered an error processing your request.");
+                });
+            });
+
+        } catch (error) {
+            SafeLogger.error('Processing error:', error);
+            return "I apologize, but I encountered an error. Could you please try again?";
+        }
     }
 }
 

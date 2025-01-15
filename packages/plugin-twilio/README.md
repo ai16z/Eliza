@@ -1,87 +1,85 @@
 # Eliza OS - Twilio Plugin
 
-A plugin for Eliza OS that enables SMS and voice call interactions using Twilio.
+A plugin for Eliza OS that enables SMS and voice call interactions using Twilio, with support for ElevenLabs and Amazon Polly voice synthesis.
 
-## Important: A2P 10DLC Compliance
+## Setup
 
-If you're sending SMS messages to US numbers, you **must** register for A2P 10DLC (Application-to-Person 10-Digit Long Code). This is a requirement from US carriers for all application-based messaging.
+### 1. Environment Configuration
 
-### What is A2P 10DLC?
-- A2P: Application-to-Person messaging (any messages sent from an application)
-- 10DLC: 10-Digit Long Code (standard US phone numbers)
+Create a `.env` file in your project root or copy from `.env.example`:
 
-### Who needs to register?
-Anyone using this plugin to send SMS messages to US numbers must register, including:
-- Businesses of any size
-- Individual developers
-- Hobbyists
+```env
+# Twilio Configuration
+TWILIO_ACCOUNT_SID=your_account_sid
+TWILIO_AUTH_TOKEN=your_auth_token
+TWILIO_PHONE_NUMBER=your_twilio_phone_number
+TWILIO_CHARACTER=your-character.json
 
-### Benefits of Registration
-- Lower message filtering
-- Higher throughput rates
-- Avoid additional carrier fees for unregistered traffic
+# Webhook Configuration
+WEBHOOK_PORT=3004
+WEBHOOK_BASE_URL=your_webhook_url  # See webhook URL configuration below
 
-### Registration Process
-1. Determine your type:
-   - Direct Brand (business with Tax ID)
-   - Sole Proprietor (individual/hobbyist)
-   - ISV (software vendor)
-
-2. Choose your Brand type based on volume:
-   - Sole Proprietor: Up to 1,000 SMS/day to T-Mobile
-   - Low Volume Standard: Up to 2,000 SMS/day to T-Mobile
-   - Standard: 2,000+ SMS/day to T-Mobile
-
-3. Register through Twilio Console:
-   - Create a Brand (sender verification)
-   - Create a Campaign (message purpose & opt-in/out details)
-
-For detailed registration instructions, visit [Twilio's A2P 10DLC Documentation](https://www.twilio.com/docs/messaging/compliance/a2p-10dlc).
-
-## Features
-
-- SMS messaging support
-- Voice call support with text-to-speech
-- Configurable voice settings (language, gender)
-- Message sanitization and logging
-- Environment-based configuration
-- Message delivery tracking
-- International number support
-
-## Available Actions
-
-### SEND_SMS
-Sends an SMS message to a specified phone number.
-
-```typescript
-// Example usage:
-"Send SMS to +1234567890: Hello from Eliza!"
-"Text +1234567890: How are you doing?"
-"SMS +1234567890 Let's meet tomorrow"
+# ElevenLabs Configuration (Optional)
+ELEVENLABS_XI_API_KEY=your_elevenlabs_api_key
+ELEVENLABS_MODEL_ID=eleven_multilingual_v2
+ELEVENLABS_VOICE_ID=21m00Tcm4TlvDq8ikWAM
+ELEVENLABS_VOICE_STABILITY=0.5
+ELEVENLABS_VOICE_SIMILARITY_BOOST=0.9
+ELEVENLABS_VOICE_STYLE=0.66
+ELEVENLABS_VOICE_USE_SPEAKER_BOOST=false
+ELEVENLABS_OPTIMIZE_STREAMING_LATENCY=4
+ELEVENLABS_OUTPUT_FORMAT=pcm_16000
 ```
 
-- **Triggers**: `SEND_SMS`, `SEND_MESSAGE`, `TEXT`, `SMS`
-- **Format**: Include a phone number (with country code) and the message
-- **Validation**: Requires valid phone number in E.164 format (+XXXXXXXXXXX)
-- **Response**: Confirms message delivery with message SID
+### Webhook URL Configuration
 
-### CALL_VOICE
-Initiates a voice call to a specified phone number and speaks the provided message.
+The `WEBHOOK_BASE_URL` needs to be a publicly accessible URL that Twilio can reach. You have two options:
 
-```typescript
-// Example usage:
-"Call +1234567890 and say: Hello from Eliza!"
-"Make a call to +1234567890 saying Welcome aboard"
-"Dial +1234567890 tell them: The meeting starts in 5 minutes"
+#### Local Development
+For local development, use ngrok to create a secure tunnel:
+1. Install ngrok: `npm install -g ngrok` or download from [ngrok.com](https://ngrok.com)
+2. Start ngrok: `ngrok http 3004`
+3. Copy the HTTPS URL (e.g., `https://abc123.ngrok.io`)
+4. Set in your .env:
+```env
+WEBHOOK_BASE_URL=https://abc123.ngrok.io  # Replace with your ngrok URL
 ```
 
-- **Triggers**: `CALL_VOICE`, `MAKE_CALL`, `PHONE_CALL`, `DIAL`
-- **Format**: Include a phone number and the message to speak
-- **Validation**: Requires valid phone number in E.164 format (+XXXXXXXXXXX)
-- **Voice Settings**: Uses the voice configuration from character file
+#### Production Server
+If running on a server with a domain:
+1. Use your domain name with HTTPS
+2. Make sure port 3004 is accessible
+3. Set in your .env:
+```env
+WEBHOOK_BASE_URL=https://your-domain.com  # Your production domain
+```
 
-### Voice Configuration
-Configure voice settings in your character file:
+> **Important**: Always use HTTPS URLs. Twilio requires secure webhooks for production.
+
+### 2. Character Configuration
+
+Create or update your character file (e.g., `characters/your-character.json`) with voice settings:
+
+#### Using ElevenLabs (Premium Voice Quality)
+```json
+{
+    "name": "Your Character",
+    "settings": {
+        "voice": {
+            "useElevenLabs": true,
+            "elevenLabsVoiceId": "your-voice-id",
+            "elevenLabsSettings": {
+                "stability": 0.5,
+                "similarityBoost": 0.9,
+                "style": 0.66,
+                "useSpeakerBoost": false
+            }
+        }
+    }
+}
+```
+
+#### Using Amazon Polly (Default)
 ```json
 {
     "name": "Your Character",
@@ -94,17 +92,7 @@ Configure voice settings in your character file:
 }
 ```
 
-Available voice combinations:
-- English: male (Matthew) or female (Joanna)
-- Chinese: male/female (Zhiyu)
-- French: male (Mathieu) or female (Lea)
-- German: male (Hans) or female (Marlene)
-- Spanish: male (Miguel) or female (Lucia)
-- Japanese: male (Takumi) or female (Mizuki)
-- Korean: male/female (Seoyeon)
-
-#### Custom Amazon Polly Voices
-You can use any voice available in Amazon Polly by specifying the voice ID directly:
+#### Using Custom Polly Voice
 ```json
 {
     "name": "Your Character",
@@ -116,6 +104,28 @@ You can use any voice available in Amazon Polly by specifying the voice ID direc
 }
 ```
 
+### Voice Configuration Options
+
+#### ElevenLabs Settings
+- `useElevenLabs`: Enable/disable ElevenLabs (defaults to false)
+- `elevenLabsVoiceId`: Your ElevenLabs voice ID
+- `elevenLabsSettings`:
+  - `stability`: Voice stability (0.0 to 1.0)
+  - `similarityBoost`: Voice similarity boost (0.0 to 1.0)
+  - `style`: Speaking style (0.0 to 1.0)
+  - `useSpeakerBoost`: Enable speaker boost
+
+#### Amazon Polly Voice Combinations
+Standard voices by language:
+- English: male (Matthew) or female (Joanna)
+- Chinese: male/female (Zhiyu)
+- French: male (Mathieu) or female (Lea)
+- German: male (Hans) or female (Marlene)
+- Spanish: male (Miguel) or female (Lucia)
+- Japanese: male (Takumi) or female (Mizuki)
+- Korean: male/female (Seoyeon)
+
+#### Custom Neural Voices
 Available Neural Voices:
 - US English: Aria, Ivy, Joanna, Kendra, Ruth
 - British English: Amy, Emma, Brian
@@ -125,189 +135,80 @@ Available Neural Voices:
 
 See [Amazon Polly's voice list](https://docs.aws.amazon.com/polly/latest/dg/voicelist.html) for all available voices.
 
-Note: Using custom voices requires Twilio's Pay-As-You-Go pricing for Amazon Polly.
+## Voice Selection Priority
 
-## Prerequisites
-
-- Twilio account with:
-  - Account SID
-  - Auth Token
-  - Phone number
-- Anthropic API key
-- Node.js 18 or higher
-
-## Installation
-
-```bash
-pnpm add @elizaos/plugin-twilio
-```
-
-## Plugin Configuration
-
-1. Add the plugin to your character file (e.g., characters/your-character.json):
-
-```json
-{
-    "name": "Your Character",
-    "settings": {
-        // ... other settings ...
-    },
-    "plugins": [
-        "@elizaos/plugin-twilio"  // Add this line to enable the plugin
-    ]
-}
-```
-
-For local development, you can use a relative path:
-```json
-{
-    "plugins": [
-        "../packages/plugin-twilio"
-    ]
-}
-```
-
-2. Add these variables to your project's root `.env` file:
-
-```env
-# Add these to your existing .env file in the project root
-
-# Anthropic Configuration (if not already set)
-ANTHROPIC_API_KEY=your_anthropic_key
-
-# Twilio Configuration
-TWILIO_ACCOUNT_SID=your_account_sid
-TWILIO_AUTH_TOKEN=your_auth_token
-TWILIO_PHONE_NUMBER=your_twilio_phone_number
-TWILIO_CHARACTER=your-character.json  # Must match your character file name
-
-# Webhook Configuration
-WEBHOOK_PORT=3004
-WEBHOOK_BASE_URL=your_webhook_url  # Will be set after starting ngrok
-```
-
-Note: Do not create a new .env file in the plugin directory. Instead, add these variables to your existing .env file at the project root.
+The plugin selects the voice in this order:
+1. ElevenLabs (if configured and enabled)
+2. Custom Polly voice (if specified)
+3. Standard language/gender combination
+4. Default fallback (English/Matthew)
 
 ## Webhook Setup
 
-You have two options for webhook URLs:
-
-1. **Development/Testing**: Use ngrok to create a temporary public URL
-   ```bash
-   ngrok http 3004  # Creates URL like https://abc123.ngrok.io
-   ```
-
-2. **Production**: Use your own domain
-   ```env
-   WEBHOOK_BASE_URL=https://your-domain.com  # e.g., https://api.yourapp.com
-   ```
-
-### Twilio Console Configuration
-1. Go to [Twilio Console](https://console.twilio.com/)
-2. Navigate to Phone Numbers > Manage > Active Numbers
-3. Click on your phone number
-4. Under "Voice & Fax" configuration:
-   - Choose "Webhook" for "Configure With"
-   - For "A Call Comes In", select "Webhook"
-   - Set the URL to: `${WEBHOOK_BASE_URL}/webhook/voice`
-5. Under "Messaging" configuration:
-   - Choose "Webhook" for "Configure With"
-   - For "A Message Comes In", select "Webhook"
-   - Set the URL to: `${WEBHOOK_BASE_URL}/webhook/sms`
-
-### Local Development
-1. Start your Eliza agent with your configured character:
+1. Start your Eliza agent:
 ```bash
 pnpm start --character="characters/your-character.json"
 ```
 
-2. In a separate terminal, create a tunnel using ngrok:
+2. Set up your webhook URL:
+   - **Local**: Start ngrok as described above
+   - **Production**: Ensure your domain is configured correctly
+
+3. Configure Twilio webhooks in [Twilio Console](https://console.twilio.com/):
+   - Voice webhook: `${WEBHOOK_BASE_URL}/webhook/voice`
+   - SMS webhook: `${WEBHOOK_BASE_URL}/webhook/sms`
+
+> **Note**: If using ngrok, you'll need to update the webhook URLs in Twilio Console whenever you restart ngrok as it generates a new URL each time. For production, the URLs will remain stable.
+
+## Testing
+
+1. Voice call test:
 ```bash
-ngrok http 3004
+curl -X POST http://localhost:3004/webhook/voice \
+  -d "From=+1234567890" \
+  -d "CallSid=test123"
 ```
 
-3. Copy the ngrok URL and update your .env:
-```env
-WEBHOOK_BASE_URL=https://your-ngrok-url
-```
-
-4. Update your webhook URLs in Twilio Console with the new ngrok URL
-5. Test your webhooks:
-   - SMS: Send a message to your Twilio number
-   - Voice: Make a call to your Twilio number
-
-### Server Installation
-1. Set your server's domain in .env:
-```env
-WEBHOOK_BASE_URL=https://your-domain.com
-```
-
-2. Ensure your server accepts incoming traffic on the webhook port (default: 3004)
-
-3. Configure your reverse proxy (nginx/apache) to forward requests to the webhook port:
-
-Example nginx configuration:
-```nginx
-location /webhook/ {
-    proxy_pass http://localhost:3004;
-    proxy_http_version 1.1;
-    proxy_set_header Upgrade $http_upgrade;
-    proxy_set_header Connection 'upgrade';
-    proxy_set_header Host $host;
-    proxy_cache_bypass $http_upgrade;
-}
-```
-
-4. Update your webhook URLs in Twilio Console with your domain
-
-## Development
-
+2. SMS test:
 ```bash
-# Install dependencies
-pnpm install
-
-# Build the plugin
-pnpm build
-
-# Run in development mode
-pnpm dev
+curl -X POST http://localhost:3004/webhook/sms \
+  -d "From=+1234567890" \
+  -d "Body=Hello"
 ```
 
 ## Troubleshooting
 
-1. Check webhook server status:
-```bash
-curl http://localhost:3004/health
-```
+### Common Issues
 
-2. View webhook logs:
+1. Voice not working:
+   - Check ELEVENLABS_XI_API_KEY if using ElevenLabs
+   - Verify character file voice settings
+   - Check webhook logs for errors
+
+2. Webhook errors:
+   - Verify WEBHOOK_PORT is available
+   - Check ngrok tunnel is running (for local development)
+   - Ensure WEBHOOK_BASE_URL matches your ngrok URL or domain
+   - Verify Twilio webhook URLs in console match WEBHOOK_BASE_URL
+   - Check SSL certificate is valid (for production domains)
+
+3. SMS not working:
+   - Verify TWILIO_PHONE_NUMBER format
+   - Check Twilio account balance
+   - Verify webhook URLs in Twilio console
+   - Test webhook endpoints using curl commands below
+
+### Logs
+
+View webhook logs:
 ```bash
 tail -f eliza.log | grep "Twilio Plugin"
 ```
 
-3. Common issues:
-- Port already in use: Change WEBHOOK_PORT in .env
-- Webhook not receiving messages: Check ngrok/domain configuration
-- Wrong character responses: Delete SQLite database and restart
-- Plugin not loading: Ensure it's properly listed in character file plugins array
-- Character not responding: Check TWILIO_CHARACTER in .env matches your character file name
-
-## Environment Variables
-
-| Variable | Description | Required |
-|----------|-------------|----------|
-| ANTHROPIC_API_KEY | Your Anthropic API key | Yes |
-| TWILIO_ACCOUNT_SID | Your Twilio Account SID | Yes |
-| TWILIO_AUTH_TOKEN | Your Twilio Auth Token | Yes |
-| TWILIO_PHONE_NUMBER | Your Twilio phone number | Yes |
-| TWILIO_CHARACTER | Character file to use | Yes |
-| WEBHOOK_PORT | Port for webhook server (default: 3004) | No |
-| WEBHOOK_BASE_URL | Public URL for webhooks | Yes |
-
 ## Support
 
-For issues, questions, or support:
-1. Visit our [documentation](https://www.boolkeys.com/eliza/plugin-twilio/)
+For issues or questions:
+1. Check the [documentation](https://www.boolkeys.com/eliza/plugin-twilio/)
 2. Open an issue on GitHub
 3. Contact: [arwen@boolkeys.com](mailto:arwen@boolkeys.com)
 

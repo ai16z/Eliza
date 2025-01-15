@@ -7,6 +7,7 @@ import { webhookConfig } from './config/webhookConfig.js';
 import { webhookHandler } from './services/webhookHandler.js';
 import { SafeLogger } from './utils/logger.js';
 import { actions } from './actions/index.js';
+import { elevenLabsService } from './services/elevenlabs.js';
 
 export interface TwilioPlugin extends Plugin {
   webhooks?: {
@@ -23,7 +24,7 @@ export const plugin: TwilioPlugin = {
   name: 'twilio',
   description: 'Twilio plugin for SMS and voice calls',
   version: '0.1.0',
-  services: [webhookService, twilioService],
+  services: [webhookService, twilioService, elevenLabsService],
   actions,
   webhooks: {
     config: webhookConfig,
@@ -39,6 +40,13 @@ export const plugin: TwilioPlugin = {
       });
 
       await webhookService.initialize(runtime);
+      await twilioService.initialize();
+
+      try {
+        await elevenLabsService.initialize();
+      } catch (error) {
+        SafeLogger.warn('ElevenLabs initialization failed - will use default TTS:', error);
+      }
 
       const baseUrl = process.env.WEBHOOK_BASE_URL;
       if (!baseUrl) {

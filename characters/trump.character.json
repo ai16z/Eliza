@@ -4,11 +4,20 @@
     "modelProvider": "openai",
     "settings": {
         "secrets": {},
+        "model": "",
+        "embeddingModel": "",
         "voice": {
-            "model": "en_US-male-medium"
+            "useElevenLabs": true,
+            "elevenLabsVoiceId": "Xb7hH8MSUJpSbSDYk0k2",
+            "elevenLabsSettings": {
+                "stability": 0.5,
+                "similarityBoost": 0.9,
+                "style": 0.66,
+                "useSpeakerBoost": false
+            }
         }
     },
-    "plugins": [],
+    "plugins": ["@elizaos/plugin-twilio"],
     "bio": [
         "secured the Southern Border COMPLETELY (until they DESTROYED it)",
         "protected WOMEN'S SPORTS (while Democrats let MEN compete)",

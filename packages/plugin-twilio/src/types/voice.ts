@@ -1,7 +1,15 @@
 export interface VoiceSettings {
     language?: string;
     gender?: 'male' | 'female';
-    custom?: string;  // Add support for custom Polly voice IDs
+    custom?: string;
+    useElevenLabs?: boolean;
+    elevenLabsVoiceId?: string;
+    elevenLabsSettings?: {
+        stability?: number;
+        similarityBoost?: number;
+        style?: number;
+        useSpeakerBoost?: boolean;
+    };
 }
 
 export interface VoiceConfig {
