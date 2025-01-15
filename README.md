@@ -12,7 +12,7 @@
 
 ## 🌍 README Translations
 
-[中文说明](./README_CN.md) | [日本語の説明](./README_JA.md) | [한국어 설명](./README_KOR.md) | [Persian](./README_FA.md) | [Français](./README_FR.md) | [Português](./README_PTBR.md) | [Türkçe](./README_TR.md) | [Русский](./README_RU.md) | [Español](./README_ES.md) | [Italiano](./README_IT.md) | [ไทย](./README_TH.md) | [Deutsch](./README_DE.md) | [Tiếng Việt](./README_VI.md) | [עִברִית](https://github.com/elizaos/Elisa/blob/main/README_HE.md) | [Tagalog](./README_TG.md) | [Polski](./README_PL.md) | [Arabic](./README_AR.md) | [Hungarian](./README_HU.md) | [Srpski](./README_RS.md) | [Română](./README_RO.md) | [Nederlands](./README_NL.md) | [Ελληνικά](./README_GR.md)
+[中文说明](i18n/readme/README_CN.md) | [日本語の説明](i18n/readme/README_JA.md) | [한국어 설명](i18n/readme/README_KOR.md) | [Persian](i18n/readme/README_FA.md) | [Français](i18n/readme/README_FR.md) | [Português](i18n/readme/README_PTBR.md) | [Türkçe](i18n/readme/README_TR.md) | [Русский](i18n/readme/README_RU.md) | [Español](i18n/readme/README_ES.md) | [Italiano](i18n/readme/README_IT.md) | [ไทย](i18n/readme/README_TH.md) | [Deutsch](i18n/readme/README_DE.md) | [Tiếng Việt](i18n/readme/README_VI.md) | [עִברִית](i18n/readme/README_HE.md) | [Tagalog](i18n/readme/README_TG.md) | [Polski](i18n/readme/README_PL.md) | [Arabic](i18n/readme/README_AR.md) | [Hungarian](i18n/readme/README_HU.md) | [Srpski](i18n/readme/README_RS.md) | [Română](i18n/readme/README_RO.md) | [Nederlands](i18n/readme/README_NL.md) | [Ελληνικά](i18n/readme/README_GR.md)
 
 ## 🚩 Overview
 
@@ -85,7 +85,6 @@ cp .env.example .env
 
 Note: .env is optional. If you're planning to run multiple distinct agents, you can pass secrets through the character JSON
 
-
 #### Start Eliza
 
 ```bash
@@ -99,17 +98,17 @@ pnpm clean
 
 ### Interact via Browser
 
-```
+````
 Once the agent is running, you should see the message to run "pnpm start:client" at the end.
 Open another terminal and move to same directory and then run below command and follow the URL to chat to your agent.
 
 ```bash
 pnpm start:client
-```
+````
 
 Then read the [Documentation](https://elizaos.github.io/eliza/) to learn how to customize your Eliza.
 
-----
+---
 
 ### Automatically Start Eliza
 
@@ -123,7 +122,7 @@ For detailed instructions on using the start script, including character managem
 
 > **Note**: The start script handles all dependencies, environment setup, and character management automatically.
 
-----
+---
 
 ### Modify Character
 
@@ -144,8 +143,8 @@ You may need to install Sharp. If you see an error when starting up, try install
 ```
 pnpm install --include=optional sharp
 ```
----
 
+---
 
 ### Start Eliza with Gitpod
 
