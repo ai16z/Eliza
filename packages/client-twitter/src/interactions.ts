@@ -1,22 +1,22 @@
-import { SearchMode, Tweet } from "agent-twitter-client";
 import {
     composeContext,
+    Content,
+    elizaLogger,
     generateMessageResponse,
     generateShouldRespond,
-    messageCompletionFooter,
-    shouldRespondFooter,
-    Content,
+    getEmbeddingZeroVector,
     HandlerCallback,
     IAgentRuntime,
+    IImageDescriptionService,
     Memory,
+    messageCompletionFooter,
     ModelClass,
+    ServiceType,
+    shouldRespondFooter,
     State,
     stringToUuid,
-    elizaLogger,
-    getEmbeddingZeroVector,
-    IImageDescriptionService,
-    ServiceType
 } from "@elizaos/core";
+import { SearchMode, Tweet } from "agent-twitter-client";
 import { ClientBase } from "./base";
 import { buildConversationThread, sendTweet, wait } from "./utils.ts";
 
@@ -349,8 +349,8 @@ export class TwitterInteractionClient {
         elizaLogger.debug("formattedConversation: ", formattedConversation);
 
         const imageDescriptionsArray = [];
-        try{
-            elizaLogger.debug('Getting images');
+        try {
+            elizaLogger.debug("Getting images");
             for (const photo of tweet.photos) {
                 elizaLogger.debug(photo.url);
                 const description = await this.runtime
@@ -361,21 +361,24 @@ export class TwitterInteractionClient {
                 imageDescriptionsArray.push(description);
             }
         } catch (error) {
-    // Handle the error
-    elizaLogger.error("Error Occured during describing image: ", error);
-}
-
-
-
+            // Handle the error
+            elizaLogger.error("Error Occured during describing image: ", error);
+        }
 
         let state = await this.runtime.composeState(message, {
             twitterClient: this.client.twitterClient,
             twitterUserName: this.client.twitterConfig.TWITTER_USERNAME,
             currentPost,
             formattedConversation,
-            imageDescriptions: imageDescriptionsArray.length > 0
-            ? `\nImages in Tweet:\n${imageDescriptionsArray.map((desc, i) =>
-              `Image ${i + 1}: Title: ${desc.title}\nDescription: ${desc.description}`).join("\n\n")}`:""
+            imageDescriptions:
+                imageDescriptionsArray.length > 0
+                    ? `\nImages in Tweet:\n${imageDescriptionsArray
+                          .map(
+                              (desc, i) =>
+                                  `Image ${i + 1}: Title: ${desc.title}\nDescription: ${desc.description}`
+                          )
+                          .join("\n\n")}`
+                    : "",
         });
 
         // check if the tweet exists, save if it doesn't
@@ -430,6 +433,7 @@ export class TwitterInteractionClient {
 
         // Promise<"RESPOND" | "IGNORE" | "STOP" | null> {
         if (shouldRespond !== "RESPOND") {
+            console.log("NOTR", shouldRespond);
             elizaLogger.log("Not responding to message");
             return { text: "Response Decision:", action: shouldRespond };
         }

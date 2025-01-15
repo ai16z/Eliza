@@ -1,32 +1,33 @@
-import { Tweet } from "agent-twitter-client";
 import {
+    ActionResponse,
     composeContext,
+    elizaLogger,
     generateText,
+    generateTweetActions,
     getEmbeddingZeroVector,
     IAgentRuntime,
+    IImageDescriptionService,
     ModelClass,
+    postActionResponseFooter,
+    ServiceType,
+    State,
     stringToUuid,
     TemplateType,
-    UUID,
     truncateToCompleteSentence,
+    UUID,
 } from "@elizaos/core";
-import { elizaLogger } from "@elizaos/core";
-import { ClientBase } from "./base.ts";
-import { postActionResponseFooter } from "@elizaos/core";
-import { generateTweetActions } from "@elizaos/core";
-import { IImageDescriptionService, ServiceType } from "@elizaos/core";
-import { buildConversationThread } from "./utils.ts";
-import { twitterMessageHandlerTemplate } from "./interactions.ts";
-import { DEFAULT_MAX_TWEET_LENGTH } from "./environment.ts";
+import { Tweet } from "agent-twitter-client";
 import {
     Client,
     Events,
     GatewayIntentBits,
-    TextChannel,
     Partials,
+    TextChannel,
 } from "discord.js";
-import { State } from "@elizaos/core";
-import { ActionResponse } from "@elizaos/core";
+import { ClientBase } from "./base.ts";
+import { DEFAULT_MAX_TWEET_LENGTH } from "./environment.ts";
+import { twitterMessageHandlerTemplate } from "./interactions.ts";
+import { buildConversationThread } from "./utils.ts";
 
 const MAX_TIMELINES_TO_FETCH = 15;
 
@@ -47,6 +48,8 @@ const twitterPostTemplate = `
 
 # Task: Generate a post in the voice and style and perspective of {{agentName}} @{{twitterUserName}}.
 Write a post that is {{adjective}} about {{topic}} (without mentioning {{topic}} directly), from the perspective of {{agentName}}. Do not add commentary or acknowledge this request, just write the post.
+Your response must include the summary of the # NEWS above into a sentences and Dont discard or remove any important numbers and informations
+If the news isnt about SUI or SUIRISE, dont mix the context with SUI Shilling. keep the original and relevant context of the news.
 Your response should be 1, 2, or 3 sentences (choose the length at random).
 Your response should not contain any questions. Brief, concise statements only. The total character count MUST be less than {{maxTweetLength}}. No emojis. Use \\n\\n (double spaces) between statements if there are multiple statements in your response.`;
 
@@ -494,7 +497,7 @@ export class TwitterPostClient {
                     this.runtime.character.templates?.twitterPostTemplate ||
                     twitterPostTemplate,
             });
-
+            // console.log("PROMPT", context);
             elizaLogger.debug("generate post prompt:\n" + context);
 
             const newTweetContent = await generateText({
@@ -743,6 +746,7 @@ export class TwitterPostClient {
                         );
                         continue;
                     }
+
                     processedTimelines.push({
                         tweet: tweet,
                         actionResponse: actionResponse,
@@ -1161,30 +1165,66 @@ export class TwitterPostClient {
 
             elizaLogger.debug("Final reply text to be sent:", replyText);
 
+            // temporary fix
+            const _replyText = replyText;
+
+            // Regular expression untuk menangkap teks
+            const regex = /{ "user": "SUIRISE", "text": "(.*)/;
+
+            // Ekstrak teks menggunakan regex
+            const match = regex.exec(_replyText);
+            let finalReplyText;
+            if (match) {
+                finalReplyText = match[1]; // Ambil grup pertama
+            } else {
+                finalReplyText = replyText;
+            }
+            console.log("Final reply text to be sent:", {
+                finalReplyText,
+                length: replyText.length,
+            });
             let result;
 
             if (replyText.length > DEFAULT_MAX_TWEET_LENGTH) {
                 result = await this.handleNoteTweet(
                     this.client,
-                    replyText,
+                    finalReplyText,
                     tweet.id
                 );
             } else {
                 result = await this.sendStandardTweet(
                     this.client,
-                    replyText,
+                    finalReplyText,
                     tweet.id
                 );
             }
+
+            // if (replyText.length > DEFAULT_MAX_TWEET_LENGTH) {
+            //     result = await this.handleNoteTweet(
+            //         this.client,
+            //         replyText,
+            //         tweet.id
+            //     );
+            // } else {
+            //     result = await this.sendStandardTweet(
+            //         this.client,
+            //         replyText,
+            //         tweet.id
+            //     );
+            // }
 
             if (result) {
                 elizaLogger.log("Successfully posted reply tweet");
                 executedActions.push("reply");
 
                 // Cache generation context for debugging
+                // await this.runtime.cacheManager.set(
+                //     `twitter/reply_generation_${tweet.id}.txt`,
+                //     `Context:\n${enrichedState}\n\nGenerated Reply:\n${replyText}`
+                // );
                 await this.runtime.cacheManager.set(
                     `twitter/reply_generation_${tweet.id}.txt`,
-                    `Context:\n${enrichedState}\n\nGenerated Reply:\n${replyText}`
+                    `Context:\n${enrichedState}\n\nGenerated Reply:\n${finalReplyText}`
                 );
             } else {
                 elizaLogger.error("Tweet reply creation failed");

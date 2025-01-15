@@ -1,14 +1,11 @@
-import { elizaLogger } from "@elizaos/core";
 import {
-    Action,
+    Action, elizaLogger, generateSerperSearch,
     HandlerCallback,
     IAgentRuntime,
     Memory,
     Plugin,
-    State,
+    SerperOrganicResult, State
 } from "@elizaos/core";
-import { generateWebSearch } from "@elizaos/core";
-import { SearchResult } from "@elizaos/core";
 import { encodingForModel, TiktokenModel } from "js-tiktoken";
 
 const DEFAULT_MAX_WEB_SEARCH_TOKENS = 4000;
@@ -68,30 +65,57 @@ const webSearch: Action = {
         elizaLogger.log("web search prompt received:", webSearchPrompt);
 
         elizaLogger.log("Generating image with prompt:", webSearchPrompt);
-        const searchResponse = await generateWebSearch(
-            webSearchPrompt,
+        // const searchResponse = await generateWebSearch(
+        //     webSearchPrompt,
+        //     runtime
+        // );
+        const cleansePrompt =  webSearchPrompt.replace(/@\S+/g, '');
+        const serperResponse = await generateSerperSearch(
+            cleansePrompt,
             runtime
         );
 
-        if (searchResponse && searchResponse.results.length) {
-            const responseList = searchResponse.answer
-                ? `${searchResponse.answer}${
-                      Array.isArray(searchResponse.results) &&
-                      searchResponse.results.length > 0
-                          ? `\n\nFor more details, you can check out these resources:\n${searchResponse.results
-                                .map(
-                                    (result: SearchResult, index: number) =>
-                                        `${index + 1}. [${result.title}](${result.url})`
-                                )
-                                .join("\n")}`
-                          : ""
-                  }`
-                : "";
+        if(serperResponse && serperResponse.organic.length){
+            const responseList = serperResponse?.answerBox?.snippet
+            ? `${serperResponse.answerBox.snippet}${
+                  Array.isArray(serperResponse.organic) &&
+                  serperResponse.organic.length > 0
+                      ? `\n\nFor more details, you can check out these resources:\n${serperResponse.organic
+                            .map(
+                                (result: SerperOrganicResult, index: number) =>
+                                    `${index + 1}. [${result.title}](${result.link})`
+                            )
+                            .join("\n")}`
+                      : ""
+              }`
+            : (
+                serperResponse.organic.length > 0 ?  serperResponse.organic[0].snippet : ""
+            );
 
             callback({
                 text: MaxTokens(responseList, DEFAULT_MAX_WEB_SEARCH_TOKENS),
             });
-        } else {
+        }
+        // else if (searchResponse && searchResponse.results.length) {
+        //     const responseList = searchResponse.answer
+        //         ? `${searchResponse.answer}${
+        //               Array.isArray(searchResponse.results) &&
+        //               searchResponse.results.length > 0
+        //                   ? `\n\nFor more details, you can check out these resources:\n${searchResponse.results
+        //                         .map(
+        //                             (result: SearchResult, index: number) =>
+        //                                 `${index + 1}. [${result.title}](${result.url})`
+        //                         )
+        //                         .join("\n")}`
+        //                   : ""
+        //           }`
+        //         : "";
+
+        //     callback({
+        //         text: MaxTokens(responseList, DEFAULT_MAX_WEB_SEARCH_TOKENS),
+        //     });
+        // }
+         else {
             elizaLogger.error("search failed or returned no data.");
         }
     },

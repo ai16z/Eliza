@@ -20,6 +20,8 @@
     "dependencies": {
         "@elizaos/adapter-supabase": "workspace:*",
         "@elizaos/adapter-postgres": "workspace:*",
+        "@elizaos/plugin-coinmarketcap": "workspace:*",
+        "@elizaos/plugin-goplus": "workspace:*",
         "@elizaos/adapter-redis": "workspace:*",
         "@elizaos/adapter-sqlite": "workspace:*",
         "@elizaos/adapter-pglite": "workspace:*",
@@ -99,6 +101,8 @@
         "@elizaos/plugin-b2": "workspace:*",
         "@elizaos/plugin-nft-collections": "workspace:*",
         "readline": "1.3.0",
+        "@ethosdao/plugin-market-analisys": "workspace:*",
+        "@srise/plugin-crypto-news": "workspace:*",
         "ws": "8.18.0",
         "yargs": "17.7.2"
     },

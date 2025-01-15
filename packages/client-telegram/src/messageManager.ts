@@ -1,35 +1,37 @@
-import { Message } from "@telegraf/types";
-import { Context, Telegraf } from "telegraf";
 import {
     composeContext,
-    elizaLogger,
-    ServiceType,
     composeRandomUser,
-} from "@elizaos/core";
-import { getEmbeddingZeroVector } from "@elizaos/core";
-import {
     Content,
+    elizaLogger,
+    getEmbeddingZeroVector,
     HandlerCallback,
     IAgentRuntime,
     IImageDescriptionService,
+    Media,
     Memory,
     ModelClass,
+    ServiceType,
     State,
+    stringToUuid,
     UUID,
-    Media,
 } from "@elizaos/core";
-import { stringToUuid } from "@elizaos/core";
+import { Message } from "@telegraf/types";
+import { Context, Telegraf } from "telegraf";
 
-import { generateMessageResponse, generateShouldRespond } from "@elizaos/core";
-import { messageCompletionFooter, shouldRespondFooter } from "@elizaos/core";
+import {
+    generateMessageResponse,
+    generateShouldRespond,
+    messageCompletionFooter,
+    shouldRespondFooter,
+} from "@elizaos/core";
 
-import { cosineSimilarity, escapeMarkdown } from "./utils";
 import {
     MESSAGE_CONSTANTS,
-    TIMING_CONSTANTS,
     RESPONSE_CHANCES,
     TEAM_COORDINATION,
+    TIMING_CONSTANTS,
 } from "./constants";
+import { cosineSimilarity, escapeMarkdown } from "./utils";
 
 import fs from "fs";
 
@@ -680,9 +682,17 @@ export class MessageManager {
             content.attachments.map(async (attachment: Media) => {
                 if (attachment.contentType === "image/gif") {
                     // Handle GIFs specifically
-                    await this.sendAnimation(ctx, attachment.url, attachment.description);
+                    await this.sendAnimation(
+                        ctx,
+                        attachment.url,
+                        attachment.description
+                    );
                 } else if (attachment.contentType.startsWith("image")) {
-                    await this.sendImage(ctx, attachment.url, attachment.description);
+                    await this.sendImage(
+                        ctx,
+                        attachment.url,
+                        attachment.description
+                    );
                 }
             });
         } else {
@@ -1149,6 +1159,10 @@ export class MessageManager {
 
                 // Execute callback to send messages and log memories
                 const responseMessages = await callback(responseContent);
+                // console.log({
+                //     responseMessages,
+                //     responseContent,
+                // });
 
                 // Update state after response
                 state = await this.runtime.updateRecentMessageState(state);

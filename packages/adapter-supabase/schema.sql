@@ -13,6 +13,7 @@
 
 
 CREATE EXTENSION IF NOT EXISTS vector;
+CREATE EXTENSION IF NOT EXISTS fuzzystrmatch;
 
 BEGIN;
 
@@ -191,5 +192,213 @@ CREATE INDEX idx_knowledge_original ON knowledge("originalId");
 CREATE INDEX idx_knowledge_created ON knowledge("agentId", "createdAt");
 CREATE INDEX idx_knowledge_shared ON knowledge("isShared");
 CREATE INDEX idx_knowledge_embedding ON knowledge USING ivfflat (embedding vector_cosine_ops);
+
+CREATE OR REPLACE FUNCTION "public"."check_similarity_and_insert"("query_table_name" "text", "query_userid" "uuid", "query_content" "text", "query_roomid" "uuid", "query_embedding" "public"."vector", "query_createdat" timestamp with time zone, "similarity_threshold" double precision DEFAULT 0.95) RETURNS "void"
+    LANGUAGE "plpgsql"
+    AS $$
+DECLARE
+    similar_exists BOOLEAN;
+BEGIN
+    -- Check which table to query based on embedding size
+    CASE query_table_name
+    WHEN 'memories_1536' THEN
+        SELECT EXISTS (
+            SELECT 1 FROM memories_1536
+            WHERE roomId = query_roomId
+            AND userId = query_userId
+            AND content->>'text' = query_content
+            AND 1 - (embedding <=> query_embedding) > similarity_threshold
+        ) INTO similar_exists;
+    WHEN 'memories_1024' THEN
+        SELECT EXISTS (
+            SELECT 1 FROM memories_1024
+            WHERE roomId = query_roomId
+            AND userId = query_userId
+            AND content->>'text' = query_content
+            AND 1 - (embedding <=> query_embedding) > similarity_threshold
+        ) INTO similar_exists;
+    WHEN 'memories_768' THEN
+        SELECT EXISTS (
+            SELECT 1 FROM memories_768
+            WHERE roomId = query_roomId
+            AND userId = query_userId
+            AND content->>'text' = query_content
+            AND 1 - (embedding <=> query_embedding) > similarity_threshold
+        ) INTO similar_exists;
+    WHEN 'memories_384' THEN
+        SELECT EXISTS (
+            SELECT 1 FROM memories_384
+            WHERE roomId = query_roomId
+            AND userId = query_userId
+            AND content->>'text' = query_content
+            AND 1 - (embedding <=> query_embedding) > similarity_threshold
+        ) INTO similar_exists;
+    ELSE
+        RAISE EXCEPTION 'Invalid table name: %', query_table_name;
+    END CASE;
+
+    -- Only insert if no similar memory exists
+    IF NOT similar_exists THEN
+        CASE query_table_name
+        WHEN 'memories_1536' THEN
+            INSERT INTO memories_1536 (id, type, "createdAt", content, embedding, "userId", "roomId", "unique")
+            VALUES (gen_random_uuid(), 'message', query_createdAt, jsonb_build_object('text', query_content), query_embedding, query_userId, query_roomId, true);
+        WHEN 'memories_1024' THEN
+            INSERT INTO memories_1024 (id, type, "createdAt", content, embedding, "userId", "roomId", "unique")
+            VALUES (gen_random_uuid(), 'message', query_createdAt, jsonb_build_object('text', query_content), query_embedding, query_userId, query_roomId, true);
+        WHEN 'memories_768' THEN
+            INSERT INTO memories_768 (id, type, "createdAt", content, embedding, "userId", "roomId", "unique")
+            VALUES (gen_random_uuid(), 'message', query_createdAt, jsonb_build_object('text', query_content), query_embedding, query_userId, query_roomId, true);
+        WHEN 'memories_384' THEN
+            INSERT INTO memories_384 (id, type, "createdAt", content, embedding, "userId", "roomId", "unique")
+            VALUES (gen_random_uuid(), 'message', query_createdAt, jsonb_build_object('text', query_content), query_embedding, query_userId, query_roomId, true);
+        END CASE;
+    END IF;
+END;
+$$;
+
+
+CREATE OR REPLACE FUNCTION "public"."count_memories"("query_table_name" "text", "query_roomId" "uuid", "query_unique" boolean DEFAULT false) RETURNS bigint
+    LANGUAGE "plpgsql"
+    AS $$
+BEGIN
+    RETURN (
+        SELECT COUNT(*) FROM public.memories
+        WHERE public.memories."type" = "query_table_name"
+        AND ("query_roomId" IS NULL OR public.memories."roomId" = "query_roomId")
+        AND ("query_unique" IS FALSE OR public.memories."unique" = TRUE)
+    );
+END;
+$$;
+
+CREATE OR REPLACE FUNCTION "public"."create_room"("roomId" "uuid") RETURNS TABLE("id" "uuid")
+    LANGUAGE "plpgsql"
+    AS $$
+BEGIN
+    RETURN QUERY INSERT INTO public.rooms ("id") VALUES ("roomId") RETURNING public.rooms."id";
+END;
+$$;
+
+
+CREATE OR REPLACE FUNCTION "public"."get_embedding_list"("query_table_name" "text", "query_threshold" integer, "query_input" "text", "query_field_name" "text", "query_field_sub_name" "text", "query_match_count" integer) RETURNS TABLE("embedding" "public"."vector", "levenshtein_score" integer)
+    LANGUAGE "plpgsql"
+    AS $$
+BEGIN
+    RETURN QUERY
+    SELECT public.memories."embedding", levenshtein("query_input", (public.memories."content"->>"query_field_name")::TEXT) AS "levenshtein_score"
+    FROM public.memories
+    WHERE public.memories."type" = "query_table_name"
+    AND levenshtein("query_input", (public.memories."content"->>"query_field_name")::TEXT) <= "query_threshold"
+    ORDER BY "levenshtein_score"
+    LIMIT "query_match_count";
+END;
+$$;
+
+
+CREATE OR REPLACE FUNCTION "public"."get_goals"("query_roomid" "uuid", "query_userid" "uuid" DEFAULT NULL::"uuid", "only_in_progress" boolean DEFAULT true, "row_count" integer DEFAULT 5) RETURNS SETOF "public"."goals"
+    LANGUAGE "plpgsql"
+    AS $$
+BEGIN
+    RETURN QUERY
+    SELECT * FROM goals
+    WHERE
+        (query_userId IS NULL OR userId = query_userId)
+        AND (roomId = query_roomId)
+        AND (NOT only_in_progress OR status = 'IN_PROGRESS')
+    LIMIT row_count;
+END;
+$$;
+
+
+CREATE OR REPLACE FUNCTION "public"."get_relationship"("userA" "uuid", "userB" "uuid") RETURNS SETOF "public"."relationships"
+    LANGUAGE "plpgsql" STABLE
+    AS $$
+BEGIN
+    RETURN QUERY
+    SELECT * FROM public.relationships
+    WHERE (public.relationships."userA" = "userA" AND public.relationships."userB" = "userB")
+    OR (public.relationships."userA" = "userB" AND public.relationships."userB" = "userA");
+END;
+$$;
+
+
+CREATE OR REPLACE FUNCTION "public"."remove_memories"("query_table_name" "text", "query_roomId" "uuid") RETURNS "void"
+    LANGUAGE "plpgsql"
+    AS $$
+BEGIN
+    DELETE FROM public.memories WHERE public.memories."roomId" = "query_roomId" AND public.memories."type" = "query_table_name";
+END;
+$$;
+
+
+CREATE OR REPLACE FUNCTION "public"."search_knowledge"("query_embedding" "public"."vector", "query_agent_id" "uuid", "match_threshold" double precision, "match_count" integer, "search_text" "text") RETURNS TABLE("id" "uuid", "agentId" "uuid", "content" "jsonb", "embedding" "public"."vector", "createdAt" timestamp with time zone, "similarity" double precision)
+    LANGUAGE "plpgsql"
+    AS $$
+BEGIN
+    RETURN QUERY
+    WITH vector_matches AS (
+        SELECT public.knowledge."id",
+            1 - (public.knowledge."embedding" <=> "query_embedding") AS "vector_score"
+        FROM public.knowledge
+        WHERE (public.knowledge."agentId" IS NULL AND public.knowledge."isShared" = true) OR public.knowledge."agentId" = "query_agent_id"
+        AND public.knowledge."embedding" IS NOT NULL
+    ),
+    keyword_matches AS (
+        SELECT public.knowledge."id",
+        CASE
+            WHEN public.knowledge."content"->>'text' ILIKE '%' || "search_text" || '%' THEN 3.0
+            ELSE 1.0
+        END *
+        CASE
+            WHEN public.knowledge."content"->'metadata'->>'isChunk' = 'true' THEN 1.5
+            WHEN public.knowledge."content"->'metadata'->>'isMain' = 'true' THEN 1.2
+            ELSE 1.0
+        END AS "keyword_score"
+        FROM public.knowledge
+        WHERE (public.knowledge."agentId" IS NULL AND public.knowledge."isShared" = true) OR public.knowledge."agentId" = "query_agent_id"
+    )
+    SELECT
+        k."id",
+        k."agentId",
+        k."content",
+        k."embedding",
+        k."createdAt",
+        (v."vector_score" * kw."keyword_score") AS "similarity"
+    FROM public.knowledge k
+    JOIN vector_matches v ON k."id" = v."id"
+    LEFT JOIN keyword_matches kw ON k."id" = kw."id"
+    WHERE (k."agentId" IS NULL AND k."isShared" = true) OR k."agentId" = "query_agent_id"
+    AND (
+        v."vector_score" >= "match_threshold"
+        OR (kw."keyword_score" > 1.0 AND v."vector_score" >= 0.3)
+    )
+    ORDER BY "similarity" DESC
+    LIMIT "match_count";
+END;
+$$;
+
+
+CREATE OR REPLACE FUNCTION "public"."search_memories"("query_table_name" "text", "query_roomId" "uuid", "query_embedding" "public"."vector", "query_match_threshold" double precision, "query_match_count" integer, "query_unique" boolean) RETURNS TABLE("id" "uuid", "userId" "uuid", "content" "jsonb", "createdAt" timestamp with time zone, "similarity" double precision, "roomId" "uuid", "embedding" "public"."vector")
+    LANGUAGE "plpgsql"
+    AS $$
+BEGIN
+    RETURN QUERY
+    SELECT
+        public.memories."id",
+        public.memories."userId",
+        public.memories."content",
+        public.memories."createdAt",
+        1 - (public.memories."embedding" <=> "query_embedding") AS "similarity",
+        public.memories."roomId",
+        public.memories."embedding"
+    FROM public.memories
+    WHERE (1 - (public.memories."embedding" <=> "query_embedding") > "query_match_threshold")
+    AND public.memories."type" = "query_table_name"
+    AND ("query_unique" IS FALSE OR public.memories."unique" = TRUE)
+    AND ("query_roomId" IS NULL OR public.memories."roomId" = "query_roomId")
+    ORDER BY "similarity" DESC
+    LIMIT "query_match_count";
+END;
+$$;
 
 COMMIT;

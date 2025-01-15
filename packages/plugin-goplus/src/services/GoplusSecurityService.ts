@@ -1,4 +1,12 @@
-import { IAgentRuntime, ModelClass, Service, ServiceType, elizaLogger, generateObjectDeprecated, generateText } from "@elizaos/core";
+import {
+    IAgentRuntime,
+    ModelClass,
+    Service,
+    ServiceType,
+    elizaLogger,
+    generateObjectDeprecated,
+    generateText,
+} from "@elizaos/core";
 import { GoPlusManage, GoPlusParamType, GoPlusType } from "../lib/GoPlusManage";
 import { requestPrompt, responsePrompt } from "../templates";
 
@@ -6,14 +14,17 @@ export interface IGoplusSecurityService extends Service {
     check(text: string): Promise<string>;
 }
 
-export class GoplusSecurityService extends Service implements IGoplusSecurityService {
+export class GoplusSecurityService
+    extends Service
+    implements IGoplusSecurityService
+{
     private apiKey: string;
     private runtime: IAgentRuntime;
     getInstance(): GoplusSecurityService {
         return this;
     }
     static get serviceType() {
-        return ServiceType.GOPLUS_SECURITY;
+        return "goplus_security" as ServiceType; // ServiceType.GOPLUS_SECURITY;
     }
 
     initialize(runtime: IAgentRuntime): Promise<void> {
@@ -22,62 +33,93 @@ export class GoplusSecurityService extends Service implements IGoplusSecuritySer
         return;
     }
 
-
     /**
      * Connect to WebSocket and send a message
      */
     async check(text: string): Promise<string> {
         try {
             elizaLogger.log("check input text", text);
-            const obj = await generateObjectDeprecated({
+            const obj = (await generateObjectDeprecated({
                 runtime: this.runtime,
                 context: requestPrompt(text),
                 modelClass: ModelClass.SMALL, // gpt-4o-mini
-            }) as GoPlusParamType;
+            })) as GoPlusParamType;
 
             elizaLogger.log("check generateObjectDeprecated text", obj);
 
-            const goPlusManage = new GoPlusManage(this.apiKey)
+            const goPlusManage = new GoPlusManage(this.apiKey);
             let checkResult: any;
-            switch(obj.type) {
+            switch (obj.type) {
                 case GoPlusType.EVMTOKEN_SECURITY_CHECK:
-                    checkResult = await goPlusManage.tokenSecurity(obj.network, obj.token);
+                    checkResult = await goPlusManage.tokenSecurity(
+                        obj.network,
+                        obj.token
+                    );
                     break;
                 case GoPlusType.SOLTOKEN_SECURITY_CHECK:
-                    checkResult = await goPlusManage.solanaTokenSecurityUsingGET(obj.token);
+                    checkResult =
+                        await goPlusManage.solanaTokenSecurityUsingGET(
+                            obj.token
+                        );
                     break;
                 case GoPlusType.SUITOKEN_SECURITY_CHECK:
-                    checkResult = await goPlusManage.suiTokenSecurityUsingGET(obj.token);
+                    checkResult = await goPlusManage.suiTokenSecurityUsingGET(
+                        obj.token
+                    );
                     break;
                 case GoPlusType.RUGPULL_SECURITY_CHECK:
-                    checkResult = await goPlusManage.rugpullDetection(obj.network, obj.contract);
+                    checkResult = await goPlusManage.rugpullDetection(
+                        obj.network,
+                        obj.contract
+                    );
                     break;
                 case GoPlusType.NFT_SECURITY_CHECK:
-                    checkResult = await goPlusManage.nftSecurity(obj.network, obj.token);
+                    checkResult = await goPlusManage.nftSecurity(
+                        obj.network,
+                        obj.token
+                    );
                     break;
                 case GoPlusType.ADRESS_SECURITY_CHECK:
-                    checkResult = await goPlusManage.addressSecurity(obj.wallet);
+                    checkResult = await goPlusManage.addressSecurity(
+                        obj.wallet
+                    );
                     break;
                 case GoPlusType.APPROVAL_SECURITY_CHECK:
-                    checkResult = await goPlusManage.approvalSecurity(obj.network, obj.contract);
+                    checkResult = await goPlusManage.approvalSecurity(
+                        obj.network,
+                        obj.contract
+                    );
                     break;
                 case GoPlusType.ACCOUNT_ERC20_SECURITY_CHECK:
-                    checkResult = await goPlusManage.erc20ApprovalSecurity(obj.network, obj.wallet);
+                    checkResult = await goPlusManage.erc20ApprovalSecurity(
+                        obj.network,
+                        obj.wallet
+                    );
                     break;
                 case GoPlusType.ACCOUNT_ERC721_SECURITY_CHECK:
-                    checkResult = await goPlusManage.erc721ApprovalSecurity(obj.network, obj.wallet);
+                    checkResult = await goPlusManage.erc721ApprovalSecurity(
+                        obj.network,
+                        obj.wallet
+                    );
                     break;
                 case GoPlusType.ACCOUNT_ERC1155_SECURITY_CHECK:
-                    checkResult = await goPlusManage.erc1155ApprovalSecurity(obj.network, obj.wallet);
+                    checkResult = await goPlusManage.erc1155ApprovalSecurity(
+                        obj.network,
+                        obj.wallet
+                    );
                     break;
                 case GoPlusType.SIGNATURE_SECURITY_CHECK:
-                    checkResult = await goPlusManage.inputDecode(obj.network, obj.data);
+                    checkResult = await goPlusManage.inputDecode(
+                        obj.network,
+                        obj.data
+                    );
                     break;
                 case GoPlusType.URL_SECURITY_CHECK:
-                    checkResult = await goPlusManage.dappSecurityAndPhishingSite(obj.url);
+                    checkResult =
+                        await goPlusManage.dappSecurityAndPhishingSite(obj.url);
                     break;
                 default:
-                    throw new Error("type is invaild")
+                    throw new Error("type is invaild");
             }
 
             elizaLogger.log("checkResult text", checkResult);
@@ -87,7 +129,7 @@ export class GoplusSecurityService extends Service implements IGoplusSecuritySer
                 modelClass: ModelClass.SMALL,
             });
             elizaLogger.log("checkResponse text", checkResponse);
-            return checkResponse
+            return checkResponse;
         } catch (e) {
             elizaLogger.error(e);
             return "error";

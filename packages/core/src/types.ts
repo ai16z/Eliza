@@ -1440,6 +1440,56 @@ export type SearchResponse = {
     results: SearchResult[];
 };
 
+export type SerperSearchParameters = {
+    q: string;
+    type: string;
+    engine: string;
+  };
+
+  export type SerperAnswerBox = {
+    snippet: string;
+    snippetHighlighted: string[];
+    title: string;
+    link: string;
+  };
+
+  export type SerperSiteLink = {
+    title: string;
+    link: string;
+  };
+
+  export type SerperOrganicResult = {
+    title: string;
+    link: string;
+    snippet: string;
+    sitelinks?: SerperSiteLink[];
+    position: number;
+    attributes?: Record<string, string>;
+    rating?: number;
+    ratingCount?: number;
+  };
+
+  export type SerperPeopleAlsoAsk = {
+    question: string;
+    snippet: string;
+    title: string;
+    link: string;
+  };
+
+  export type SerperRelatedSearch = {
+    query: string;
+  };
+
+  export type SerperSearchResponse = {
+    searchParameters: SerperSearchParameters;
+    answerBox?: SerperAnswerBox;
+    organic: SerperOrganicResult[];
+    peopleAlsoAsk: SerperPeopleAlsoAsk[];
+    relatedSearches: SerperRelatedSearch[];
+    credits: number;
+  };
+
+
 export enum ServiceType {
     IMAGE_DESCRIPTION = "image_description",
     TRANSCRIPTION = "transcription",
