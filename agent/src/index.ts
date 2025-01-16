@@ -53,6 +53,7 @@ import { avalanchePlugin } from "@elizaos/plugin-avalanche";
 import { b2Plugin } from "@elizaos/plugin-b2";
 import { binancePlugin } from "@elizaos/plugin-binance";
 import { birdeyePlugin } from "@elizaos/plugin-birdeye";
+import { bnbPlugin } from "@elizaos/plugin-bnb";
 import {
     advancedTradePlugin,
     coinbaseCommercePlugin,
@@ -944,6 +945,11 @@ export async function createAgent(
             getSecret(character, "QUAI_PRIVATE_KEY") ? quaiPlugin : null,
             getSecret(character, "RESERVOIR_API_KEY")
                 ? createNFTCollectionsPlugin()
+                : null,
+            getSecret(character, "BNB_PRIVATE_KEY") ||
+            (getSecret(character, "BNB_PUBLIC_KEY") &&
+                getSecret(character, "BNB_PUBLIC_KEY")?.startsWith("0x"))
+                ? bnbPlugin
                 : null,
         ].filter(Boolean),
         providers: [],
