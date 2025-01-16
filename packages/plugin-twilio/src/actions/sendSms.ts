@@ -1,11 +1,23 @@
 import { Action, generateText, ModelClass } from '@elizaos/core';
 import { twilioService } from '../services/twilio.js';
 import { SafeLogger } from '../utils/logger.js';
+import type { Character } from '@elizaos/core';
 
 const isValidPhoneNumber = (phoneNumber: string): boolean => {
     // E.164 format validation (e.g., +1234567890)
     const e164Regex = /^\+[1-9]\d{10,14}$/;
     return e164Regex.test(phoneNumber);
+};
+
+const generateSmsPrompt = (topic: string, character: Character): string => {
+    return `You are ${character.name}. Generate a short, engaging SMS message (max 160 chars) about ${topic}.
+    Use your unique personality and speaking style.
+
+    Bio traits to incorporate:
+    ${Array.isArray(character.bio) ? character.bio.join('\n') : character.bio || ''}
+
+    Speaking style:
+    ${character.style?.all ? character.style.all.join('\n') : ''}`;
 };
 
 export const sendSms: Action = {
@@ -14,13 +26,14 @@ export const sendSms: Action = {
     similes: ['SEND_TEXT', 'TEXT_MESSAGE', 'SMS_MESSAGE'],
 
     validate: async (runtime, message) => {
-        const text = (message.content as { text: string }).text;
-        // Match both direct messages and AI-generated content requests
-        const patterns = [
-            /send (?:an? )?sms to (\+\d{10,15}) saying (.*)/i,
-            /send (?:an? )?sms to (\+\d{10,15}) (?:telling|about|with) (.*)/i
-        ];
-        return patterns.some(pattern => pattern.test(text));
+        const text = message.content.text;
+        const phoneMatch = text.match(/send (?:an? )?sms to (\+\d{10,15}) (?:saying|telling|about|with) (.*)/i);
+        if (!phoneMatch) return false;
+
+        const messageContent = phoneMatch[2]?.trim();
+        if (!messageContent) return false; // Add this check for empty messages
+
+        return true;
     },
 
     handler: async (runtime, message) => {
@@ -55,8 +68,7 @@ export const sendSms: Action = {
                 SafeLogger.info('Generating SMS content for prompt:', contentPrompt);
 
                 messageContent = await generateText({
-                    context: `Generate a short, engaging SMS message (max 160 chars) ${contentPrompt}.
-                             Keep it fun and conversational.`,
+                    context: generateSmsPrompt(contentPrompt, runtime.character),
                     runtime,
                     modelClass: ModelClass.MEDIUM,
                     stop: ["\n", "User:", "Assistant:"]
@@ -70,7 +82,8 @@ export const sendSms: Action = {
 
             SafeLogger.info('Sending SMS:', {
                 to: phoneNumber,
-                content: messageContent
+                content: messageContent,
+                length: messageContent.length
             });
 
             // Send the SMS
@@ -96,6 +109,12 @@ export const sendSms: Action = {
                 }
                 throw error; // Re-throw unexpected errors
             }
+
+            SafeLogger.info('✅ SMS sent successfully:', {
+                to: phoneNumber,
+                content: messageContent,
+                length: messageContent.length
+            });
 
             return {
                 success: true,

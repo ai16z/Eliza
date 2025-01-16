@@ -1,33 +1,28 @@
 // /packages/plugin-twilio/src/types/voice.ts
 
-export interface VoiceSettings {
-    language?: string;
-    gender?: 'male' | 'female';
-    custom?: string;
-    useElevenLabs?: boolean;
-    elevenLabsVoiceId?: string;
-    elevenLabsSettings?: {
-        stability?: number;
-        similarityBoost?: number;
-        style?: number;
-        useSpeakerBoost?: boolean;
-    };
-}
-
-export interface VoiceConfig {
-    voice: string;
-    language: string;
-    recognitionLanguage: string;
-}
-
-export interface VoiceMessage {
-    role: 'user' | 'assistant';
-    content: string;
-    timestamp: string;
+export interface ElevenLabsVoiceConfig {
+    voiceId: string;
+    modelId?: string;
+    stability?: number;
+    similarityBoost?: number;
+    style?: number;
+    useSpeakerBoost?: boolean;
 }
 
 export interface VoiceConversationMemory {
-    messages: VoiceMessage[];
+    messages: Array<{
+        role: 'assistant' | 'user';
+        content: string;
+        timestamp: string;
+    }>;
     lastActivity: number;
     characterName: string;
+}
+
+export interface VoiceSettings {
+    elevenlabs?: Partial<ElevenLabsVoiceConfig>;
+    polly?: {
+        voiceId: string;
+        engine?: 'neural' | 'standard';
+    };
 }

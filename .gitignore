@@ -64,3 +64,5 @@ eliza.manifest.sgx
 eliza.sig
 
 pnpm-lock.yaml
+
+/characters

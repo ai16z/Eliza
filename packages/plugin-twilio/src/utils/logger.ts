@@ -7,11 +7,14 @@ export class SafeLogger {
     }
 
     static info(message: string, data?: any): void {
-        if (data?.text) {
-            // For messages with text content, show simplified format
+        if (data?.content) {
+            // For messages with content, show full format
+            console.log(`${this.PREFIX} ${message}\n   Content: "${data.content}"\n   Length: ${data.length || 'N/A'} chars`);
+        } else if (data?.text) {
+            // For messages with text content
             console.log(`${this.PREFIX} ${message} "${data.text}"`);
         } else if (data?.duration) {
-            // For messages with significant duration (>1 second)
+            // For messages with duration
             const duration = parseFloat(data.duration);
             if (duration > 1) {
                 console.log(`${this.PREFIX} ${message} (${duration.toFixed(2)}s)`);
@@ -20,7 +23,7 @@ export class SafeLogger {
             }
         } else {
             // For status updates, just show the message
-            console.log(`${this.PREFIX} ${message}`);
+            console.log(`${this.PREFIX} ${message}`, data ? JSON.stringify(data, null, 2) : '');
         }
     }
 
@@ -85,10 +88,4 @@ export class SafeLogger {
         console.log(`${this.PREFIX} Initialized ${service} with:`, this.sanitize(JSON.stringify(data)));
     }
 
-    static anthropicDebug(type: string, data: any): void {
-        const sanitizedData = typeof data === 'string' ?
-            this.sanitize(data) :
-            this.sanitize(JSON.stringify(data));
-        console.log(`${this.PREFIX} Anthropic:${type}:`, sanitizedData);
-    }
 }

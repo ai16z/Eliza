@@ -17,21 +17,6 @@ import { audioHandler } from '../utils/audioHandler.js';
 // Add UUID type at the top
 type UUID = string;
 
-// Add proper typing for Anthropic response
-interface AnthropicMessage {
-    role: 'user' | 'assistant';
-    content: string;
-}
-
-interface AnthropicContentBlock {
-    type: string;
-    text?: string;
-}
-
-interface AnthropicResponse {
-    content: AnthropicContentBlock[];
-}
-
 // Add types for router stack
 interface RouteInfo {
     route?: {
@@ -42,21 +27,6 @@ interface RouteInfo {
 
 // Add type for Gather input
 type GatherInput = 'speech' | 'dtmf';
-
-// API key validation helper
-const validateApiKey = (apiKey: string | undefined): string => {
-    if (!apiKey?.trim()) {
-        throw new Error('ANTHROPIC_API_KEY is not set');
-    }
-    const cleanKey = apiKey.trim();
-    if (!cleanKey.startsWith('sk-ant-')) {
-        throw new Error('Invalid API key format - must start with sk-ant-');
-    }
-    if (cleanKey.length < 40) {
-        throw new Error('API key appears too short');
-    }
-    return cleanKey;
-};
 
 // Add voice configuration
 interface VoiceConfig {

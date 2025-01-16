@@ -27,7 +27,6 @@ async function buildPlugin() {
                 '@elizaos/core',
                 'twilio',
                 'express',
-                '@anthropic-ai/sdk',
                 'uuid'
             ],
             logLevel: 'info',

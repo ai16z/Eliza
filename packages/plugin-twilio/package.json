@@ -19,8 +19,7 @@
         "clean": "rimraf dist",
         "prebuild": "pnpm clean",
         "build": "tsx scripts/build.ts && tsc --emitDeclarationOnly --declaration",
-        "dev": "tsc -w",
-        "test:actions": "tsx src/tests/actions.test.ts"
+        "dev": "tsc -w"
     },
     "dependencies": {
         "@elizaos/core": "workspace:*",
@@ -38,6 +37,8 @@
         "rimraf": "^5.0.5",
         "tsx": "^4.7.0",
         "typescript": "^5.0.0",
-        "@types/twilio": "^3.19.3"
+        "@types/twilio": "^3.19.3",
+        "vitest": "^1.0.0",
+        "@vitest/coverage-v8": "^1.0.0"
     }
 }
