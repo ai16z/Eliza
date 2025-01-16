@@ -1,94 +1,107 @@
 // /packages/plugin-twilio/src/services/twilio.ts
 
-import twilio, { Twilio } from 'twilio';
-import type { Service } from '@elizaos/core';
-import { ServiceType } from '@elizaos/core';
+import twilio from 'twilio';
 import { SafeLogger } from '../utils/logger.js';
+import { VoiceConversationMemory } from '../types/voice.js';
 
-interface SendSmsOptions {
+// Export the interfaces so they can be used elsewhere
+export interface SendSmsOptions {
     to: string;
     body: string;
 }
 
-interface MakeCallOptions {
+export interface MakeCallOptions {
     to: string;
-    message: string;
+    message?: string;
+    twiml?: string;
 }
 
-export class TwilioService implements Service {
-    readonly serviceType = ServiceType.TEXT_GENERATION;
-    private client: Twilio | null = null;
-    private initialized = false;
+export class TwilioService {
+    private _client: twilio.Twilio | null = null;
+    private _phoneNumber: string | null = null;
+    public voiceConversations = new Map<string, VoiceConversationMemory>();
 
-    async initialize(runtime?: any): Promise<void> {
-        const accountSid = process.env.TWILIO_ACCOUNT_SID;
-        const authToken = process.env.TWILIO_AUTH_TOKEN;
-
-        if (!accountSid || !authToken) {
-            throw new Error('TWILIO_ACCOUNT_SID and TWILIO_AUTH_TOKEN must be set');
+    constructor() {
+        if (process.env.TWILIO_ACCOUNT_SID && process.env.TWILIO_AUTH_TOKEN) {
+            this._client = twilio(process.env.TWILIO_ACCOUNT_SID, process.env.TWILIO_AUTH_TOKEN);
+            this._phoneNumber = process.env.TWILIO_PHONE_NUMBER || null;
         }
-
-        this.client = twilio(accountSid, authToken);
-        this.initialized = true;
-        SafeLogger.info('✅ Twilio client initialized successfully');
     }
 
-    isInitialized(): boolean {
-        return this.initialized;
+    get client() {
+        if (!this._client) {
+            throw new Error('Twilio client not initialized');
+        }
+        return this._client;
     }
 
-    getClient(): Twilio | null {
-        return this.client;
+    get phoneNumber() {
+        if (!this._phoneNumber) {
+            throw new Error('Twilio phone number not set');
+        }
+        return this._phoneNumber;
     }
 
-    async sendSms({ to, body }: SendSmsOptions): Promise<void> {
-        if (!this.client) {
+    public isInitialized(): boolean {
+        return this._client !== null;
+    }
+
+    public async sendSms({ to, body }: SendSmsOptions) {
+        if (!this.isInitialized()) {
+            SafeLogger.error('Twilio not initialized');
             throw new Error('Twilio client not initialized');
         }
 
-        const fromNumber = process.env.TWILIO_PHONE_NUMBER;
-        if (!fromNumber) {
-            throw new Error('TWILIO_PHONE_NUMBER not set');
-        }
-
         try {
+            SafeLogger.info('Attempting to send SMS:', {
+                from: this.phoneNumber,
+                to,
+                bodyLength: body.length
+            });
+
             const message = await this.client.messages.create({
                 body,
                 to,
-                from: fromNumber
+                from: this.phoneNumber
             });
 
-            SafeLogger.info(`📱 Message sent successfully, SID: ${message.sid}`);
+            SafeLogger.info('SMS sent successfully:', {
+                sid: message.sid,
+                status: message.status,
+                from: message.from,
+                to: message.to
+            });
+            return message;
         } catch (error) {
-            SafeLogger.error('❌ Failed to send SMS:', error);
+            SafeLogger.error('Failed to send SMS:', {
+                error: error instanceof Error ? error.message : error,
+                errorDetails: error,
+                to,
+                from: this.phoneNumber
+            });
             throw error;
         }
     }
 
-    async makeCall({ to, message }: MakeCallOptions): Promise<void> {
-        if (!this.client) {
+    public async makeCall({ to, message, twiml }: MakeCallOptions) {
+        if (!this.isInitialized()) {
             throw new Error('Twilio client not initialized');
-        }
-
-        const fromNumber = process.env.TWILIO_PHONE_NUMBER;
-        if (!fromNumber) {
-            throw new Error('TWILIO_PHONE_NUMBER not set');
         }
 
         try {
             const call = await this.client.calls.create({
-                twiml: `<Response><Say>${message}</Say></Response>`,
                 to,
-                from: fromNumber
+                from: this.phoneNumber,
+                twiml: twiml || `<Response><Say>${message}</Say></Response>`
             });
 
-            SafeLogger.info(`📞 Call initiated successfully, SID: ${call.sid}`);
+            SafeLogger.info(`Call initiated successfully. SID: ${call.sid}`);
+            return call;
         } catch (error) {
-            SafeLogger.error('❌ Failed to initiate call:', error);
+            SafeLogger.error('Failed to initiate call:', error);
             throw error;
         }
     }
 }
 
-// Export singleton instance
 export const twilioService = new TwilioService();

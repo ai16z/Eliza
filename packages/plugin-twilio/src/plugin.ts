@@ -1,80 +1,37 @@
-import type { Plugin } from '@elizaos/core';
-import type { WebhookConfig } from './types/webhook.js';
-import type { WebhookHandler } from './types/webhook.js';
+import { Plugin, Service } from '@elizaos/core';
 import { webhookService } from './services/webhook.js';
 import { twilioService } from './services/twilio.js';
-import { webhookConfig } from './config/webhookConfig.js';
-import { webhookHandler } from './services/webhookHandler.js';
-import { SafeLogger } from './utils/logger.js';
 import { actions } from './actions/index.js';
-import { elevenLabsService } from './services/elevenlabs.js';
+import { SafeLogger } from './utils/logger.js';
 
-export interface TwilioPlugin extends Plugin {
-  webhooks?: {
-    config: WebhookConfig;
-    handler: WebhookHandler;
-  };
-  initialize?: (runtime: any) => Promise<void>;
-  version?: string;
-  services: any[];
-  actions: any[];
-}
+const plugin: Plugin = {
+    name: '@elizaos/plugin-twilio',
+    description: 'Twilio integration for voice and SMS interactions',
+    actions,
+    evaluators: [],
+    providers: [],
+    services: [webhookService]
+};
 
-export const plugin: TwilioPlugin = {
-  name: 'twilio',
-  description: 'Twilio plugin for SMS and voice calls',
-  version: '0.1.0',
-  services: [webhookService, twilioService, elevenLabsService],
-  actions,
-  webhooks: {
-    config: webhookConfig,
-    handler: webhookHandler
-  },
-  initialize: async (runtime) => {
+// Initialize services when plugin is loaded
+(async () => {
     try {
-      SafeLogger.info('🔌 Initializing Twilio plugin...');
-      SafeLogger.info('Plugin configuration:', {
-        name: plugin.name,
-        version: plugin.version,
-        services: Array.isArray(plugin.services) ? plugin.services.length : 0
-      });
+        // Check if Twilio is initialized
+        if (!twilioService.isInitialized()) {
+            SafeLogger.error('Failed to initialize Twilio service - check your credentials');
+            return;
+        }
 
-      await webhookService.initialize(runtime);
-      await twilioService.initialize();
-
-      try {
-        await elevenLabsService.initialize();
-      } catch (error) {
-        SafeLogger.warn('ElevenLabs initialization failed - will use default TTS:', error);
-      }
-
-      const baseUrl = process.env.WEBHOOK_BASE_URL;
-      if (!baseUrl) {
-        throw new Error('WEBHOOK_BASE_URL not set in environment');
-      }
-
-      const phoneNumber = process.env.TWILIO_PHONE_NUMBER;
-      if (!phoneNumber) {
-        throw new Error('TWILIO_PHONE_NUMBER not set in environment');
-      }
-
-      const client = twilioService.getClient();
-      if (!client) {
-        throw new Error('Twilio client not initialized');
-      }
-
-      await client.incomingPhoneNumbers(phoneNumber)
-        .update({
-          smsUrl: `${baseUrl}/webhook/sms`,
-          voiceUrl: `${baseUrl}/webhook/voice`
+        // Add debug logging
+        SafeLogger.info('Available actions:', actions.map(a => a.name));
+        SafeLogger.info('Plugin initialized with services:', {
+            webhook: true, // WebhookService is always initialized when loaded
+            twilio: twilioService.isInitialized()
         });
 
-      SafeLogger.info('✅ Twilio webhooks configured successfully');
-      SafeLogger.info(`📱 SMS webhook URL: ${baseUrl}/webhook/sms`);
-      SafeLogger.info(`🗣️ Voice webhook URL: ${baseUrl}/webhook/voice`);
     } catch (error) {
-      SafeLogger.error('❌ Plugin initialization failed:', error);
-      throw error;
+        SafeLogger.error('Error initializing Twilio plugin:', error);
     }
-  }
-};
+})();
+
+export default plugin;

@@ -1,10 +1,9 @@
 {
     "name": "@elizaos/plugin-twilio",
     "version": "0.1.0",
-    "private": true,
     "type": "module",
-    "main": "./dist/index.js",
-    "types": "./dist/index.d.ts",
+    "main": "dist/index.js",
+    "types": "dist/index.d.ts",
     "exports": {
         ".": {
             "types": "./dist/index.d.ts",
@@ -20,15 +19,14 @@
         "clean": "rimraf dist",
         "prebuild": "pnpm clean",
         "build": "tsx scripts/build.ts && tsc --emitDeclarationOnly --declaration",
-        "dev": "tsc -w"
+        "dev": "tsc -w",
+        "test:actions": "tsx src/tests/actions.test.ts"
     },
     "dependencies": {
         "@elizaos/core": "workspace:*",
-        "express": "^4.18.2",
-        "twilio": "^4.20.0",
+        "express": "^4.x.x",
+        "twilio": "^4.x.x",
         "uuid": "^9.0.0",
-        "@anthropic-ai/sdk": "^0.18.0",
-        "typeid-ts": "^0.3.0",
         "elevenlabs-node": "^2.0.0"
     },
     "devDependencies": {
@@ -41,8 +39,5 @@
         "tsx": "^4.7.0",
         "typescript": "^5.0.0",
         "@types/twilio": "^3.19.3"
-    },
-    "peerDependencies": {
-        "@elizaos/core": "workspace:*"
     }
 }

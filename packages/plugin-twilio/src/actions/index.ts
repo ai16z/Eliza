@@ -1,9 +1,20 @@
-import { sendSmsAction } from './sendSms.js';
-import { callVoiceAction } from './callVoice.js';
+import { sendSms } from './sendSms.js';
+import { callVoice } from './callVoice.js';
+import { smsConversation } from './smsConversation.js';
+import { voiceConversation } from './voiceConversation.js';
 
+// Export individual actions
+export {
+    sendSms,
+    callVoice,
+    smsConversation,
+    voiceConversation
+};
+
+// Export actions array
 export const actions = [
-    sendSmsAction,
-    callVoiceAction
+    sendSms,
+    callVoice,
+    smsConversation,
+    voiceConversation
 ];
-
-export { sendSmsAction, callVoiceAction };

@@ -6,13 +6,30 @@ export class SafeLogger {
         this.debugMode = enabled;
     }
 
-    static info(message: string, ...args: any[]): void {
-        console.log(`${this.PREFIX} ${message}`, ...this.sanitizeArgs(args));
+    static info(message: string, data?: any): void {
+        if (data?.text) {
+            // For messages with text content, show simplified format
+            console.log(`${this.PREFIX} ${message} "${data.text}"`);
+        } else if (data?.duration) {
+            // For messages with significant duration (>1 second)
+            const duration = parseFloat(data.duration);
+            if (duration > 1) {
+                console.log(`${this.PREFIX} ${message} (${duration.toFixed(2)}s)`);
+            } else {
+                console.log(`${this.PREFIX} ${message}`);
+            }
+        } else {
+            // For status updates, just show the message
+            console.log(`${this.PREFIX} ${message}`);
+        }
     }
 
-    static error(message: string | Error, ...args: any[]): void {
-        const errorMessage = message instanceof Error ? message.message : message;
-        console.error(`${this.PREFIX} Error: ${errorMessage}`, ...this.sanitizeArgs(args));
+    static error(message: string, error?: any): void {
+        if (error) {
+            console.error(`${this.PREFIX} ❌ ${message}`, error);
+        } else {
+            console.error(`${this.PREFIX} ❌ ${message}`);
+        }
     }
 
     static service(serviceName: string, message: string, ...args: any[]): void {

@@ -9,10 +9,8 @@ interface ElevenLabsVoiceConfig {
     style: number;
     useSpeakerBoost: boolean;
     optimizeStreamingLatency?: number;
-    outputFormat?: {
+    output_format?: {
         type: string;
-        sampleRate: number;
-        bitRate: number;
     };
 }
 
@@ -51,22 +49,38 @@ export class ElevenLabsService implements Service {
     private initialized = false;
     private baseUrl = 'https://api.elevenlabs.io/v1';
     private quotaExceeded = false;
+    private isReinitializing = false;
+    private initializationPromise: Promise<void> | null = null;
 
     constructor() {
         this.apiKey = null;
     }
 
     async reinitialize(): Promise<void> {
-        this.initialized = false;
-        this.quotaExceeded = false;
-        this.apiKey = null;
-        await this.initialize();
+        if (this.isReinitializing && this.initializationPromise) {
+            await this.initializationPromise;
+            return;
+        }
+
+        try {
+            this.isReinitializing = true;
+            this.initializationPromise = this.initialize();
+            await this.initializationPromise;
+        } finally {
+            this.isReinitializing = false;
+            this.initializationPromise = null;
+        }
     }
 
     async initialize(): Promise<void> {
         const apiKey = process.env.ELEVENLABS_XI_API_KEY;
         if (!apiKey) {
             SafeLogger.warn('ELEVENLABS_XI_API_KEY not set - ElevenLabs features will be disabled');
+            return;
+        }
+
+        // If we already have this API key and we're initialized, skip
+        if (this.apiKey === apiKey && this.initialized) {
             return;
         }
 
@@ -84,11 +98,6 @@ export class ElevenLabsService implements Service {
             }
 
             const subscriptionData = await response.json() as ElevenLabsSubscription;
-
-            // Log full subscription data for debugging
-            SafeLogger.info('ElevenLabs subscription data:', subscriptionData);
-
-            // Check if we have enough quota (available characters)
             const availableCharacters = subscriptionData.character_limit - subscriptionData.character_count;
 
             if (availableCharacters <= 0) {
@@ -116,12 +125,15 @@ export class ElevenLabsService implements Service {
     private getDefaultConfig(): ElevenLabsVoiceConfig {
         return {
             voiceId: process.env.ELEVENLABS_VOICE_ID || '21m00Tcm4TlvDq8ikWAM',
-            modelId: process.env.ELEVENLABS_MODEL_ID || 'eleven_multilingual_v2',
-            stability: Number(process.env.ELEVENLABS_VOICE_STABILITY) || 0.5,
-            similarityBoost: Number(process.env.ELEVENLABS_VOICE_SIMILARITY_BOOST) || 0.9,
-            style: Number(process.env.ELEVENLABS_VOICE_STYLE) || 0.66,
-            useSpeakerBoost: process.env.ELEVENLABS_VOICE_USE_SPEAKER_BOOST === 'true',
-            optimizeStreamingLatency: Number(process.env.ELEVENLABS_OPTIMIZE_STREAMING_LATENCY) || 4
+            modelId: 'eleven_monolingual_v1',
+            stability: 0.3,
+            similarityBoost: 0.5,
+            style: 0.5,
+            useSpeakerBoost: false,
+            optimizeStreamingLatency: 4,
+            output_format: {
+                type: "mp3_44100_64"
+            }
         };
     }
 
@@ -147,21 +159,24 @@ export class ElevenLabsService implements Service {
     }
 
     async textToSpeech(text: string, config?: Partial<ElevenLabsVoiceConfig>): Promise<Buffer | null> {
-        // Check if we need to reinitialize (new API key)
-        const currentApiKey = process.env.ELEVENLABS_XI_API_KEY;
-        if (currentApiKey && currentApiKey !== this.apiKey) {
-            SafeLogger.info('New API key detected, reinitializing ElevenLabs service...');
-            await this.reinitialize();
-        }
-
-        if (!this.initialized || !this.apiKey || this.quotaExceeded) {
-            SafeLogger.warn('ElevenLabs service not available - falling back to Twilio TTS');
-            return null;
-        }
-
-        const finalConfig = { ...this.getDefaultConfig(), ...config };
-
         try {
+            // Check if we need to reinitialize (new API key)
+            const currentApiKey = process.env.ELEVENLABS_XI_API_KEY;
+            if (currentApiKey && currentApiKey !== this.apiKey && !this.isReinitializing) {
+                await this.reinitialize();
+            }
+
+            // Wait for any pending initialization to complete
+            if (this.initializationPromise) {
+                await this.initializationPromise;
+            }
+
+            if (!this.initialized || !this.apiKey || this.quotaExceeded) {
+                return null;
+            }
+
+            const finalConfig = { ...this.getDefaultConfig(), ...config };
+
             // Optimize text length to save characters
             const MAX_CHARS = 300;
             if (text.length > MAX_CHARS) {
@@ -219,11 +234,12 @@ export class ElevenLabsService implements Service {
                 throw new Error('Received empty audio buffer from ElevenLabs');
             }
 
-            SafeLogger.info(`Successfully generated speech with ElevenLabs (${buffer.length} bytes)`);
+            // Log only at the end if successful
+            //SafeLogger.info('✅ Audio generated successfully');
             return buffer;
 
         } catch (error) {
-            SafeLogger.error('Failed to generate speech with ElevenLabs:', error);
+            SafeLogger.error('❌ Audio generation failed:', error);
             return null;
         }
     }
