@@ -13,6 +13,9 @@ import type { Gather } from 'twilio/lib/twiml/VoiceResponse';
 import { v4 as uuidv4 } from 'uuid';
 import { elevenLabsService } from './elevenlabs.js';
 import { audioHandler } from '../utils/audioHandler.js';
+import voiceRoutes from '../routes/voice.js';
+import { smsHandler } from './sms/handler.js';
+import { voiceHandler } from './voice/handler.js';
 
 // Add UUID type at the top
 type UUID = string;
@@ -267,6 +270,10 @@ export class WebhookService implements Service {
         throw new Error('No available ports found');
     }
 
+    async init(runtime?: IAgentRuntime): Promise<void> {
+        return this.initialize(runtime);
+    }
+
     async initialize(runtime?: IAgentRuntime): Promise<void> {
         // Skip if already initialized
         if (this.initialized) {
@@ -276,7 +283,11 @@ export class WebhookService implements Service {
 
         SafeLogger.info('🚀 Starting Twilio webhook server...');
 
-        this.runtime = runtime || null;
+        if (!runtime) {
+            throw new Error('Runtime is required for initialization');
+        }
+
+        this.runtime = runtime;
         const port = process.env.WEBHOOK_PORT ? parseInt(process.env.WEBHOOK_PORT, 10) : WebhookService.DEFAULT_PORT;
 
         try {
@@ -286,8 +297,16 @@ export class WebhookService implements Service {
             // Setup audio routes
             audioHandler.setupRoutes(this.app);
 
+            // Initialize handlers with runtime
+            await smsHandler.init(runtime);
+            SafeLogger.info('SMS handler initialized with runtime');
+
+            // Setup webhooks
             this.setupSMSWebhook();
             this.setupVoiceWebhook();
+
+            // Add voice routes
+            this.app.use('/', voiceRoutes);
 
             // Start the server
             this.server = this.app.listen(port, () => {
@@ -319,75 +338,57 @@ export class WebhookService implements Service {
     }
 
     private setupSMSWebhook() {
-        this.app.post('/webhook/sms',
-            async (req, res) => {
-                try {
-                    const { Body: messageText, From: fromNumber } = req.body;
+        this.app.post('/webhook/sms', async (req, res) => {
+            try {
+                const { Body: messageText, From: fromNumber } = req.body;
 
-                    // Check runtime first
-                    if (!this.runtime) {
-                        throw new Error('Runtime not initialized');
-                    }
-
-                    // Get or create conversation memory
-                    let conversation = this.conversations.get(fromNumber) || {
-                        messages: [],
-                        lastActivity: Date.now()
-                    };
-
-                    // Add user message
-                    conversation.messages.push({
-                        role: 'user',
-                        content: messageText
-                    });
-
-                    // Get response using built-in generateText with context
-                    const config = await this.loadCharacterConfig();
-                    const context = conversation.messages
-                        .map(m => `${m.role}: ${m.content}`)
-                        .join('\n');
-
-                    const response = await generateText({
-                        context: `You are ${config.name}. Keep responses under 160 characters for SMS.
-                                 DO NOT include tone markers, reactions, or contextual notes in brackets/parentheses.
-                                 Speak naturally without describing how to speak.\n\n${context}`,
-                        runtime: this.runtime,
-                        modelClass: ModelClass.SMALL,
-                        stop: ["\n", "User:", "Assistant:"]
-                    });
-
-                    // Add assistant response to memory
-                    conversation.messages.push({
-                        role: 'assistant',
-                        content: response
-                    });
-
-                    // Trim conversation if too long (keep last 20 messages)
-                    if (conversation.messages.length > 10) {
-                        conversation.messages = conversation.messages.slice(-10);
-                    }
-
-                    // Update conversation
-                    conversation.lastActivity = Date.now();
-                    this.conversations.set(fromNumber, conversation);
-
-                    // Send SMS response
-                    const cleanResponse = this.cleanResponseText(response);
-                    await twilioService.sendSms({
-                        to: fromNumber,
-                        body: cleanResponse
-                    });
-
-                    res.type('text/xml');
-                    res.send('<Response></Response>');
-
-                } catch (error) {
-                    SafeLogger.error('Error handling SMS webhook:', error);
-                    res.type('text/xml');
-                    res.send('<Response></Response>');
+                // Get the runtime from the webhook service
+                if (!this.runtime) {
+                    throw new Error('Runtime not initialized');
                 }
+
+                // Get or create conversation memory
+                let conversation = this.conversations.get(fromNumber) || {
+                    messages: [],
+                    lastActivity: Date.now()
+                };
+
+                // Add user message
+                conversation.messages.push({
+                    role: 'user',
+                    content: messageText
+                });
+
+                // Use the webhook service's runtime
+                const response = await smsHandler.generateAndSendSms(
+                    fromNumber,
+                    messageText,
+                    this.runtime,  // Pass the webhook service's runtime
+                    undefined     // No direct message in this case
+                );
+
+                // Update conversation memory
+                conversation.messages.push({
+                    role: 'assistant',
+                    content: response
+                });
+                conversation.lastActivity = Date.now();
+                this.conversations.set(fromNumber, conversation);
+
+                // Send TwiML response
+                const twiml = new twilio.twiml.MessagingResponse();
+                res.type('text/xml');
+                res.send(twiml.toString());
+
+            } catch (error) {
+                SafeLogger.error('Error in SMS webhook:', error);
+                // Send a proper TwiML response even in case of error
+                const twiml = new twilio.twiml.MessagingResponse();
+                twiml.message('Sorry, I encountered an error. Please try again later.');
+                res.type('text/xml');
+                res.send(twiml.toString());
             }
-        );
+        });
     }
 
     private setupAudioRoute() {
@@ -496,223 +497,20 @@ export class WebhookService implements Service {
     }
 
     private setupVoiceWebhook() {
-        // Initial call handler
         this.app.post('/webhook/voice', async (req, res) => {
             try {
-                const startTime = Date.now();
-                const callSid = req.body.CallSid;
-                const webhookBaseUrl = process.env.WEBHOOK_BASE_URL || 'http://localhost:3004';
+                if (!this.runtime) {
+                    throw new Error('Runtime not initialized');
+                }
 
-                SafeLogger.info('📞 New call received');
+                // Pass the webhook service's runtime to the voice handler
+                await voiceHandler.init(this.runtime);
 
-                const config = await this.loadCharacterConfig();
-                const greeting = `Hello! I'm ${config.name}. How may I assist you today?`;
-
-                // Add greeting log
-                SafeLogger.info('🤖 Agent greeting:', {
-                    text: greeting
-                });
-
-                // Initialize conversation memory
-                const conversation: VoiceConversationMemory = {
-                    messages: [{
-                        role: 'assistant',
-                        content: greeting,
-                        timestamp: new Date().toISOString()
-                    }],
-                    lastActivity: Date.now(),
-                    characterName: config.name
-                };
-                this.voiceConversations.set(callSid, conversation);
-
-                SafeLogger.info('🗣️ Converting greeting to speech');
-
-                // Generate both greeting and goodbye buffers
-                const [greetingBuffer, goodbyeBuffer] = await Promise.all([
-                    elevenLabsService.textToSpeech(greeting, this.getVoiceSettings(config)),
-                    elevenLabsService.textToSpeech("I haven't heard anything. Please call back if you'd like to talk.", this.getVoiceSettings(config))
-                ]);
-
-                const greetingId = this.audioHandler.addAudio(greetingBuffer!);
-                const goodbyeId = this.audioHandler.addAudio(goodbyeBuffer!);
-
-                const twiml = new twilio.twiml.VoiceResponse();
-
-                // Create a gather that starts listening immediately
-                const gather = twiml.gather({
-                    input: ['speech', 'dtmf'],
-                    timeout: 5,
-                    action: `${webhookBaseUrl}/webhook/voice/gather`,
-                    method: 'POST',
-                    speechTimeout: 'auto'
-                });
-
-                // Play greeting inside gather - allows listening while playing
-                gather.play({}, `${webhookBaseUrl}/audio/${greetingId}`);
-
-                // Add a backup message in case no input is received
-                twiml.play({}, `${webhookBaseUrl}/audio/${goodbyeId}`);
-                twiml.hangup();
-
-                res.type('text/xml').send(twiml.toString());
-
-                SafeLogger.info('📞 Voice conversation:', {
-                    type: 'voice',
-                    duration: this.formatDuration(Date.now() - startTime),
-                    exchange: { agent: greeting }
-                });
+                // Let the voice handler handle everything
+                await voiceHandler.handleIncomingCall(req, res);
 
             } catch (error) {
                 SafeLogger.error('Error in voice webhook:', error);
-                const twiml = new twilio.twiml.VoiceResponse();
-                twiml.say("I'm sorry, I encountered an error. Please try again later.");
-                twiml.hangup();
-                res.type('text/xml').send(twiml.toString());
-            }
-        });
-
-        // Handle ongoing conversation
-        this.app.post('/webhook/voice/gather', async (req, res) => {
-            try {
-                const startTime = Date.now();
-                const speechResult = req.body.SpeechResult;
-                const callSid = req.body.CallSid;
-                const webhookBaseUrl = process.env.WEBHOOK_BASE_URL || 'http://localhost:3004';
-
-                // Log waiting for input
-                SafeLogger.info('👂 Waiting for voice input', {
-                    duration: (Date.now() - startTime) / 1000
-                });
-
-                if (speechResult) {
-                    // Log received voice data immediately
-                    SafeLogger.info('📥 Received voice data from Twilio');
-
-                    // Add user message log
-                    SafeLogger.info('👤 User said:', {
-                        text: speechResult
-                    });
-
-                    try {
-                        // Wrap all async operations in Promise.race with timeout
-                        const processingPromise = (async (): Promise<ProcessingResult> => {
-                            // Load config and get conversation in parallel
-                            const [config, conversation] = await Promise.all([
-                                this.loadCharacterConfig(),
-                                this.getConversationMemory(callSid)
-                            ]);
-
-                            // Update conversation memory with user's message
-                            conversation.messages.push({
-                                role: 'user',
-                                content: speechResult,
-                                timestamp: new Date().toISOString()
-                            });
-
-                            // Generate response and audio in parallel
-                            const [response, goodbyeBuffer] = await Promise.all([
-                                generateText({
-                                    context: `You are ${config.name}. Previous: ${conversation.messages.map(m => `${m.role}: ${m.content}`).join('\n')}\nUser: ${speechResult}\n\nRespond in 1-2 short sentences and end with a question.`,
-                                    runtime: this.runtime!,
-                                    modelClass: ModelClass.SMALL,
-                                    stop: ["\n", "User:", "Assistant:"]
-                                }),
-                                elevenLabsService.textToSpeech("I haven't heard a response. Have a great day!", this.getVoiceSettings(config))
-                            ]);
-
-                            // Update conversation memory with assistant's response
-                            conversation.messages.push({
-                                role: 'assistant',
-                                content: response,
-                                timestamp: new Date().toISOString()
-                            });
-
-                            // Generate response audio
-                            const responseBuffer = await elevenLabsService.textToSpeech(response, this.getVoiceSettings(config));
-                            return { response, responseBuffer, goodbyeBuffer, conversation };
-                        })();
-
-                        const timeoutPromise = new Promise<never>((_, reject) => {
-                            setTimeout(() => reject(new Error('Operation timed out')), 8000);
-                        });
-
-                        // Race between processing and timeout with proper typing
-                        const result = await Promise.race<ProcessingResult>([
-                            processingPromise,
-                            timeoutPromise
-                        ]);
-
-                        const { response, responseBuffer, goodbyeBuffer } = result;
-
-                        // Add agent response log
-                        SafeLogger.info('🤖 Agent response:', {
-                            text: response
-                        });
-
-                        // Create TwiML response
-                        const twiml = new twilio.twiml.VoiceResponse();
-
-                        if (responseBuffer) {
-                            const responseId = this.audioHandler.addAudio(responseBuffer);
-                            const goodbyeId = this.audioHandler.addAudio(goodbyeBuffer!);
-
-                            // Create a gather that starts listening immediately while playing audio
-                            const gather = twiml.gather({
-                                input: ['speech'],
-                                timeout: 5,
-                                action: `${webhookBaseUrl}/webhook/voice/gather`,
-                                method: 'POST',
-                                speechTimeout: 'auto',
-                                language: 'en-US'
-                            });
-
-                            // Play the response inside the gather
-                            gather.play({}, `${webhookBaseUrl}/audio/${responseId}`);
-
-                            // Add a pause before goodbye to give more time for response
-                            twiml.pause({ length: 2 });
-                            twiml.play({}, `${webhookBaseUrl}/audio/${goodbyeId}`);
-
-                            // Add debug log
-                            const playbackStartTime = Date.now();
-                            SafeLogger.info('🔊 Starting playback and listening', {
-                                duration: (Date.now() - playbackStartTime) / 1000
-                            });
-                        } else {
-                            // Similar optimization for TTS fallback
-                            const gather = twiml.gather({
-                                input: ['speech'],
-                                timeout: 5,
-                                action: `${webhookBaseUrl}/webhook/voice/gather`,
-                                method: 'POST',
-                                speechTimeout: 'auto',
-                                language: 'en-US'
-                            });
-                            gather.say(response);
-                            twiml.pause({ length: 2 });
-                            twiml.say("I haven't heard a response. Have a great day!");
-                        }
-
-                        // Send response immediately
-                        res.type('text/xml').send(twiml.toString());
-
-                        // Log after sending response
-                        SafeLogger.info('🎤 Voice captured', {
-                            duration: (Date.now() - startTime) / 1000
-                        });
-
-                    } catch (timeoutError) {
-                        // Handle timeout specifically
-                        SafeLogger.error('Operation timed out:', { callSid, error: timeoutError });
-                        const twiml = new twilio.twiml.VoiceResponse();
-                        twiml.say("I'm sorry, it's taking longer than expected. Please try again.");
-                        twiml.hangup();
-                        res.type('text/xml').send(twiml.toString());
-                    }
-                }
-
-            } catch (error) {
-                SafeLogger.error('Error in voice gather webhook:', error);
                 const twiml = new twilio.twiml.VoiceResponse();
                 twiml.say("I'm sorry, I encountered an error. Please try again later.");
                 twiml.hangup();
@@ -884,6 +682,11 @@ export class WebhookService implements Service {
             this.voiceConversations.set(callSid, conversation);
         }
         return conversation;
+    }
+
+    // Add isInitialized method
+    isInitialized(): boolean {
+        return this.initialized;
     }
 }
 

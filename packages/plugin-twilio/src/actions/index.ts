@@ -1,14 +1,6 @@
-import { sendSms } from './sendSms.js';
-import { callVoice } from './callVoice.js';
+import { Action } from '@elizaos/core';
+import { sms } from './sms.js';
+import { call } from './call.js';
 
-// Export individual actions
-export {
-    sendSms,
-    callVoice
-};
-
-// Export actions array
-export const actions = [
-    sendSms,
-    callVoice
-];
+// Export as an array of actions, not an object
+export const actions: Action[] = [sms, call];

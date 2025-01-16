@@ -1,8 +1,14 @@
 // /packages/plugin-twilio/src/services/twilio.ts
 
+import type { IAgentRuntime } from '@elizaos/core';
 import twilio from 'twilio';
 import { SafeLogger } from '../utils/logger.js';
 import { VoiceConversationMemory } from '../types/voice.js';
+
+// Declare global runtime type
+declare global {
+    var defaultRuntime: IAgentRuntime | undefined;
+}
 
 // Export the interfaces so they can be used elsewhere
 export interface SendSmsOptions {
@@ -17,91 +23,82 @@ export interface MakeCallOptions {
 }
 
 export class TwilioService {
-    private _client: twilio.Twilio | null = null;
-    private _phoneNumber: string | null = null;
-    public voiceConversations = new Map<string, VoiceConversationMemory>();
+    private static instance: TwilioService;
+    public client: twilio.Twilio;
+    public voiceConversations: Map<string, VoiceConversationMemory>;
+    private callRuntimes: Map<string, IAgentRuntime>;
+    private initialized: boolean = false;
 
     constructor() {
-        if (process.env.TWILIO_ACCOUNT_SID && process.env.TWILIO_AUTH_TOKEN) {
-            this._client = twilio(process.env.TWILIO_ACCOUNT_SID, process.env.TWILIO_AUTH_TOKEN);
-            this._phoneNumber = process.env.TWILIO_PHONE_NUMBER || null;
+        const accountSid = process.env.TWILIO_ACCOUNT_SID;
+        const authToken = process.env.TWILIO_AUTH_TOKEN;
+
+        if (!accountSid || !authToken) {
+            throw new Error('Missing required Twilio credentials');
+        }
+
+        try {
+            this.client = twilio(accountSid, authToken);
+            this.voiceConversations = new Map();
+            this.callRuntimes = new Map();
+            this.initialized = true;
+        } catch (error) {
+            SafeLogger.error('Failed to initialize Twilio client:', error);
+            this.initialized = false;
+            throw error;
         }
     }
 
-    get client() {
-        if (!this._client) {
-            throw new Error('Twilio client not initialized');
+    static getInstance(): TwilioService {
+        if (!this.instance) {
+            this.instance = new TwilioService();
         }
-        return this._client;
-    }
-
-    get phoneNumber() {
-        if (!this._phoneNumber) {
-            throw new Error('Twilio phone number not set');
-        }
-        return this._phoneNumber;
+        return this.instance;
     }
 
     public isInitialized(): boolean {
-        return this._client !== null;
+        return this.initialized && !!process.env.TWILIO_PHONE_NUMBER;
     }
 
-    public async sendSms({ to, body }: SendSmsOptions) {
+    async initializeCallRuntime(callSid: string): Promise<IAgentRuntime> {
         if (!this.isInitialized()) {
-            SafeLogger.error('Twilio not initialized');
-            throw new Error('Twilio client not initialized');
+            throw new Error('Twilio service not properly initialized');
         }
 
         try {
-            SafeLogger.info('Attempting to send SMS:', {
-                from: this.phoneNumber,
-                to,
-                bodyLength: body.length
-            });
+            const runtime = global.defaultRuntime;
+            if (!runtime) {
+                throw new Error('Default runtime not found');
+            }
 
-            const message = await this.client.messages.create({
-                body,
-                to,
-                from: this.phoneNumber
-            });
+            this.callRuntimes.set(callSid, runtime);
+            SafeLogger.info(`Runtime initialized for call ${callSid}`);
 
-            SafeLogger.info('SMS sent successfully:', {
-                sid: message.sid,
-                status: message.status,
-                from: message.from,
-                to: message.to
-            });
-            return message;
+            return runtime;
         } catch (error) {
-            SafeLogger.error('Failed to send SMS:', {
-                error: error instanceof Error ? error.message : error,
-                errorDetails: error,
-                to,
-                from: this.phoneNumber
-            });
+            SafeLogger.error('Failed to initialize call runtime:', error);
             throw error;
         }
     }
 
-    public async makeCall({ to, message, twiml }: MakeCallOptions) {
+    getRuntimeForCall(callSid: string): IAgentRuntime | undefined {
         if (!this.isInitialized()) {
-            throw new Error('Twilio client not initialized');
+            throw new Error('Twilio service not properly initialized');
+        }
+        return this.callRuntimes.get(callSid);
+    }
+
+    async sendSms(params: { to: string; body: string }) {
+        if (!this.isInitialized()) {
+            throw new Error('Twilio service not properly initialized');
         }
 
-        try {
-            const call = await this.client.calls.create({
-                to,
-                from: this.phoneNumber,
-                twiml: twiml || `<Response><Say>${message}</Say></Response>`
-            });
-
-            SafeLogger.info(`Call initiated successfully. SID: ${call.sid}`);
-            return call;
-        } catch (error) {
-            SafeLogger.error('Failed to initiate call:', error);
-            throw error;
-        }
+        return this.client.messages.create({
+            to: params.to,
+            from: process.env.TWILIO_PHONE_NUMBER,
+            body: params.body
+        });
     }
 }
 
-export const twilioService = new TwilioService();
+export const twilioService = TwilioService.getInstance();

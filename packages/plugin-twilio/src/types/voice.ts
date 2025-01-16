@@ -1,17 +1,10 @@
 // /packages/plugin-twilio/src/types/voice.ts
 
-export interface ElevenLabsVoiceConfig {
-    voiceId: string;
-    modelId?: string;
-    stability?: number;
-    similarityBoost?: number;
-    style?: number;
-    useSpeakerBoost?: boolean;
-}
+import type { Character } from '@elizaos/core';
 
 export interface VoiceConversationMemory {
     messages: Array<{
-        role: 'assistant' | 'user';
+        role: 'user' | 'assistant';
         content: string;
         timestamp: string;
     }>;
@@ -20,9 +13,14 @@ export interface VoiceConversationMemory {
 }
 
 export interface VoiceSettings {
-    elevenlabs?: Partial<ElevenLabsVoiceConfig>;
-    polly?: {
-        voiceId: string;
-        engine?: 'neural' | 'standard';
-    };
+    voiceId: string;
+    model?: string;
+    stability?: number;
+    similarityBoost?: number;
+    style?: number;
+    useSpeakerBoost?: boolean;
+}
+
+export interface ElevenLabsAPI {
+    textToSpeech(text: string, settings?: Partial<VoiceSettings>): Promise<Buffer | null>;
 }
