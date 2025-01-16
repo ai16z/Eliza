@@ -53,6 +53,7 @@ import { avalanchePlugin } from "@elizaos/plugin-avalanche";
 import { b2Plugin } from "@elizaos/plugin-b2";
 import { binancePlugin } from "@elizaos/plugin-binance";
 import { birdeyePlugin } from "@elizaos/plugin-birdeye";
+import { tronPlugin } from "@elizaos/plugin-tron";
 import {
     advancedTradePlugin,
     coinbaseCommercePlugin,
@@ -938,6 +939,7 @@ export async function createAgent(
             getSecret(character, "RESERVOIR_API_KEY")
                 ? createNFTCollectionsPlugin()
                 : null,
+            getSecret(character, "TRON_PRIVATE_KEY") ? tronPlugin : null,
         ].filter(Boolean),
         providers: [],
         actions: [],

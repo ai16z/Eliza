@@ -67,6 +67,7 @@
         "@elizaos/plugin-starknet": "workspace:*",
         "@elizaos/plugin-stargaze": "workspace:*",
         "@elizaos/plugin-giphy": "workspace:*",
+        "@elizaos/plugin-tron": "workspace:*",
         "@elizaos/plugin-ton": "workspace:*",
         "@elizaos/plugin-sui": "workspace:*",
         "@elizaos/plugin-sgx": "workspace:*",

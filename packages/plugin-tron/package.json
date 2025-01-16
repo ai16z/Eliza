@@ -1,0 +1,60 @@
+{
+    "name": "@elizaos/plugin-tron",
+    "version": "0.1.0",
+    "repository": {
+        "url": "https://github.com/moon-ai-labs/eliza-tron-plugin"
+    },
+    "author": {
+        "name": "moon-ai-labs"
+    },
+    "type": "module",
+    "main": "dist/index.js",
+    "module": "dist/index.js",
+    "types": "dist/index.d.ts",
+    "exports": {
+        "./package.json": "./package.json",
+        ".": {
+            "import": {
+                "@elizaos/source": "./src/index.ts",
+                "types": "./dist/index.d.ts",
+                "default": "./dist/index.js"
+            }
+        }
+    },
+    "files": [
+        "dist"
+    ],
+    "dependencies": {
+        "@elizaos/core": "^0.1.7",
+        "@elizaos/plugin-tee": "^0.1.7",
+        "@langchain/core": "^0.3.27",
+        "@lifi/data-types": "5.15.5",
+        "@lifi/sdk": "3.4.1",
+        "@lifi/types": "16.3.0",
+        "@noble/secp256k1": "^2.2.3",
+        "axios": "^1.7.9",
+        "dotenv": "^16.4.7",
+        "sharp": "0.33.5",
+        "tronweb": "^6.0.0",
+        "tsup": "8.3.5"
+    },
+    "scripts": {
+        "build": "tsup --format esm --dts",
+        "dev": "tsup --format esm --dts --watch",
+        "test": "vitest run",
+        "lint": "eslint --fix  --cache ."
+    },
+    "peerDependencies": {
+        "whatwg-url": "7.1.0"
+    },
+    "devDependencies": {
+        "@tavily/core": "^0.0.2",
+        "@typescript-eslint/eslint-plugin": "8.16.0",
+        "@typescript-eslint/parser": "8.16.0",
+        "@vitest/eslint-plugin": "1.1.13",
+        "eslint": "9.16.0",
+        "eslint-config-prettier": "9.1.0",
+        "typescript": "5.6.3",
+        "vitest": "^2.1.8"
+    }
+}
