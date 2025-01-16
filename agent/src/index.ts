@@ -99,6 +99,7 @@ import { verifiableLogPlugin } from "@elizaos/plugin-tee-verifiable-log";
 import { thirdwebPlugin } from "@elizaos/plugin-thirdweb";
 import { tonPlugin } from "@elizaos/plugin-ton";
 import { webSearchPlugin } from "@elizaos/plugin-web-search";
+import { dkgPlugin } from "@elizaos/plugin-dkg";
 import { echoChambersPlugin } from "@elizaos/plugin-echochambers";
 import { dexScreenerPlugin } from "@elizaos/plugin-dexscreener";
 
@@ -109,7 +110,6 @@ import net from "net";
 import path from "path";
 import { fileURLToPath } from "url";
 import yargs from "yargs";
-
 
 const __filename = fileURLToPath(import.meta.url); // get the resolved path to the file
 const __dirname = path.dirname(__filename); // get the name of the directory
@@ -246,14 +246,13 @@ async function loadCharacter(filePath: string): Promise<Character> {
 }
 
 function commaSeparatedStringToArray(commaSeparated: string): string[] {
-    return commaSeparated?.split(",").map(value => value.trim())
+    return commaSeparated?.split(",").map((value) => value.trim());
 }
-
 
 export async function loadCharacters(
     charactersArg: string
 ): Promise<Character[]> {
-    let characterPaths = commaSeparatedStringToArray(charactersArg)
+    let characterPaths = commaSeparatedStringToArray(charactersArg);
     const loadedCharacters: Character[] = [];
 
     if (characterPaths?.length > 0) {
@@ -327,7 +326,9 @@ export async function loadCharacters(
 
     if (hasValidRemoteUrls()) {
         elizaLogger.info("Loading characters from remote URLs");
-        let characterUrls = commaSeparatedStringToArray(process.env.REMOTE_CHARACTER_URLS)
+        let characterUrls = commaSeparatedStringToArray(
+            process.env.REMOTE_CHARACTER_URLS
+        );
         for (const characterUrl of characterUrls) {
             const character = await loadCharacterFromUrl(characterUrl);
             loadedCharacters.push(character);
@@ -940,6 +941,7 @@ export async function createAgent(
             getSecret(character, "RESERVOIR_API_KEY")
                 ? createNFTCollectionsPlugin()
                 : null,
+            getSecret(character, "DKG_PRIVATE_KEY") ? dkgPlugin : null,
         ].filter(Boolean),
         providers: [],
         actions: [],
@@ -1103,10 +1105,9 @@ const checkPortAvailable = (port: number): Promise<boolean> => {
 
 
 const hasValidRemoteUrls = () =>
-    process.env.REMOTE_CHARACTER_URLS &&
+    process.env.REMOTE_CHARACTER_URLS != "" &&
     process.env.REMOTE_CHARACTER_URLS !== "" &&
-    process.env.REMOTE_CHARACTER_URLS.startsWith("http");
-
+    process.env.REMOTE_CHARACTER_URLS?.startsWith("http");
 
 const startAgents = async () => {
     const directClient = new DirectClient();
