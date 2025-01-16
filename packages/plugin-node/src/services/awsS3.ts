@@ -69,7 +69,15 @@ export class AwsS3Service extends Service implements IAwsS3Service {
         return true;
     }
 
-    async uploadFile(
+    uploadFile(
+        imagePath: string,
+        useSignedUrl: boolean,
+        expiresIn: number
+    ): Promise<UploadResult> {
+        return this.uploadFileInternal(imagePath, "", useSignedUrl, expiresIn);
+    }
+
+    async uploadFileInternal(
         filePath: string,
         subDirectory: string = "",
         useSignedUrl: boolean = false,

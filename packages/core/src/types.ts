@@ -641,7 +641,9 @@ export type Plugin = {
  */
 export enum Clients {
     DISCORD = "discord",
-    DIRECT = "direct",
+    // you can't specify this in characters
+    // all characters are registered with this
+    //    DIRECT = "direct",
     TWITTER = "twitter",
     TELEGRAM = "telegram",
     FARCASTER = "farcaster",
@@ -649,6 +651,7 @@ export enum Clients {
     AUTO = "auto",
     SLACK = "slack",
     GITHUB = "github",
+    NOSTR = "nostr",
 }
 
 export interface IAgentConfig {
@@ -745,6 +748,9 @@ export type Character = {
         discordMessageHandlerTemplate?: TemplateType;
         slackMessageHandlerTemplate?: TemplateType;
         slackShouldRespondTemplate?: TemplateType;
+        nostrMessageHandlerTemplate?: TemplateType;
+        nostrShouldRespondTemplate?: TemplateType;
+        nostrPostTemplate?: TemplateType;
     };
 
     /** Character biography */
@@ -1336,7 +1342,6 @@ export interface IPdfService extends Service {
 export interface IAwsS3Service extends Service {
     uploadFile(
         imagePath: string,
-        subDirectory: string,
         useSignedUrl: boolean,
         expiresIn: number
     ): Promise<{

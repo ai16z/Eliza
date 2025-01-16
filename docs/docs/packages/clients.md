@@ -18,6 +18,7 @@ graph TD
     CI --> TC["Telegram Client"]
     CI --> TWC["Twitter Client"]
     CI --> AC["Auto Client"]
+    CI --> NC["Nostr Client"]
 
     %% Key Features - one per client for clarity
     DC --> |"REST API"| DC1["Messages & Images"]
@@ -25,6 +26,7 @@ graph TD
     TC --> |"Bot API"| TC1["Commands & Media"]
     TWC --> |"Social"| TWC1["Posts & Interactions"]
     AC --> |"Trading"| AC1["Analysis & Execution"]
+    NC --> |"Social"| NC1["Posts & Interactions"]
 
     %% Simple styling with better contrast and black text
     classDef default fill:#f9f9f9,stroke:#333,stroke-width:1px,color:black
@@ -40,6 +42,7 @@ graph TD
 - **Telegram** (`@elizaos/client-telegram`) - Telegram bot integration
 - **Direct** (`@elizaos/client-direct`) - Direct API interface for custom integrations
 - **Auto** (`@elizaos/client-auto`) - Automated trading and interaction client
+- **Nostr** (`@elizaos/client-nostr`) - Nostr bot integration
 
 ---
 
@@ -60,6 +63,9 @@ pnpm add @elizaos/client-direct
 
 # Auto Client
 pnpm add @elizaos/client-auto
+
+# Nostr
+pnpm add @elizaos/client-nostr
 ```
 
 ---
@@ -290,6 +296,44 @@ class AutoClient {
         // Execute trades
         await this.executeTrades(analysis);
     }
+}
+```
+
+## Nostr Client
+
+The Nostr client enables posting and interacting with Nostr users.
+
+### Basic Setup
+
+```typescript
+import { NostrAgentClient } from "@eliza/client-nostr";
+// Initialize and start the client
+await new NostrAgentClient(runtime).start();
+
+// Configuration in .env
+// The list of Nostr relays to connect to.
+NOSTR_RELAYS="wss://relay.damus.io,wss://relay.primal.net"
+// Nostr Private Key (starts with nsec)
+NOSTR_NSEC_KEY="nsec1..."
+// Nostr Public Key (starts with npub)
+NOSTR_NPUB_KEY="npub1..."
+// How often (in seconds) the bot should check for Nostr interactions (default: 2 minutes)
+NOSTR_POLL_INTERVAL=120
+// Whether to post immediately or not
+NOSTR_POST_IMMEDIATELY=false
+// Whether to dry run or not
+NOSTR_DRY_RUN=false
+```
+
+### Components
+
+- **NostrClient**: Handles creating and managing posts
+
+### Post Management
+
+```typescript
+class NostrClient {
+  async publishNote(content: string) {};
 }
 ```
 
