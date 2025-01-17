@@ -165,9 +165,12 @@ export class AgentRuntime implements IAgentRuntime {
 
     ragKnowledgeManager: IRAGKnowledgeManager;
 
+    services: Map<ServiceType | string, Service> = new Map();
+    private serviceMethods: Map<
+        string,
+        { [methodName: string]: (...args: unknown[]) => any }
+    > = new Map();
     private readonly knowledgeRoot: string;
-
-    services: Map<ServiceType, Service> = new Map();
     memoryManagers: Map<string, IMemoryManager> = new Map();
     cacheManager: ICacheManager;
     clients: Record<string, any>;
@@ -193,7 +196,7 @@ export class AgentRuntime implements IAgentRuntime {
         return this.memoryManagers.get(tableName) || null;
     }
 
-    getService<T extends Service>(service: ServiceType): T | null {
+    getService<T extends Service>(service: ServiceType | string): T | null {
         const serviceInstance = this.services.get(service);
         if (!serviceInstance) {
             elizaLogger.error(`Service ${service} not found`);
@@ -215,7 +218,44 @@ export class AgentRuntime implements IAgentRuntime {
 
         // Add the service to the services map
         this.services.set(serviceType, service);
+
+        if (typeof (service as any).getMethods === "function") {
+            if (this.serviceMethods.has(serviceType)) {
+                elizaLogger.error(
+                    `Methods for service '${serviceType}' already registered.`
+                );
+                return;
+            }
+
+            const methods = (service as any).getMethods();
+            this.serviceMethods.set(serviceType, methods);
+            console.log(
+                `Registered methods for '${serviceType}':`,
+                Object.keys(methods)
+            );
+        }
+
         elizaLogger.success(`Service ${serviceType} registered successfully`);
+    }
+
+    async callServiceMethod(
+        serviceName: string,
+        methodName: string,
+        ...args: unknown[]
+    ): Promise<any> {
+        const methods = this.serviceMethods.get(serviceName);
+        if (!methods) {
+            throw new Error(`No methods found for service '${serviceName}'.`);
+        }
+        const method = methods[methodName];
+        if (!method) {
+            throw new Error(
+                `Method '${methodName}' not found on service '${serviceName}'.`
+            );
+        }
+
+        const result = method(...args);
+        return Promise.resolve(result);
     }
 
     /**

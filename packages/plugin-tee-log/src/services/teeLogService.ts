@@ -1,9 +1,29 @@
-import { IAgentRuntime, Service, ServiceType, ITeeLogService } from "@elizaos/core";
+import { IAgentRuntime, Service, ServiceType } from "@elizaos/core";
 import { TEEMode } from "@elizaos/plugin-tee";
 import { SqliteTeeLogDAO } from "../adapters/sqliteDAO";
-import { TeeType, TeeLogDAO, TeeAgent, TeeLog, TeeLogQuery, PageQuery } from "../types";
+import {
+    TeeType,
+    TeeLogDAO,
+    TeeAgent,
+    TeeLog,
+    TeeLogQuery,
+    PageQuery,
+} from "../types";
 import { TeeLogManager } from "./teeLogManager";
 import Database from "better-sqlite3";
+
+interface ITeeLogService extends Service {
+    getInstance(): ITeeLogService;
+    log(
+        agentId: string,
+        roomId: string,
+        userId: string,
+        type: string,
+        content: string
+    ): Promise<boolean>;
+}
+
+const TEE_LOG_SERVICE_TYPE = "tee_log";
 
 export class TeeLogService extends Service implements ITeeLogService {
     private readonly dbPath = "./data/tee_log.sqlite";
@@ -16,13 +36,18 @@ export class TeeLogService extends Service implements ITeeLogService {
     private teeLogDAO: TeeLogDAO;
     private teeLogManager: TeeLogManager;
 
-
     getInstance(): TeeLogService {
         return this;
     }
 
-    static get serviceType(): ServiceType {
-        return ServiceType.TEE_LOG;
+    getMethods() {
+        return {
+            log: this.log.bind(this),
+        };
+    }
+
+    static get serviceType(): string {
+        return TEE_LOG_SERVICE_TYPE;
     }
 
     async initialize(runtime: IAgentRuntime): Promise<void> {
@@ -46,11 +71,15 @@ export class TeeLogService extends Service implements ITeeLogService {
         const teeMode = runtime.getSetting("TEE_MODE");
         const walletSecretSalt = runtime.getSetting("WALLET_SECRET_SALT");
 
-        const useSgxGramine = runInSgx && enableValues.includes(runInSgx.toLowerCase());
-        const useTdxDstack = !teeMode && teeMode !== TEEMode.OFF && walletSecretSalt;
+        const useSgxGramine =
+            runInSgx && enableValues.includes(runInSgx.toLowerCase());
+        const useTdxDstack =
+            !teeMode && teeMode !== TEEMode.OFF && walletSecretSalt;
 
         if (useSgxGramine && useTdxDstack) {
-            throw new Error("Cannot configure both SGX and TDX at the same time.");
+            throw new Error(
+                "Cannot configure both SGX and TDX at the same time."
+            );
         } else if (useSgxGramine) {
             this.teeType = TeeType.SGX_GRAMINE;
         } else if (useTdxDstack) {
@@ -62,11 +91,15 @@ export class TeeLogService extends Service implements ITeeLogService {
         const db = new Database(this.dbPath);
         this.teeLogDAO = new SqliteTeeLogDAO(db);
         await this.teeLogDAO.initialize();
-        this.teeLogManager = new TeeLogManager(this.teeLogDAO, this.teeType, this.teeMode);
+        this.teeLogManager = new TeeLogManager(
+            this.teeLogDAO,
+            this.teeType,
+            this.teeMode
+        );
 
         const isRegistered = await this.teeLogManager.registerAgent(
             runtime?.agentId,
-            runtime?.character?.name,
+            runtime?.character?.name
         );
         if (!isRegistered) {
             throw new Error(`Failed to register agent ${runtime.agentId}`);
@@ -75,7 +108,13 @@ export class TeeLogService extends Service implements ITeeLogService {
         this.initialized = true;
     }
 
-    async log(agentId: string, roomId: string, userId: string, type: string, content: string): Promise<boolean> {
+    async log(
+        agentId: string,
+        roomId: string,
+        userId: string,
+        type: string,
+        content: string
+    ): Promise<boolean> {
         if (!this.enableTeeLog) {
             return false;
         }
@@ -99,7 +138,11 @@ export class TeeLogService extends Service implements ITeeLogService {
         return this.teeLogManager.getAgent(agentId);
     }
 
-    async getLogs(query: TeeLogQuery, page: number, pageSize: number): Promise<PageQuery<TeeLog[]>> {
+    async getLogs(
+        query: TeeLogQuery,
+        page: number,
+        pageSize: number
+    ): Promise<PageQuery<TeeLog[]>> {
         if (!this.enableTeeLog) {
             return {
                 data: [],

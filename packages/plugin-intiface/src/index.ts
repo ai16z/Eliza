@@ -8,7 +8,7 @@ import type {
     Plugin,
     State,
 } from "@elizaos/core";
-import { Service, ServiceType } from "@elizaos/core";
+import { Service } from "@elizaos/core";
 import {
     isPortAvailable,
     startIntifaceEngine,
@@ -23,8 +23,10 @@ export interface IIntifaceService extends Service {
     getDevices(): any[];
 }
 
+const INTIFACE_SERVICE_TYPE = "intiface";
+
 export class IntifaceService extends Service implements IIntifaceService {
-    static serviceType: ServiceType = ServiceType.INTIFACE;
+    static serviceType: string = INTIFACE_SERVICE_TYPE;
     private client: ButtplugClient;
     private connected = false;
     private devices: Map<string, any> = new Map();
@@ -68,6 +70,14 @@ export class IntifaceService extends Service implements IIntifaceService {
 
     getInstance(): IIntifaceService {
         return this;
+    }
+
+    getMethods() {
+        return {
+            vibrate: this.vibrate.bind(this),
+            rotate: this.rotate.bind(this),
+            getBatteryLevel: this.getBatteryLevel.bind(this),
+        };
     }
 
     async initialize(runtime: IAgentRuntime): Promise<void> {
@@ -339,7 +349,7 @@ const vibrateAction: Action = {
         callback: HandlerCallback
     ) => {
         const service = runtime.getService<IIntifaceService>(
-            ServiceType.INTIFACE
+            INTIFACE_SERVICE_TYPE
         );
         if (!service) {
             throw new Error("Intiface service not available");
@@ -449,7 +459,7 @@ const rotateAction: Action = {
         callback: HandlerCallback
     ) => {
         const service = runtime.getService<IIntifaceService>(
-            ServiceType.INTIFACE
+            INTIFACE_SERVICE_TYPE
         );
         if (!service || !service.rotate) {
             throw new Error("Rotation not supported");
@@ -507,7 +517,7 @@ const batteryAction: Action = {
         callback: HandlerCallback
     ) => {
         const service = runtime.getService<IIntifaceService>(
-            ServiceType.INTIFACE
+            INTIFACE_SERVICE_TYPE
         );
         if (!service || !service.getBatteryLevel) {
             throw new Error("Battery level check not supported");

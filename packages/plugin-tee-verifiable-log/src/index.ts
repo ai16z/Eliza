@@ -1,4 +1,4 @@
-import { IAgentRuntime, type Plugin, Service, ServiceType } from "@elizaos/core";
+import { IAgentRuntime, type Plugin, Service } from "@elizaos/core";
 import { VerifiableLogProvider } from "./providers/verifiableLogProvider.ts";
 import { SQLite3VerifiableDAO } from "./adapters/sqliteVerifiableDAO.ts";
 import {
@@ -10,15 +10,17 @@ import {
 } from "./types/logTypes.ts";
 
 export { PageQuery, VerifiableAgent, VerifiableLog, VerifiableLogQuery };
-export { DeriveProvider } from "./providers/dreriveProvider.ts"
+export { DeriveProvider } from "./providers/dreriveProvider.ts";
+
+const TEE_VERIFIABLE_SERVICE_TYPE = "verifiable_logging";
 
 export class VerifiableLogService extends Service {
     getInstance(): VerifiableLogService {
         return this;
     }
 
-    static get serviceType(): ServiceType {
-        return ServiceType.VERIFIABLE_LOGGING;
+    static get serviceType(): string {
+        return TEE_VERIFIABLE_SERVICE_TYPE;
     }
 
     private verifiableLogProvider: VerifiableLogProvider;
@@ -59,6 +61,14 @@ export class VerifiableLogService extends Service {
         return;
     }
 
+    getMethods() {
+        return {
+            listAgent: this.listAgent.bind(this),
+            generateAttestation: this.generateAttestation.bind(this),
+            pageQueryLogs: this.pageQueryLogs.bind(this),
+        };
+    }
+
     async log(params: {
         agentId: string;
         roomId: string;
@@ -77,9 +87,7 @@ export class VerifiableLogService extends Service {
         publicKey: string;
     }): Promise<string> {
         if (this.vlogOpen) {
-            return this.verifiableLogProvider.generateAttestation(
-                params,
-            );
+            return this.verifiableLogProvider.generateAttestation(params);
         }
         return "";
     }

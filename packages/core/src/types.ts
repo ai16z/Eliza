@@ -1179,7 +1179,7 @@ export interface ICacheManager {
 export abstract class Service {
     private static instance: Service | null = null;
 
-    static get serviceType(): ServiceType {
+    static get serviceType(): ServiceType | string {
         throw new Error("Service must implement static serviceType getter");
     }
 
@@ -1190,7 +1190,7 @@ export abstract class Service {
         return Service.instance as T;
     }
 
-    get serviceType(): ServiceType {
+    get serviceType(): ServiceType | string {
         return (this.constructor as typeof Service).serviceType;
     }
 
@@ -1224,7 +1224,7 @@ export interface IAgentRuntime {
 
     cacheManager: ICacheManager;
 
-    services: Map<ServiceType, Service>;
+    services: Map<ServiceType | string, Service>;
     // any could be EventEmitter
     // but I think the real solution is forthcoming as a base client interface
     clients: Record<string, any>;
@@ -1237,7 +1237,7 @@ export interface IAgentRuntime {
 
     getMemoryManager(name: string): IMemoryManager | null;
 
-    getService<T extends Service>(service: ServiceType): T | null;
+    getService<T extends Service>(service: ServiceType | string): T | null;
 
     registerService(service: Service): void;
 
@@ -1289,6 +1289,12 @@ export interface IAgentRuntime {
     ): Promise<State>;
 
     updateRecentMessageState(state: State): Promise<State>;
+
+    callServiceMethod(
+        serviceName: string,
+        methodName: string,
+        ...args: unknown[]
+    ): Promise<any>;
 }
 
 export interface IImageDescriptionService extends Service {
@@ -1366,77 +1372,6 @@ export interface IAwsS3Service extends Service {
     generateSignedUrl(fileName: string, expiresIn: number): Promise<string>;
 }
 
-export interface UploadIrysResult {
-    success: boolean;
-    url?: string;
-    error?: string;
-    data?: any;
-}
-
-export interface DataIrysFetchedFromGQL {
-    success: boolean;
-    data: any;
-    error?: string;
-}
-
-export interface GraphQLTag {
-    name: string;
-    values: any[];
-}
-
-export const enum IrysMessageType {
-    REQUEST = "REQUEST",
-    DATA_STORAGE = "DATA_STORAGE",
-    REQUEST_RESPONSE = "REQUEST_RESPONSE",
-}
-
-export const enum IrysDataType {
-    FILE = "FILE",
-    IMAGE = "IMAGE",
-    OTHER = "OTHER",
-}
-
-export interface IrysTimestamp {
-    from: number;
-    to: number;
-}
-
-export interface IIrysService extends Service {
-    getDataFromAnAgent(
-        agentsWalletPublicKeys: string[],
-        tags: GraphQLTag[],
-        timestamp: IrysTimestamp
-    ): Promise<DataIrysFetchedFromGQL>;
-    workerUploadDataOnIrys(
-        data: any,
-        dataType: IrysDataType,
-        messageType: IrysMessageType,
-        serviceCategory: string[],
-        protocol: string[],
-        validationThreshold: number[],
-        minimumProviders: number[],
-        testProvider: boolean[],
-        reputation: number[]
-    ): Promise<UploadIrysResult>;
-    providerUploadDataOnIrys(
-        data: any,
-        dataType: IrysDataType,
-        serviceCategory: string[],
-        protocol: string[]
-    ): Promise<UploadIrysResult>;
-}
-
-export interface ITeeLogService extends Service {
-    getInstance(): ITeeLogService;
-    log(
-        agentId: string,
-        roomId: string,
-        userId: string,
-        type: string,
-        content: string
-    ): Promise<boolean>;
-}
-
 export enum ServiceType {
     IMAGE_DESCRIPTION = "image_description",
     TRANSCRIPTION = "transcription",
@@ -1445,15 +1380,8 @@ export enum ServiceType {
     BROWSER = "browser",
     SPEECH_GENERATION = "speech_generation",
     PDF = "pdf",
-    INTIFACE = "intiface",
     AWS_S3 = "aws_s3",
-    BUTTPLUG = "buttplug",
     SLACK = "slack",
-    VERIFIABLE_LOGGING = "verifiable_logging",
-    IRYS = "irys",
-    TEE_LOG = "tee_log",
-    GOPLUS_SECURITY = "goplus_security",
-    WEB_SEARCH = "web_search",
 }
 
 export enum LoggingLevel {

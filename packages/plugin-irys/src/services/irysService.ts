@@ -2,20 +2,73 @@ import {
     IAgentRuntime,
     Service,
     ServiceType,
-    IIrysService,
-    UploadIrysResult,
-    DataIrysFetchedFromGQL,
-    GraphQLTag,
-    IrysMessageType,
     generateMessageResponse,
     ModelClass,
-    IrysDataType,
-    IrysTimestamp,
 } from "@elizaos/core";
 import { Uploader } from "@irys/upload";
 import { BaseEth } from "@irys/upload-ethereum";
-import { GraphQLClient, gql } from 'graphql-request';
-import crypto from 'crypto';
+import { GraphQLClient, gql } from "graphql-request";
+import crypto from "crypto";
+
+interface IIrysService extends Service {
+    getDataFromAnAgent(
+        agentsWalletPublicKeys: string[],
+        tags: GraphQLTag[],
+        timestamp: IrysTimestamp
+    ): Promise<DataIrysFetchedFromGQL>;
+    workerUploadDataOnIrys(
+        data: any,
+        dataType: IrysDataType,
+        messageType: IrysMessageType,
+        serviceCategory: string[],
+        protocol: string[],
+        validationThreshold: number[],
+        minimumProviders: number[],
+        testProvider: boolean[],
+        reputation: number[]
+    ): Promise<UploadIrysResult>;
+    providerUploadDataOnIrys(
+        data: any,
+        dataType: IrysDataType,
+        serviceCategory: string[],
+        protocol: string[]
+    ): Promise<UploadIrysResult>;
+}
+
+interface UploadIrysResult {
+    success: boolean;
+    url?: string;
+    error?: string;
+    data?: any;
+}
+
+interface DataIrysFetchedFromGQL {
+    success: boolean;
+    data: any;
+    error?: string;
+}
+
+interface GraphQLTag {
+    name: string;
+    values: any[];
+}
+
+const enum IrysMessageType {
+    REQUEST = "REQUEST",
+    DATA_STORAGE = "DATA_STORAGE",
+    REQUEST_RESPONSE = "REQUEST_RESPONSE",
+}
+
+const enum IrysDataType {
+    FILE = "FILE",
+    IMAGE = "IMAGE",
+    OTHER = "OTHER",
+}
+
+interface IrysTimestamp {
+    from: number;
+    to: number;
+}
 
 interface NodeGQL {
     id: string;
@@ -34,17 +87,20 @@ interface TransactionGQL {
             node: {
                 id: string;
                 address: string;
-            }
-        }[]
-    }
+            };
+        }[];
+    };
 }
 
+const IRYS_SERVICE_TYPE = "irys";
+
 export class IrysService extends Service implements IIrysService {
-    static serviceType: ServiceType = ServiceType.IRYS;
+    static serviceType: string = IRYS_SERVICE_TYPE;
 
     private runtime: IAgentRuntime | null = null;
     private irysUploader: any | null = null;
-    private endpointForTransactionId: string = "https://uploader.irys.xyz/graphql";
+    private endpointForTransactionId: string =
+        "https://uploader.irys.xyz/graphql";
     private endpointForData: string = "https://gateway.irys.xyz";
 
     async initialize(runtime: IAgentRuntime): Promise<void> {
@@ -52,14 +108,34 @@ export class IrysService extends Service implements IIrysService {
         this.runtime = runtime;
     }
 
-    private async getTransactionId(owners: string[] = null, tags: GraphQLTag[] = null, timestamp: IrysTimestamp = null): Promise<TransactionsIdAddress> {
+    getMethods() {
+        return {
+            getDataFromAnAgent: this.getDataFromAnAgent.bind(this),
+            workerUploadDataOnIrys: this.workerUploadDataOnIrys.bind(this),
+            providerUploadDataOnIrys: this.providerUploadDataOnIrys.bind(this),
+        };
+    }
+
+    private async getTransactionId(
+        owners: string[] = null,
+        tags: GraphQLTag[] = null,
+        timestamp: IrysTimestamp = null
+    ): Promise<TransactionsIdAddress> {
         const graphQLClient = new GraphQLClient(this.endpointForTransactionId);
         const QUERY = gql`
-            query($owners: [String!], $tags: [TagFilter!], $timestamp: TimestampFilter) {
-                transactions(owners: $owners, tags: $tags, timestamp: $timestamp) {
+            query (
+                $owners: [String!]
+                $tags: [TagFilter!]
+                $timestamp: TimestampFilter
+            ) {
+                transactions(
+                    owners: $owners
+                    tags: $tags
+                    timestamp: $timestamp
+                ) {
                     edges {
                         node {
-                            id,
+                            id
                             address
                         }
                     }
@@ -70,15 +146,24 @@ export class IrysService extends Service implements IIrysService {
             const variables = {
                 owners: owners,
                 tags: tags,
-                timestamp: timestamp
-            }
-            const data: TransactionGQL = await graphQLClient.request(QUERY, variables);
-            const listOfTransactions : NodeGQL[] = data.transactions.edges.map((edge: any) => edge.node);
-            console.log("Transaction IDs retrieved")
+                timestamp: timestamp,
+            };
+            const data: TransactionGQL = await graphQLClient.request(
+                QUERY,
+                variables
+            );
+            const listOfTransactions: NodeGQL[] = data.transactions.edges.map(
+                (edge: any) => edge.node
+            );
+            console.log("Transaction IDs retrieved");
             return { success: true, data: listOfTransactions };
         } catch (error) {
             console.error("Error fetching transaction IDs", error);
-            return { success: false, data: [], error: "Error fetching transaction IDs" };
+            return {
+                success: false,
+                data: [],
+                error: "Error fetching transaction IDs",
+            };
         }
     }
 
@@ -87,10 +172,14 @@ export class IrysService extends Service implements IIrysService {
         if (!this.runtime) return false;
 
         try {
-            const EVM_WALLET_PRIVATE_KEY = this.runtime.getSetting("EVM_WALLET_PRIVATE_KEY");
+            const EVM_WALLET_PRIVATE_KEY = this.runtime.getSetting(
+                "EVM_WALLET_PRIVATE_KEY"
+            );
             if (!EVM_WALLET_PRIVATE_KEY) return false;
 
-            const irysUploader = await Uploader(BaseEth).withWallet(EVM_WALLET_PRIVATE_KEY);
+            const irysUploader = await Uploader(BaseEth).withWallet(
+                EVM_WALLET_PRIVATE_KEY
+            );
             this.irysUploader = irysUploader;
             return true;
         } catch (error) {
@@ -99,10 +188,19 @@ export class IrysService extends Service implements IIrysService {
         }
     }
 
-    private async fetchDataFromTransactionId(transactionId: string): Promise<DataIrysFetchedFromGQL> {
+    private async fetchDataFromTransactionId(
+        transactionId: string
+    ): Promise<DataIrysFetchedFromGQL> {
         console.log(`Fetching data from transaction ID: ${transactionId}`);
-        const response = await fetch(`${this.endpointForData}/${transactionId}`);
-        if (!response.ok) return { success: false, data: null, error: "Error fetching data from transaction ID" };
+        const response = await fetch(
+            `${this.endpointForData}/${transactionId}`
+        );
+        if (!response.ok)
+            return {
+                success: false,
+                data: null,
+                error: "Error fetching data from transaction ID",
+            };
         return {
             success: true,
             data: response,
@@ -115,23 +213,39 @@ export class IrysService extends Service implements IIrysService {
         return [value];
     }
 
-    private async orchestrateRequest(requestMessage: string, tags: GraphQLTag[], timestamp: IrysTimestamp = null): Promise<DataIrysFetchedFromGQL> {
-        const serviceCategory = tags.find((tag) => tag.name == "Service-Category")?.values;
+    private async orchestrateRequest(
+        requestMessage: string,
+        tags: GraphQLTag[],
+        timestamp: IrysTimestamp = null
+    ): Promise<DataIrysFetchedFromGQL> {
+        const serviceCategory = tags.find(
+            (tag) => tag.name == "Service-Category"
+        )?.values;
         const protocol = tags.find((tag) => tag.name == "Protocol")?.values;
-        const minimumProviders = Number(tags.find((tag) => tag.name == "Minimum-Providers")?.values);
+        const minimumProviders = Number(
+            tags.find((tag) => tag.name == "Minimum-Providers")?.values
+        );
         /*
             Further implementation of the orchestrator
             { name: "Validation-Threshold", values: validationThreshold },
             { name: "Test-Provider", values: testProvider },
             { name: "Reputation", values: reputation },
         */
-        const tagsToRetrieve : GraphQLTag[] = [
+        const tagsToRetrieve: GraphQLTag[] = [
             { name: "Message-Type", values: [IrysMessageType.DATA_STORAGE] },
-            { name: "Service-Category", values: this.converToValues(serviceCategory) },
+            {
+                name: "Service-Category",
+                values: this.converToValues(serviceCategory),
+            },
             { name: "Protocol", values: this.converToValues(protocol) },
         ];
-        const data = await this.getDataFromAnAgent(null, tagsToRetrieve, timestamp);
-        if (!data.success) return { success: false, data: null, error: data.error };
+        const data = await this.getDataFromAnAgent(
+            null,
+            tagsToRetrieve,
+            timestamp
+        );
+        if (!data.success)
+            return { success: false, data: null, error: data.error };
         const dataArray = data.data as Array<any>;
         try {
             for (let i = 0; i < dataArray.length; i++) {
@@ -142,50 +256,103 @@ export class IrysService extends Service implements IIrysService {
                 Text: ${node.data}
                 Return True or False
             `;
-            const responseFromModel = await generateMessageResponse({
-                runtime: this.runtime,
-                context: templateRequest,
-                modelClass: ModelClass.MEDIUM,
-            });
-            console.log("RESPONSE FROM MODEL : ", responseFromModel)
-            if (!responseFromModel.success || ((responseFromModel.content?.toString().toLowerCase().includes('false')) && (!responseFromModel.content?.toString().toLowerCase().includes('true')))) {
-                dataArray.splice(i, 1);
+                const responseFromModel = await generateMessageResponse({
+                    runtime: this.runtime,
+                    context: templateRequest,
+                    modelClass: ModelClass.MEDIUM,
+                });
+                console.log("RESPONSE FROM MODEL : ", responseFromModel);
+                if (
+                    !responseFromModel.success ||
+                    (responseFromModel.content
+                        ?.toString()
+                        .toLowerCase()
+                        .includes("false") &&
+                        !responseFromModel.content
+                            ?.toString()
+                            .toLowerCase()
+                            .includes("true"))
+                ) {
+                    dataArray.splice(i, 1);
                     i--;
                 }
             }
         } catch (error) {
-            if (error.message.includes("TypeError: Cannot read properties of undefined (reading 'settings')")) {
-                return { success: false, data: null, error: "Error in the orchestrator" };
+            if (
+                error.message.includes(
+                    "TypeError: Cannot read properties of undefined (reading 'settings')"
+                )
+            ) {
+                return {
+                    success: false,
+                    data: null,
+                    error: "Error in the orchestrator",
+                };
             }
         }
         const responseTags: GraphQLTag[] = [
-            { name: "Message-Type", values: [IrysMessageType.REQUEST_RESPONSE] },
+            {
+                name: "Message-Type",
+                values: [IrysMessageType.REQUEST_RESPONSE],
+            },
             { name: "Service-Category", values: [serviceCategory] },
             { name: "Protocol", values: [protocol] },
-            { name: "Request-Id", values: [tags.find((tag) => tag.name == "Request-Id")?.values[0]] },
+            {
+                name: "Request-Id",
+                values: [
+                    tags.find((tag) => tag.name == "Request-Id")?.values[0],
+                ],
+            },
         ];
         if (dataArray.length == 0) {
-            const response = await this.uploadDataOnIrys("No relevant data found from providers", responseTags, IrysMessageType.REQUEST_RESPONSE);
+            const response = await this.uploadDataOnIrys(
+                "No relevant data found from providers",
+                responseTags,
+                IrysMessageType.REQUEST_RESPONSE
+            );
             console.log("Response from Irys: ", response);
-            return { success: false, data: null, error: "No relevant data found from providers" };
+            return {
+                success: false,
+                data: null,
+                error: "No relevant data found from providers",
+            };
         }
-        const listProviders = new Set(dataArray.map((provider: any) => provider.address));
+        const listProviders = new Set(
+            dataArray.map((provider: any) => provider.address)
+        );
         if (listProviders.size < minimumProviders) {
-            const response = await this.uploadDataOnIrys("Not enough providers", responseTags, IrysMessageType.REQUEST_RESPONSE);
+            const response = await this.uploadDataOnIrys(
+                "Not enough providers",
+                responseTags,
+                IrysMessageType.REQUEST_RESPONSE
+            );
             console.log("Response from Irys: ", response);
-            return { success: false, data: null, error: "Not enough providers" };
+            return {
+                success: false,
+                data: null,
+                error: "Not enough providers",
+            };
         }
         const listData = dataArray.map((provider: any) => provider.data);
-        const response = await this.uploadDataOnIrys(listData, responseTags, IrysMessageType.REQUEST_RESPONSE);
+        const response = await this.uploadDataOnIrys(
+            listData,
+            responseTags,
+            IrysMessageType.REQUEST_RESPONSE
+        );
         console.log("Response from Irys: ", response);
         return {
             success: true,
-            data: listData
-        }
+            data: listData,
+        };
     }
 
     // Orchestrator
-    private async uploadDataOnIrys(data: any, tags: GraphQLTag[], messageType: IrysMessageType, timestamp: IrysTimestamp = null): Promise<UploadIrysResult> {
+    private async uploadDataOnIrys(
+        data: any,
+        tags: GraphQLTag[],
+        messageType: IrysMessageType,
+        timestamp: IrysTimestamp = null
+    ): Promise<UploadIrysResult> {
         if (!(await this.initializeIrysUploader())) {
             return {
                 success: false,
@@ -194,63 +361,108 @@ export class IrysService extends Service implements IIrysService {
         }
 
         // Transform tags to the correct format
-        const formattedTags = tags.map(tag => ({
+        const formattedTags = tags.map((tag) => ({
             name: tag.name,
-            value: Array.isArray(tag.values) ? tag.values.join(',') : tag.values
+            value: Array.isArray(tag.values)
+                ? tag.values.join(",")
+                : tag.values,
         }));
 
-        const requestId = String(crypto.createHash('sha256').update(new Date().toISOString()).digest('hex'));
+        const requestId = String(
+            crypto
+                .createHash("sha256")
+                .update(new Date().toISOString())
+                .digest("hex")
+        );
         formattedTags.push({
             name: "Request-Id",
-            value: requestId
+            value: requestId,
         });
         try {
             const dataToStore = {
                 data: data,
             };
-            const receipt = await this.irysUploader.upload(JSON.stringify(dataToStore), { tags: formattedTags });
-            if (messageType == IrysMessageType.DATA_STORAGE || messageType == IrysMessageType.REQUEST_RESPONSE) {
-                return { success: true, url: `https://gateway.irys.xyz/${receipt.id}`};
+            const receipt = await this.irysUploader.upload(
+                JSON.stringify(dataToStore),
+                { tags: formattedTags }
+            );
+            if (
+                messageType == IrysMessageType.DATA_STORAGE ||
+                messageType == IrysMessageType.REQUEST_RESPONSE
+            ) {
+                return {
+                    success: true,
+                    url: `https://gateway.irys.xyz/${receipt.id}`,
+                };
             } else if (messageType == IrysMessageType.REQUEST) {
-                const response = await this.orchestrateRequest(data, tags, timestamp);
+                const response = await this.orchestrateRequest(
+                    data,
+                    tags,
+                    timestamp
+                );
                 return {
                     success: response.success,
                     url: `https://gateway.irys.xyz/${receipt.id}`,
                     data: response.data,
-                    error: response.error ? response.error : null
-                }
-
+                    error: response.error ? response.error : null,
+                };
             }
-            return { success: true, url: `https://gateway.irys.xyz/${receipt.id}` };
+            return {
+                success: true,
+                url: `https://gateway.irys.xyz/${receipt.id}`,
+            };
         } catch (error) {
-            return { success: false, error: "Error uploading to Irys, " + error };
+            return {
+                success: false,
+                error: "Error uploading to Irys, " + error,
+            };
         }
     }
 
-    private async uploadFileOrImageOnIrys(data: string, tags: GraphQLTag[]): Promise<UploadIrysResult> {
+    private async uploadFileOrImageOnIrys(
+        data: string,
+        tags: GraphQLTag[]
+    ): Promise<UploadIrysResult> {
         if (!(await this.initializeIrysUploader())) {
             return {
                 success: false,
-                error: "Irys uploader not initialized"
+                error: "Irys uploader not initialized",
             };
         }
 
-        const formattedTags = tags.map(tag => ({
+        const formattedTags = tags.map((tag) => ({
             name: tag.name,
-            value: Array.isArray(tag.values) ? tag.values.join(',') : tag.values
+            value: Array.isArray(tag.values)
+                ? tag.values.join(",")
+                : tag.values,
         }));
 
         try {
-            const receipt = await this.irysUploader.uploadFile(data, { tags: formattedTags });
-            return { success: true, url: `https://gateway.irys.xyz/${receipt.id}` };
+            const receipt = await this.irysUploader.uploadFile(data, {
+                tags: formattedTags,
+            });
+            return {
+                success: true,
+                url: `https://gateway.irys.xyz/${receipt.id}`,
+            };
         } catch (error) {
-            return { success: false, error: "Error uploading to Irys, " + error };
+            return {
+                success: false,
+                error: "Error uploading to Irys, " + error,
+            };
         }
     }
 
-    private normalizeArrayValues(arr: number[], min: number, max?: number): void {
+    private normalizeArrayValues(
+        arr: number[],
+        min: number,
+        max?: number
+    ): void {
         for (let i = 0; i < arr.length; i++) {
-            arr[i] = Math.max(min, max !== undefined ? Math.min(arr[i], max) : arr[i]);
+            arr[i] = Math.max(
+                min,
+                max !== undefined ? Math.min(arr[i], max) : arr[i]
+            );
         }
     }
 
@@ -261,29 +473,54 @@ export class IrysService extends Service implements IIrysService {
         return arr;
     }
 
-    async workerUploadDataOnIrys(data: any, dataType: IrysDataType, messageType: IrysMessageType, serviceCategory: string[], protocol: string[], validationThreshold: number[] = [], minimumProviders: number[] = [], testProvider: boolean[] = [], reputation: number[] = []): Promise<UploadIrysResult> {
+    async workerUploadDataOnIrys(
+        data: any,
+        dataType: IrysDataType,
+        messageType: IrysMessageType,
+        serviceCategory: string[],
+        protocol: string[],
+        validationThreshold: number[] = [],
+        minimumProviders: number[] = [],
+        testProvider: boolean[] = [],
+        reputation: number[] = []
+    ): Promise<UploadIrysResult> {
         this.normalizeArrayValues(validationThreshold, 0, 1);
         this.normalizeArrayValues(minimumProviders, 0);
         this.normalizeArrayValues(reputation, 0, 1);
 
         const tags = [
             { name: "Message-Type", values: messageType },
-            { name: "Service-Category", values: this.normalizeArraySize(serviceCategory) },
+            {
+                name: "Service-Category",
+                values: this.normalizeArraySize(serviceCategory),
+            },
             { name: "Protocol", values: this.normalizeArraySize(protocol) },
         ] as GraphQLTag[];
 
         if (messageType == IrysMessageType.REQUEST) {
             if (validationThreshold.length > 0) {
-                tags.push({ name: "Validation-Threshold", values: this.normalizeArraySize(validationThreshold) });
+                tags.push({
+                    name: "Validation-Threshold",
+                    values: this.normalizeArraySize(validationThreshold),
+                });
             }
             if (minimumProviders.length > 0) {
-                tags.push({ name: "Minimum-Providers", values: this.normalizeArraySize(minimumProviders) });
+                tags.push({
+                    name: "Minimum-Providers",
+                    values: this.normalizeArraySize(minimumProviders),
+                });
             }
             if (testProvider.length > 0) {
-                tags.push({ name: "Test-Provider", values: this.normalizeArraySize(testProvider) });
+                tags.push({
+                    name: "Test-Provider",
+                    values: this.normalizeArraySize(testProvider),
+                });
             }
             if (reputation.length > 0) {
-                tags.push({ name: "Reputation", values: this.normalizeArraySize(reputation) });
+                tags.push({
+                    name: "Reputation",
+                    values: this.normalizeArraySize(reputation),
+                });
             }
         }
         if (dataType == IrysDataType.FILE || dataType == IrysDataType.IMAGE) {
@@ -293,7 +530,12 @@ export class IrysService extends Service implements IIrysService {
         return await this.uploadDataOnIrys(data, tags, messageType);
     }
 
-    async providerUploadDataOnIrys(data: any, dataType: IrysDataType, serviceCategory: string[], protocol: string[]): Promise<UploadIrysResult> {
+    async providerUploadDataOnIrys(
+        data: any,
+        dataType: IrysDataType,
+        serviceCategory: string[],
+        protocol: string[]
+    ): Promise<UploadIrysResult> {
         const tags = [
             { name: "Message-Type", values: [IrysMessageType.DATA_STORAGE] },
             { name: "Service-Category", values: serviceCategory },
@@ -304,40 +546,70 @@ export class IrysService extends Service implements IIrysService {
             return await this.uploadFileOrImageOnIrys(data, tags);
         }
 
-        return await this.uploadDataOnIrys(data, tags, IrysMessageType.DATA_STORAGE);
+        return await this.uploadDataOnIrys(
+            data,
+            tags,
+            IrysMessageType.DATA_STORAGE
+        );
     }
 
-    async getDataFromAnAgent(agentsWalletPublicKeys: string[] = null, tags: GraphQLTag[] = null, timestamp: IrysTimestamp = null): Promise<DataIrysFetchedFromGQL> {
+    async getDataFromAnAgent(
+        agentsWalletPublicKeys: string[] = null,
+        tags: GraphQLTag[] = null,
+        timestamp: IrysTimestamp = null
+    ): Promise<DataIrysFetchedFromGQL> {
         try {
-            const transactionIdsResponse = await this.getTransactionId(agentsWalletPublicKeys, tags, timestamp);
-            if (!transactionIdsResponse.success) return { success: false, data: null, error: "Error fetching transaction IDs" };
-            const transactionIdsAndResponse = transactionIdsResponse.data.map((node: NodeGQL) => node);
-            const dataPromises: Promise<any>[] = transactionIdsAndResponse.map(async (node: NodeGQL) => {
-                const fetchDataFromTransactionIdResponse = await this.fetchDataFromTransactionId(node.id);
-                if (await fetchDataFromTransactionIdResponse.data.headers.get('content-type') == "application/octet-stream") {
-                    let data = null;
-                    const responseText = await fetchDataFromTransactionIdResponse.data.text();
-                    try {
-                        data = JSON.parse(responseText);
-                    } catch {
-                        data = responseText;
-                    }
-                    return {
-                        data: data,
-                        address: node.address
+            const transactionIdsResponse = await this.getTransactionId(
+                agentsWalletPublicKeys,
+                tags,
+                timestamp
+            );
+            if (!transactionIdsResponse.success)
+                return {
+                    success: false,
+                    data: null,
+                    error: "Error fetching transaction IDs",
+                };
+            const transactionIdsAndResponse = transactionIdsResponse.data.map(
+                (node: NodeGQL) => node
+            );
+            const dataPromises: Promise<any>[] = transactionIdsAndResponse.map(
+                async (node: NodeGQL) => {
+                    const fetchDataFromTransactionIdResponse =
+                        await this.fetchDataFromTransactionId(node.id);
+                    if (
+                        (await fetchDataFromTransactionIdResponse.data.headers.get(
+                            "content-type"
+                        )) == "application/octet-stream"
+                    ) {
+                        let data = null;
+                        const responseText =
+                            await fetchDataFromTransactionIdResponse.data.text();
+                        try {
+                            data = JSON.parse(responseText);
+                        } catch {
+                            data = responseText;
+                        }
+                        return {
+                            data: data,
+                            address: node.address,
+                        };
+                    } else {
+                        return {
+                            data: fetchDataFromTransactionIdResponse.data.url,
+                            address: node.address,
+                        };
                     }
                 }
-                else {
-                    return {
-                        data: fetchDataFromTransactionIdResponse.data.url,
-                        address: node.address
-                    }
-                }
-            });
+            );
             const data = await Promise.all(dataPromises);
             return { success: true, data: data };
         } catch (error) {
-            return { success: false, data: null, error: "Error fetching data from transaction IDs " + error };
+            return {
+                success: false,
+                data: null,
+                error: "Error fetching data from transaction IDs " + error,
+            };
         }
     }
 }
