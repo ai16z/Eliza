@@ -34,6 +34,7 @@ export async function getOnChainActions(
                         user: "{{user1}}",
                         content: {
                             text: "Tell me the balance of account 0xf0cb24ac66ba7375bf9b9c4fa91e208d9eaabd2e",
+                            action: "GET_BALANCE",
                         },
                     },
                     {

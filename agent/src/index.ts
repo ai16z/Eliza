@@ -944,7 +944,9 @@ export async function createAgent(
                 ? webhookPlugin
                 : null,
           goatPlugin,
-          zilliqaPlugin,
+          getSecret(character, "ENABLE_ZILLIQA")
+                ? zilliqaPlugin
+                : null,
             getSecret(character, "COINGECKO_API_KEY") ||
             getSecret(character, "COINGECKO_PRO_API_KEY")
                 ? coingeckoPlugin
