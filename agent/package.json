@@ -23,6 +23,7 @@
         "@elizaos/adapter-redis": "workspace:*",
         "@elizaos/adapter-sqlite": "workspace:*",
         "@elizaos/adapter-pglite": "workspace:*",
+        "@elizaos/adapter-qdrant": "workspace:*",
         "@elizaos/client-auto": "workspace:*",
         "@elizaos/client-direct": "workspace:*",
         "@elizaos/client-discord": "workspace:*",
