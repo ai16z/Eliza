@@ -1,5 +1,5 @@
 import { num } from "starknet";
-import { HolderData } from "../types/trustDB";
+import type { HolderData } from "../types/trustDB";
 
 export interface TokenMetrics {
     liquidityUsd: bigint;

@@ -2,18 +2,18 @@ import {
     composeContext,
     elizaLogger,
     generateObjectDeprecated,
-    HandlerCallback,
-    IAgentRuntime,
-    Memory,
+    type HandlerCallback,
+    type IAgentRuntime,
+    type Memory,
     ModelClass,
-    State,
+    type State,
     type Action,
 } from "@elizaos/core";
 import { validateCoinMarketCapConfig } from "../../environment";
 import { priceExamples } from "./examples";
 import { createPriceService } from "./service";
 import { getPriceTemplate } from "./template";
-import { GetPriceContent } from "./types";
+import type { GetPriceContent } from "./types";
 import { isGetPriceContent } from "./validation";
 
 export default {

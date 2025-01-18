@@ -8,7 +8,7 @@ import {
     afterEach,
 } from "vitest";
 import { generatePrivateKey, privateKeyToAccount } from "viem/accounts";
-import { mainnet, iotex, arbitrum, Chain } from "viem/chains";
+import { mainnet, iotex, arbitrum, type Chain } from "viem/chains";
 
 import { WalletProvider } from "../providers/wallet";
 

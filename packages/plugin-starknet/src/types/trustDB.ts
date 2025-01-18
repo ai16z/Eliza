@@ -1,4 +1,4 @@
-import { TokenInfo } from "./token";
+import type { TokenInfo } from "./token";
 
 export interface TokenSecurityData {
     ownerBalance: string;

@@ -1,29 +1,29 @@
 import { composeContext, composeRandomUser } from "@elizaos/core";
 import { generateMessageResponse, generateShouldRespond } from "@elizaos/core";
 import {
-    Content,
-    HandlerCallback,
-    IAgentRuntime,
-    IBrowserService,
-    ISpeechService,
-    IVideoService,
-    Media,
-    Memory,
+    type Content,
+    type HandlerCallback,
+    type IAgentRuntime,
+    type IBrowserService,
+    type ISpeechService,
+    type IVideoService,
+    type Media,
+    type Memory,
     ModelClass,
     ServiceType,
-    State,
-    UUID,
+    type State,
+    type UUID,
 } from "@elizaos/core";
 import { stringToUuid, getEmbeddingZeroVector } from "@elizaos/core";
 import {
     ChannelType,
-    Client,
-    Message as DiscordMessage,
-    TextChannel,
+    type Client,
+    type Message as DiscordMessage,
+    type TextChannel,
 } from "discord.js";
 import { elizaLogger } from "@elizaos/core";
 import { AttachmentManager } from "./attachments.ts";
-import { VoiceManager } from "./voice.ts";
+import type { VoiceManager } from "./voice.ts";
 import {
     discordShouldRespondTemplate,
     discordMessageHandlerTemplate,
@@ -503,7 +503,7 @@ export class MessageManager {
         }
     }
 
-    async cacheMessages(channel: TextChannel, count: number = 20) {
+    async cacheMessages(channel: TextChannel, count = 20) {
         const messages = await channel.messages.fetch({ limit: count });
 
         // TODO: This is throwing an error but seems to work?

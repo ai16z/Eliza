@@ -79,7 +79,7 @@ describe("UUID Module", () => {
 
             it("should set correct variant bits (RFC4122)", () => {
                 const uuid = stringToUuid(testString) as UUID;
-                const variantByte = parseInt(
+                const variantByte = Number.parseInt(
                     uuid.split("-")[3].slice(0, 2),
                     16
                 );

@@ -28,7 +28,7 @@ TAVILY_API_KEY=your_api_key    # Required: API key for search service
 
 ## Usage
 
-Import and register the plugin in your Eliza configuration:
+Import and register the plugin in your Eliza configuration.
 
 ```typescript
 import { webSearchPlugin } from "@elizaos/plugin-web-search";
@@ -37,6 +37,28 @@ export default {
     plugins: [webSearchPlugin],
     // ... other configuration
 };
+```
+
+**Custom Usage**
+If you want custom usage, for example, twitter-client to search the web before posting a tweet, you can also import the webSearchService and use it directly. Here's how you can do it:
+
+```typescript
+// packages/client-twitter/src/post.ts
+const webSearchService = new WebSearchService();
+await webSearchService.initialize(runtime);
+const latestNews = await webSearchService.search(
+    "latest news on AI Agents",
+    // searchOptions
+);
+
+const state = await this.runtime.composeState(
+    {  } // memory,
+    { // additional keys
+        latestNews: latestNews,
+    }
+);
+
+// Then modify the tweet template to include the {{latestNews}} and however you need
 ```
 
 ## Features

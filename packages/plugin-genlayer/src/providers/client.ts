@@ -1,10 +1,10 @@
-import { IAgentRuntime, Memory, Provider, State } from "@elizaos/core";
+import type { IAgentRuntime, Memory, Provider, State } from "@elizaos/core";
 import { createClient } from "genlayer-js";
 import { simulator } from "genlayer-js/chains";
-import { GenLayerClient, SimulatorChain } from "genlayer-js/types";
+import type { GenLayerClient, SimulatorChain } from "genlayer-js/types";
 import { privateKeyToAccount } from "viem/accounts";
 
-import { Account } from "viem";
+import type { Account } from "viem";
 
 function instantiateClient(account?: Account, rpcUrl?: string) {
     const rpcUrlToUse = rpcUrl ?? "https://studio.genlayer.com:8443/api";

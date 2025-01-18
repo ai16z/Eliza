@@ -1,13 +1,13 @@
 import { composeContext, elizaLogger } from "@elizaos/core";
 import { generateMessageResponse } from "@elizaos/core";
 import {
-    Action,
-    ActionExample,
-    HandlerCallback,
-    IAgentRuntime,
-    Memory,
+    type Action,
+    type ActionExample,
+    type HandlerCallback,
+    type IAgentRuntime,
+    type Memory,
     ModelClass,
-    State,
+    type State,
 } from "@elizaos/core";
 import { validateOpenWeatherConfig } from "../environment";
 import { getCurrentWeatherTemplate } from "../templates";

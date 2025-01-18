@@ -1,4 +1,4 @@
-import { Plugin } from "@elizaos/core";
+import type { Plugin } from "@elizaos/core";
 import { getCurrentWeatherAction } from "./actions/getCurrentWeather";
 
 export * as actions from "./actions";

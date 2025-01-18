@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { coinbaseCommercePlugin, createCharge } from '../src/plugins/commerce';
-import { IAgentRuntime, Memory, State } from '@elizaos/core';
+import { IAgentRuntime, type Memory, State } from '@elizaos/core';
 
 // Mock fetch
 global.fetch = vi.fn();

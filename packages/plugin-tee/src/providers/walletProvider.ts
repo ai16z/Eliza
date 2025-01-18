@@ -1,16 +1,16 @@
 /* This is an example of how WalletProvider can use DeriveKeyProvider to generate a Solana Keypair */
 import {
-    IAgentRuntime,
-    Memory,
-    Provider,
-    State,
+    type IAgentRuntime,
+    type Memory,
+    type Provider,
+    type State,
     elizaLogger,
 } from "@elizaos/core";
-import { Connection, Keypair, PublicKey } from "@solana/web3.js";
+import { Connection, type Keypair, type PublicKey } from "@solana/web3.js";
 import BigNumber from "bignumber.js";
 import NodeCache from "node-cache";
 import { DeriveKeyProvider } from "./deriveKeyProvider";
-import { RemoteAttestationQuote } from "../types/tee";
+import type { RemoteAttestationQuote } from "../types/tee";
 // Provider configuration
 const PROVIDER_CONFIG = {
     BIRDEYE_API: "https://public-api.birdeye.so",
@@ -299,8 +299,8 @@ const walletProvider: Provider = {
                     keypair: Keypair;
                     attestation: RemoteAttestationQuote;
                 } = await deriveKeyProvider.deriveEd25519Keypair(
-                    "/",
                     runtime.getSetting("WALLET_SECRET_SALT"),
+                    "solana",
                     agentId
                 );
                 publicKey = derivedKeyPair.keypair.publicKey;

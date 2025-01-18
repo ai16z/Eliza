@@ -1,5 +1,5 @@
-import { IAgentRuntime, ModelClass, Service, ServiceType, elizaLogger, generateObjectDeprecated, generateText } from "@elizaos/core";
-import { GoPlusManage, GoPlusParamType, GoPlusType } from "../lib/GoPlusManage";
+import { type IAgentRuntime, ModelClass, Service, ServiceType, elizaLogger, generateObjectDeprecated, generateText } from "@elizaos/core";
+import { GoPlusManage, type GoPlusParamType, GoPlusType } from "../lib/GoPlusManage";
 import { requestPrompt, responsePrompt } from "../templates";
 
 export interface IGoplusSecurityService extends Service {

@@ -3,9 +3,9 @@ import {
     elizaLogger,
     generateObject,
     ModelClass,
-    Provider,
+    type Provider,
 } from "@elizaos/core";
-import {
+import type {
     Action,
     HandlerCallback,
     IAgentRuntime,
@@ -13,7 +13,7 @@ import {
     Plugin,
     State,
 } from "@elizaos/core";
-import { ChargeContent, ChargeSchema, isChargeContent } from "../types";
+import { type ChargeContent, ChargeSchema, isChargeContent } from "../types";
 import { chargeTemplate, getChargeTemplate } from "../templates";
 import { getWalletDetails } from "../utils";
 import { Coinbase } from "@coinbase/coinbase-sdk";

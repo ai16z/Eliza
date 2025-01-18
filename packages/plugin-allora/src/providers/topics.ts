@@ -1,12 +1,12 @@
 import {
     elizaLogger,
-    IAgentRuntime,
-    Memory,
-    Provider,
-    State,
+    type IAgentRuntime,
+    type Memory,
+    type Provider,
+    type State,
 } from "@elizaos/core";
 import NodeCache from "node-cache";
-import { AlloraAPIClient, AlloraTopic, ChainSlug } from "@alloralabs/allora-sdk";
+import { AlloraAPIClient, type AlloraTopic, type ChainSlug } from "@alloralabs/allora-sdk";
 
 export class TopicsProvider implements Provider {
     private cache: NodeCache;

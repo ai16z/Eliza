@@ -1,12 +1,12 @@
 import {
-    IAgentRuntime,
-    Memory,
-    Provider,
-    State,
+    type IAgentRuntime,
+    type Memory,
+    type Provider,
+    type State,
     elizaLogger,
 } from "@elizaos/core";
-import { TdxQuoteResponse, TappdClient, TdxQuoteHashAlgorithms } from "@phala/dstack-sdk";
-import { RemoteAttestationQuote, TEEMode } from "../types/tee";
+import { type TdxQuoteResponse, TappdClient, type TdxQuoteHashAlgorithms } from "@phala/dstack-sdk";
+import { type RemoteAttestationQuote, TEEMode, type RemoteAttestationMessage } from "../types/tee";
 
 class RemoteAttestationProvider {
     private client: TappdClient;
@@ -74,14 +74,23 @@ class RemoteAttestationProvider {
 
 // Keep the original provider for backwards compatibility
 const remoteAttestationProvider: Provider = {
-    get: async (runtime: IAgentRuntime, _message: Memory, _state?: State) => {
+    get: async (runtime: IAgentRuntime, message: Memory, _state?: State) => {
         const teeMode = runtime.getSetting("TEE_MODE");
         const provider = new RemoteAttestationProvider(teeMode);
         const agentId = runtime.agentId;
 
         try {
-            elizaLogger.log("Generating attestation for: ", agentId);
-            const attestation = await provider.generateAttestation(agentId, 'raw');
+            const attestationMessage: RemoteAttestationMessage = {
+                agentId: agentId,
+                timestamp: Date.now(),
+                message: {
+                    userId: message.userId,
+                    roomId: message.roomId,
+                    content: message.content.text,
+                }
+            };
+            elizaLogger.log("Generating attestation for: ", JSON.stringify(attestationMessage));
+            const attestation = await provider.generateAttestation(JSON.stringify(attestationMessage));
             return `Your Agent's remote attestation is: ${JSON.stringify(attestation)}`;
         } catch (error) {
             console.error("Error in remote attestation provider:", error);

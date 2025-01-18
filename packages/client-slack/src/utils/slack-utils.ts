@@ -1,4 +1,4 @@
-import { WebClient } from "@slack/web-api";
+import type { WebClient } from "@slack/web-api";
 
 export interface RetryOptions {
     maxRetries?: number;

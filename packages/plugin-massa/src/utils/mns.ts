@@ -1,4 +1,4 @@
-import { CHAIN_ID, MNS, MNS_CONTRACTS, Provider } from "@massalabs/massa-web3";
+import { CHAIN_ID, MNS, MNS_CONTRACTS, type Provider } from "@massalabs/massa-web3";
 
 export const getMnsTarget = async (
     provider: Provider,

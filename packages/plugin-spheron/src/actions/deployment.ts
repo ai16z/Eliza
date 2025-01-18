@@ -1,10 +1,10 @@
 import {
-    Action,
-    ActionExample,
-    IAgentRuntime,
-    Memory,
-    State,
-    HandlerCallback,
+    type Action,
+    type ActionExample,
+    type IAgentRuntime,
+    type Memory,
+    type State,
+    type HandlerCallback,
     elizaLogger,
     composeContext,
     ModelClass,
@@ -17,7 +17,7 @@ import {
     closeDeployment,
     startDeployment,
 } from "../utils/index.ts";
-import { DeploymentContent } from "../types/index.ts";
+import type { DeploymentContent } from "../types/index.ts";
 import { AVAILABLE_GPU_MODELS } from "../utils/constants.ts";
 import { DEPLOYMENT_TEMPLATES } from "../utils/template.ts";
 

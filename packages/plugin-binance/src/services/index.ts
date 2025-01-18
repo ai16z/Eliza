@@ -1,4 +1,4 @@
-import { BinanceConfig } from "../types/internal/config";
+import type { BinanceConfig } from "../types/internal/config";
 import { AccountService } from "./account";
 import { PriceService } from "./price";
 import { TradeService } from "./trade";

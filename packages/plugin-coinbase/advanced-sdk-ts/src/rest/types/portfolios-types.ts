@@ -1,4 +1,4 @@
-import { Portfolio, PortfolioBreakdown, PortfolioType } from './common-types';
+import type { Portfolio, PortfolioBreakdown, PortfolioType } from './common-types';
 
 // List Portfolios
 export type ListPortfoliosRequest = {

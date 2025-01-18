@@ -1,8 +1,8 @@
-import {
+import type {
     IAgentRuntime,
-    type Goal,
-    type Objective,
-    type UUID,
+    Goal,
+    Objective,
+    UUID,
 } from "./types.ts";
 
 export const getGoals = async ({

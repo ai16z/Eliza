@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach, vi } from "vitest";
 import { TopicsProvider } from "../../src/providers/topics";
-import { Memory, State } from "@elizaos/core";
+import type { Memory, State } from "@elizaos/core";
 
 describe("TopicsProvider", () => {
     let topicsProvider: TopicsProvider;

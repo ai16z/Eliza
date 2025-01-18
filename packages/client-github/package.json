@@ -1,6 +1,6 @@
 {
     "name": "@elizaos/client-github",
-    "version": "0.1.8+build.1",
+    "version": "0.1.9-alpha.1",
     "type": "module",
     "main": "dist/index.js",
     "module": "dist/index.js",
@@ -27,11 +27,13 @@
     },
     "devDependencies": {
         "@types/glob": "8.1.0",
-        "tsup": "8.3.5"
+        "tsup": "8.3.5",
+        "vitest": "^1.2.1"
     },
     "scripts": {
         "build": "tsup --format esm --dts",
         "dev": "tsup --format esm --dts --watch",
-        "lint": "eslint --fix  --cache ."
+        "test": "vitest run",
+        "test:watch": "vitest"
     }
 }

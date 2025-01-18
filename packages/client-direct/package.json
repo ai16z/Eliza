@@ -1,6 +1,6 @@
 {
     "name": "@elizaos/client-direct",
-    "version": "0.1.8+build.1",
+    "version": "0.1.9-alpha.1",
     "main": "dist/index.js",
     "module": "dist/index.js",
     "type": "module",
@@ -21,6 +21,7 @@
     "dependencies": {
         "@elizaos/core": "workspace:*",
         "@elizaos/plugin-image-generation": "workspace:*",
+        "@elizaos/plugin-tee-verifiable-log": "workspace:*",
         "@elizaos/plugin-tee-log": "workspace:*",
         "@types/body-parser": "1.19.5",
         "@types/cors": "2.8.17",
@@ -38,8 +39,7 @@
     },
     "scripts": {
         "build": "tsup --format esm --dts",
-        "dev": "tsup --format esm --dts --watch",
-        "lint": "eslint --fix  --cache ."
+        "dev": "tsup --format esm --dts --watch"
     },
     "peerDependencies": {
         "whatwg-url": "7.1.0"

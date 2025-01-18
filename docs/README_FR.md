@@ -8,7 +8,7 @@ _Utilisée dans [@DegenSpartanAI](https://x.com/degenspartanai) et [@MarcAIndree
 - Ajout de multiples personnages avec [characterfile](https://github.com/lalalune/characterfile/)
 - Support des fonctionnalités et connecteurs Discord/ Twitter / Telegram, avec salons vocaux sur Discord
 - Accès aux données en mémoire et aux documents stockés
-- Peut ouvrir et lire des documents PDF, retranscire des fichiers son et vidéo, résumer des conversations, etc.
+- Peut ouvrir et lire des documents PDF, retranscrire des fichiers son et vidéo, résumer des conversations, etc.
 - Supporte les modèles open source et locaux (configuré par défaut avec Nous Hermes Llama 3.1B)
 - Supporte OpenAI pour une utilisation sur le cloud depuis une machine peu performante
 - Mode "Ask Claude" pour l'utilisation de Claude sur des modèles complexes
@@ -22,10 +22,10 @@ _Utilisée dans [@DegenSpartanAI](https://x.com/degenspartanai) et [@MarcAIndree
 - [Node.js 22+](https://docs.npmjs.com/downloading-and-installing-node-js-and-npm)
 - [pnpm](https://pnpm.io/installation)
 
-### Edit the .env file
+### Éditer le fichier .env
 
-- Copy .env.example to .env and fill in the appropriate values
-- Edit the TWITTER environment variables to add your bot's username and password
+- Copiez le fichier .env.example, renommez-le en .env et remplissez les valeurs appropriées.
+- Modifiez les variables d'environnement TWITTER pour ajouter le nom d'utilisateur et le mot de passe de votre bot.
 
 ### Modifier les fichiers personnage
 
@@ -50,7 +50,7 @@ pnpm clean
 
 # Personnaliser Eliza
 
-### Ajouter un des actions personnalisées
+### Ajouter une des actions personnalisées
 
 Pour éviter les conflits Git dans le répertoire core, nous vous recommandons d’ajouter les actions personnalisées dans un répertoire `custom_actions` et de les configurer dans le fichier `elizaConfig.yaml` . Vous pouvez consulter l’exemple dans le fichier `elizaConfig.example.yaml`.
 
@@ -82,13 +82,13 @@ pnpm install --include=optional sharp
 Vous devez ajouter certaines variables à votre fichier .env pour vous connecter aux différentes plates-formes:
 
 ```
-# Variables d'environement Discord (nécessaires)
+# Variables d'environnement Discord (nécessaires)
 DISCORD_APPLICATION_ID=
 DISCORD_API_TOKEN= # Bot token
 OPENAI_API_KEY=sk-* # OpenAI API key, starting with sk-
 ELEVENLABS_XI_API_KEY= # API key from elevenlabs
 
-# Parmètres ELEVENLABS
+# Paramètres ELEVENLABS
 ELEVENLABS_MODEL_ID=eleven_multilingual_v2
 ELEVENLABS_VOICE_ID=21m00Tcm4TlvDq8ikWAM
 ELEVENLABS_VOICE_STABILITY=0.5
@@ -144,7 +144,7 @@ Assurez-vous d’avoir le kit complet CUDA installé, y compris cuDNN et cuBLAS.
 ### Exécution locale
 
 Ajoutez XAI_MODEL et définissez-le à l’une des options ci-dessus [Run with
-Llama](#run-with-llama) - Vous pouvez laisser les valeurs X_SERVER_URL et XAI_API_KEY vides, le modèle est sera téléchargé depuis huggingface et sera modifié en local
+Llama](#run-with-llama) - Vous pouvez laisser les valeurs X_SERVER_URL et XAI_API_KEY vides, le modèle sera téléchargé depuis huggingface et sera modifié en local
 
 # Clients
 
@@ -173,7 +173,7 @@ pnpm test:sqljs    # Lance les tests avec SQL.js
 Les tests sont écrits en Jest et se trouvent ici : `src/**/*.test.ts`. L’environnement de test est configuré pour :
 
 - Charger les variables d’environnement depuis `.env.test`
-- Ajouter d'un délai d'attente de 2 minutes pour les tests de longue durée
+- Ajouter un délai d'attente de 2 minutes pour les tests de longue durée
 - Supporter les modules ESM
 - Lancer les tests de façon séquentielle (--runInBand)
 

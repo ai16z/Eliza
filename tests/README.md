@@ -24,6 +24,6 @@ This directory contains smoke and integration tests for Eliza project.
 ## Using in GitHub CI/CD
 
 - Settings -> Secrets and variables -> Actions:
-- Create an enviroment
+- Create an environment
 - Add repository secret `OPENAI_API_KEY`
 - Refer to https://docs.github.com/en/actions/security-for-github-actions/security-guides/using-secrets-in-github-actions for more information

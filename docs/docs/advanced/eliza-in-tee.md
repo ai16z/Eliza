@@ -57,15 +57,21 @@ Example usage:
 const provider = new DeriveKeyProvider(teeMode);
 // For Solana
 const { keypair, attestation } = await provider.deriveEd25519Keypair(
-    "/",
     secretSalt,
+    "solana",
     agentId,
 );
 // For EVM
 const { keypair, attestation } = await provider.deriveEcdsaKeypair(
-    "/",
     secretSalt,
+    "evm",
     agentId,
+);
+
+// For raw key derivation
+const rawKey = await provider.deriveRawKey(
+    secretSalt,
+    "raw",
 );
 ```
 
@@ -161,7 +167,7 @@ To set up your environment for TEE development:
 
 4. **Verify TEE Attestation**
 
-    You can verify the TEE attestation quote by going to the [TEE RA Explorer](https://ra-quote-explorer.vercel.app/) and pasting the attestation quote from the agent logs. Here's an example of interacting with the Eliza agent to ask for the agent's wallet address:
+    You can verify the TEE attestation quote by going to the [TEE RA Explorer](https://proof.t16z.com/) and pasting the attestation quote from the agent logs. Here's an example of interacting with the Eliza agent to ask for the agent's wallet address:
 
     ```bash
     You: what's your wallet address?
@@ -227,7 +233,7 @@ Now we are ready to deploy the Eliza agent to a real TEE environment.
 
 ### Run an Eliza Agent in a Real TEE Environment
 
-Before deploying the Eliza agent to a real TEE environment, you need to create a new TEE account on the [TEE Cloud](https://teehouse.vercel.app). Reach out to Phala Network on [Discord](https://discord.gg/phalanetwork) if you need help.
+Before deploying the Eliza agent to a real TEE environment, you need to create a new TEE account on the [TEE Cloud](https://cloud.phala.network/login). Reach out to Phala Network on [Discord](https://discord.gg/phalanetwork) if you need help.
 
 Next, you will need to take the docker-compose.yaml file in the root folder of the project and edit it based on your agent configuration.
 
@@ -285,7 +291,7 @@ volumes:
     tee:
 ```
 
-Now you can deploy the Eliza agent to a real TEE environment. Go to the [TEE Cloud](https://teehouse.vercel.app) and click on the `Create VM` button to configure your Eliza agent deployment.
+Now you can deploy the Eliza agent to a real TEE environment. Go to the [TEE Cloud](https://cloud.phala.network/login) and click on the `Create VM` button to configure your Eliza agent deployment.
 
 Click on the `Compose Manifest Mode` tab and paste the docker-compose.yaml file content into the `Compose Manifest` field.
 
@@ -313,7 +319,7 @@ Click on the `Logs` tab to view the agent logs.
 
 ![Agent Logs](https://i.imgur.com/aU3i0Dv.png)
 
-Now we can verify the REAL TEE attestation quote by going to the [TEE RA Explorer](https://ra-quote-explorer.vercel.app/) and pasting the attestation quote from the agent logs.
+Now we can verify the REAL TEE attestation quote by going to the [TEE RA Explorer](https://proof.t16z.com/) and pasting the attestation quote from the agent logs.
 
 ![TEE RA Explorer](https://i.imgur.com/TJ5299l.png)
 

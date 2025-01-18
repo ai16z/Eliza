@@ -1,6 +1,6 @@
 import { WebClient } from "@slack/web-api";
-import { SlackConfig, SlackClientContext } from "../types/slack-types";
-import { SlackUtils, RetryOptions } from "../utils/slack-utils";
+import type { SlackConfig, SlackClientContext } from "../types/slack-types";
+import { SlackUtils, type RetryOptions } from "../utils/slack-utils";
 import { elizaLogger } from "@elizaos/core";
 
 export class SlackClientProvider {

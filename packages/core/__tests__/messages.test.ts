@@ -4,7 +4,7 @@ import {
     getActorDetails,
     formatTimestamp,
 } from "../src/messages.ts";
-import { IAgentRuntime, Actor, Content, Memory, UUID } from "../src/types.ts";
+import type { IAgentRuntime, Actor, Content, Memory, UUID } from "../src/types.ts";
 import { describe, test, expect, vi, beforeAll } from "vitest";
 
 describe("Messages Library", () => {

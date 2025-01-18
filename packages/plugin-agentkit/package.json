@@ -1,0 +1,18 @@
+{
+    "name": "@elizaos/plugin-agentkit",
+    "version": "0.0.1",
+    "main": "dist/index.js",
+    "type": "module",
+    "types": "dist/index.d.ts",
+    "dependencies": {
+        "@elizaos/core": "workspace:*",
+        "@coinbase/cdp-agentkit-core": "^0.0.10",
+        "@coinbase/cdp-langchain": "^0.0.11",
+        "@langchain/core": "^0.3.27",
+        "tsup": "8.3.5"
+    },
+    "scripts": {
+        "build": "tsup --format esm --dts",
+        "dev": "tsup --format esm --dts --watch"
+    }
+}

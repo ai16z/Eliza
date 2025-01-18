@@ -1,4 +1,4 @@
-import { Plugin } from "@elizaos/core";
+import type { Plugin } from "@elizaos/core";
 import { gitbookProvider } from "./providers/gitbook";
 
 export const gitbookPlugin: Plugin = {

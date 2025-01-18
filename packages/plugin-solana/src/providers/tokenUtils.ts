@@ -1,5 +1,5 @@
 import { getAccount, getAssociatedTokenAddress } from "@solana/spl-token";
-import { Connection, PublicKey } from "@solana/web3.js";
+import { type Connection, PublicKey } from "@solana/web3.js";
 import { elizaLogger } from "@elizaos/core";
 
 export async function getTokenPriceInSol(tokenSymbol: string): Promise<number> {

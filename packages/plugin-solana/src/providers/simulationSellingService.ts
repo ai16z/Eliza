@@ -1,4 +1,4 @@
-import {
+import type {
     TrustScoreDatabase,
     TokenPerformance,
     // TradePerformance,
@@ -8,10 +8,10 @@ import { Connection, PublicKey } from "@solana/web3.js";
 // Assuming TokenProvider and IAgentRuntime are available
 import { TokenProvider } from "./token.ts";
 // import { settings } from "@elizaos/core";
-import { IAgentRuntime, elizaLogger } from "@elizaos/core";
+import { type IAgentRuntime, elizaLogger } from "@elizaos/core";
 import { WalletProvider } from "./wallet.ts";
 import * as amqp from "amqplib";
-import { ProcessedTokenData } from "../types/token.ts";
+import type { ProcessedTokenData } from "../types/token.ts";
 import { getWalletKey } from "../keypairUtils.ts";
 
 interface SellDetails {
@@ -365,7 +365,7 @@ export class SimulationSellingService {
             await tokenProvider.getProcessedTokenData();
         const prices = await this.walletProvider.fetchPrices(null);
         const solPrice = prices.solana.usd;
-        const sellSol = sellDetails.sell_amount / parseFloat(solPrice);
+        const sellSol = sellDetails.sell_amount / Number.parseFloat(solPrice);
         const sell_value_usd =
             sellDetails.sell_amount * processedData.tradeData.price;
         const trade = await this.trustScoreDb.getLatestTradePerformance(

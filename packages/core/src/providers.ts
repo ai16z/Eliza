@@ -1,4 +1,4 @@
-import { IAgentRuntime, State, type Memory } from "./types.ts";
+import type { IAgentRuntime, State, Memory } from "./types.ts";
 
 /**
  * Formats provider outputs into a string which can be injected into the context.

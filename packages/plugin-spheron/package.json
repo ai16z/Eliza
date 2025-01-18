@@ -1,13 +1,12 @@
 {
     "name": "@elizaos/plugin-spheron",
-    "version": "0.1.8+build.1",
+    "version": "0.1.9-alpha.1",
     "description": "Spheron Protocol Plugin for Eliza",
     "main": "dist/index.js",
     "types": "dist/index.d.ts",
     "scripts": {
         "build": "tsup --format esm --dts",
-        "test": "jest",
-        "lint": "eslint --fix --cache ."
+        "test": "jest"
     },
     "dependencies": {
         "@elizaos/core": "workspace:*",

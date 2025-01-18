@@ -1,8 +1,8 @@
 import {
-    Action,
-    HandlerCallback,
-    IAgentRuntime,
-    Memory,
+    type Action,
+    type HandlerCallback,
+    type IAgentRuntime,
+    type Memory,
     elizaLogger,
 } from "@elizaos/core";
 import { ClientProvider } from "../providers/client";

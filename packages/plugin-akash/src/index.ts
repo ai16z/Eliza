@@ -1,4 +1,4 @@
-import { Plugin} from "@elizaos/core";
+import type { Plugin} from "@elizaos/core";
 import { createDeploymentAction } from "./actions/createDeployment";
 import { closeDeploymentAction } from "./actions/closeDeployment";
 import { getProviderInfoAction } from "./actions/getProviderInfo";

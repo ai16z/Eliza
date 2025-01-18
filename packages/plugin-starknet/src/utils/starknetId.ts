@@ -1,4 +1,4 @@
-import { Account, starknetId } from "starknet";
+import { type Account, starknetId } from "starknet";
 
 export const isStarkDomain = (domain: string): boolean => {
     return /^(?:[a-z0-9-]{1,48}(?:[a-z0-9-]{1,48}[a-z0-9-])?\.)*[a-z0-9-]{1,48}\.stark$/.test(

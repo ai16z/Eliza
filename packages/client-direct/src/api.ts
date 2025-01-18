@@ -3,17 +3,17 @@ import bodyParser from "body-parser";
 import cors from "cors";
 
 import {
-    AgentRuntime,
+    type AgentRuntime,
     elizaLogger,
     getEnvVariable,
-    UUID,
+    type UUID,
     validateCharacterConfig,
     ServiceType,
 } from "@elizaos/core";
 
-import { TeeLogQuery, TeeLogService } from "@elizaos/plugin-tee-log";
+import type { TeeLogQuery, TeeLogService } from "@elizaos/plugin-tee-log";
 import { REST, Routes } from "discord.js";
-import { DirectClient } from ".";
+import type { DirectClient } from ".";
 import { validateUuid } from "@elizaos/core";
 
 interface UUIDParams {
@@ -103,13 +103,31 @@ export function createApiRouter(
         });
     });
 
+    router.delete("/agents/:agentId", async (req, res) => {
+        const { agentId } = validateUUIDParams(req.params, res) ?? {
+            agentId: null,
+        };
+        if (!agentId) return;
+
+        const agent: AgentRuntime = agents.get(agentId);
+
+        if (agent) {
+            agent.stop();
+            directClient.unregisterAgent(agent);
+            res.status(204).send();
+        }
+        else {
+            res.status(404).json({ error: "Agent not found" });
+        }
+    });
+
     router.post("/agents/:agentId/set", async (req, res) => {
         const { agentId } = validateUUIDParams(req.params, res) ?? {
             agentId: null,
         };
         if (!agentId) return;
 
-        let agent: AgentRuntime = agents.get(agentId);
+        const agent: AgentRuntime = agents.get(agentId);
 
         // update character
         if (agent) {
@@ -133,9 +151,17 @@ export function createApiRouter(
         }
 
         // start it up (and register it)
-        agent = await directClient.startAgent(character);
-        elizaLogger.log(`${character.name} started`);
-
+        try {
+            await directClient.startAgent(character);
+            elizaLogger.log(`${character.name} started`);
+        } catch (e) {
+            elizaLogger.error(`Error starting agent: ${e}`);
+            res.status(500).json({
+                success: false,
+                message: e.message,
+            });
+            return;
+        }
         res.json({
             id: character.id,
             character: character,
@@ -295,8 +321,8 @@ export function createApiRouter(
         async (req: express.Request, res: express.Response) => {
             try {
                 const query = req.body.query || {};
-                const page = parseInt(req.body.page) || 1;
-                const pageSize = parseInt(req.body.pageSize) || 10;
+                const page = Number.parseInt(req.body.page) || 1;
+                const pageSize = Number.parseInt(req.body.pageSize) || 10;
 
                 const teeLogQuery: TeeLogQuery = {
                     agentId: query.agentId || "",
@@ -330,3 +356,4 @@ export function createApiRouter(
 
     return router;
 }
+

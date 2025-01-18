@@ -1,5 +1,5 @@
-import { Database } from "better-sqlite3";
-import { TeeLogDAO, TeeAgent, TeeLog, TeeLogQuery, PageQuery } from "../types.ts";
+import type { Database } from "better-sqlite3";
+import { TeeLogDAO, type TeeAgent, type TeeLog, type TeeLogQuery, type PageQuery } from "../types.ts";
 import { sqliteTables } from "./sqliteTables.ts";
 
 export class SqliteTeeLogDAO extends TeeLogDAO {

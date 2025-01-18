@@ -1,4 +1,4 @@
-import { IAgentRuntime } from "@elizaos/core";
+import type { IAgentRuntime } from "@elizaos/core";
 import { elizaLogger } from "@elizaos/core";
 import { z } from "zod";
 
@@ -14,7 +14,7 @@ export const slackEnvSchema = z.object({
     SLACK_SERVER_PORT: z
         .string()
         .optional()
-        .transform((val) => (val ? parseInt(val) : 3000)),
+        .transform((val) => (val ? Number.parseInt(val) : 3000)),
 });
 
 export type SlackConfig = z.infer<typeof slackEnvSchema>;

@@ -2,18 +2,18 @@ import {
     getEmbeddingZeroVector,
     stringToUuid,
     elizaLogger,
-    Character,
-    Client as ElizaClient,
-    IAgentRuntime,
+    type Character,
+    type Client as ElizaClient,
+    type IAgentRuntime,
 } from "@elizaos/core";
 import {
     Client,
     Events,
     GatewayIntentBits,
-    Guild,
-    MessageReaction,
+    type Guild,
+    type MessageReaction,
     Partials,
-    User,
+    type User,
 } from "discord.js";
 import { EventEmitter } from "events";
 import chat_with_attachments from "./actions/chat_with_attachments.ts";

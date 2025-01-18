@@ -1,26 +1,30 @@
-import { AnchorProvider } from "@coral-xyz/anchor";
-import { Wallet } from "@coral-xyz/anchor";
-import { generateImage } from "@elizaos/core";
+import { generateImage, elizaLogger } from "@elizaos/core";
 import { Connection, Keypair, PublicKey } from "@solana/web3.js";
-import { CreateTokenMetadata, PriorityFee, PumpFunSDK } from "pumpdotfun-sdk";
-
+import { VersionedTransaction } from "@solana/web3.js";
+import { Fomo, PurchaseCurrency } from "fomo-sdk-solana";
 import { getAssociatedTokenAddressSync } from "@solana/spl-token";
+import bs58 from "bs58";
 import {
     settings,
-    ActionExample,
-    Content,
-    HandlerCallback,
-    IAgentRuntime,
-    Memory,
+    type ActionExample,
+    type Content,
+    type HandlerCallback,
+    type IAgentRuntime,
+    type Memory,
     ModelClass,
     State,
-    generateObjectDeprecated,
+    generateObject,
     composeContext,
     type Action,
-    elizaLogger,
 } from "@elizaos/core";
 
 import { walletProvider } from "../providers/wallet.ts";
+
+interface CreateTokenMetadata {
+    name: string;
+    symbol: string;
+    uri: string;
+}
 
 export interface CreateAndBuyContent extends Content {
     tokenMetadata: {
@@ -30,10 +34,10 @@ export interface CreateAndBuyContent extends Content {
         image_description: string;
     };
     buyAmountSol: string | number;
+    requiredLiquidity: string | number;
 }
 
-export function isCreateAndBuyContent(
-    runtime: IAgentRuntime,
+export function isCreateAndBuyContentForFomo(
     content: any
 ): content is CreateAndBuyContent {
     elizaLogger.log("Content for create & buy", content);
@@ -45,7 +49,8 @@ export function isCreateAndBuyContent(
         typeof content.tokenMetadata.description === "string" &&
         typeof content.tokenMetadata.image_description === "string" &&
         (typeof content.buyAmountSol === "string" ||
-            typeof content.buyAmountSol === "number")
+            typeof content.buyAmountSol === "number") &&
+        typeof content.requiredLiquidity === "number"
     );
 }
 
@@ -55,17 +60,18 @@ export const createAndBuyToken = async ({
     tokenMetadata,
     buyAmountSol,
     priorityFee,
+    requiredLiquidity = 85,
     allowOffCurve,
     commitment = "confirmed",
-    sdk,
+    fomo,
     connection,
-    slippage,
 }: {
     deployer: Keypair;
     mint: Keypair;
     tokenMetadata: CreateTokenMetadata;
     buyAmountSol: bigint;
-    priorityFee: PriorityFee;
+    priorityFee: number;
+    requiredLiquidity: number;
     allowOffCurve: boolean;
     commitment?:
         | "processed"
@@ -76,26 +82,57 @@ export const createAndBuyToken = async ({
         | "singleGossip"
         | "root"
         | "max";
-    sdk: PumpFunSDK;
+    fomo: Fomo;
     connection: Connection;
     slippage: string;
 }) => {
-    const createResults = await sdk.createAndBuy(
-        deployer,
-        mint,
-        tokenMetadata,
-        buyAmountSol,
-        BigInt(slippage),
+    const { transaction: versionedTx } = await fomo.createToken(
+        deployer.publicKey,
+        tokenMetadata.name,
+        tokenMetadata.symbol,
+        tokenMetadata.uri,
         priorityFee,
+        bs58.encode(mint.secretKey),
+        requiredLiquidity,
+        Number(buyAmountSol) / 10 ** 9
+    );
+
+    const { blockhash, lastValidBlockHeight } =
+        await connection.getLatestBlockhash();
+    versionedTx.message.recentBlockhash = blockhash;
+    versionedTx.sign([mint]);
+
+    const serializedTransaction = versionedTx.serialize();
+    const serializedTransactionBase64 = Buffer.from(
+        serializedTransaction
+    ).toString("base64");
+
+    const deserializedTx = VersionedTransaction.deserialize(
+        Buffer.from(serializedTransactionBase64, "base64")
+    );
+
+    const txid = await connection.sendTransaction(deserializedTx, {
+        skipPreflight: false,
+        maxRetries: 3,
+        preflightCommitment: "confirmed",
+    });
+
+    elizaLogger.log("Transaction sent:", txid);
+
+    // Confirm transaction using the blockhash
+    const confirmation = await connection.confirmTransaction(
+        {
+            signature: txid,
+            blockhash: blockhash,
+            lastValidBlockHeight: lastValidBlockHeight,
+        },
         commitment
     );
 
-    elizaLogger.log("Create Results: ", createResults);
-
-    if (createResults.success) {
+    if (!confirmation.value.err) {
         elizaLogger.log(
             "Success:",
-            `https://pump.fun/${mint.publicKey.toBase58()}`
+            `https://fomo.fund/token/${mint.publicKey.toBase58()}`
         );
         const ata = getAssociatedTokenAddressSync(
             mint.publicKey,
@@ -126,13 +163,13 @@ export const createAndBuyToken = async ({
         return {
             success: false,
             ca: mint.publicKey.toBase58(),
-            error: createResults.error || "Transaction failed",
+            error: confirmation.value.err || "Transaction failed",
         };
     }
 };
 
 export const buyToken = async ({
-    sdk,
+    fomo,
     buyer,
     mint,
     amount,
@@ -140,25 +177,73 @@ export const buyToken = async ({
     allowOffCurve,
     slippage,
     connection,
+    currency = "sol",
+    commitment = "confirmed",
 }: {
-    sdk: PumpFunSDK;
+    fomo: Fomo;
     buyer: Keypair;
     mint: PublicKey;
-    amount: bigint;
-    priorityFee: PriorityFee;
+    amount: number;
+    priorityFee: number;
     allowOffCurve: boolean;
-    slippage: string;
+    slippage: number;
     connection: Connection;
+    currency: PurchaseCurrency;
+    commitment?:
+        | "processed"
+        | "confirmed"
+        | "finalized"
+        | "recent"
+        | "single"
+        | "singleGossip"
+        | "root"
+        | "max";
 }) => {
-    const buyResults = await sdk.buy(
-        buyer,
+    const buyVersionedTx = await fomo.buyToken(
+        buyer.publicKey,
         mint,
         amount,
-        BigInt(slippage),
-        priorityFee
+        slippage,
+        priorityFee,
+        currency || "sol"
     );
-    if (buyResults.success) {
-        elizaLogger.log("Success:", `https://pump.fun/${mint.toBase58()}`);
+
+    const { blockhash, lastValidBlockHeight } =
+        await connection.getLatestBlockhash();
+    buyVersionedTx.message.recentBlockhash = blockhash;
+
+    const serializedTransaction = buyVersionedTx.serialize();
+    const serializedTransactionBase64 = Buffer.from(
+        serializedTransaction
+    ).toString("base64");
+
+    const deserializedTx = VersionedTransaction.deserialize(
+        Buffer.from(serializedTransactionBase64, "base64")
+    );
+
+    const txid = await connection.sendTransaction(deserializedTx, {
+        skipPreflight: false,
+        maxRetries: 3,
+        preflightCommitment: "confirmed",
+    });
+
+    elizaLogger.log("Transaction sent:", txid);
+
+    // Confirm transaction using the blockhash
+    const confirmation = await connection.confirmTransaction(
+        {
+            signature: txid,
+            blockhash: blockhash,
+            lastValidBlockHeight: lastValidBlockHeight,
+        },
+        commitment
+    );
+
+    if (!confirmation.value.err) {
+        elizaLogger.log(
+            "Success:",
+            `https://fomo.fund/token/${mint.toBase58()}`
+        );
         const ata = getAssociatedTokenAddressSync(
             mint,
             buyer.publicKey,
@@ -183,7 +268,7 @@ export const buyToken = async ({
 };
 
 export const sellToken = async ({
-    sdk,
+    fomo,
     seller,
     mint,
     amount,
@@ -191,25 +276,73 @@ export const sellToken = async ({
     allowOffCurve,
     slippage,
     connection,
+    currency = "token",
+    commitment = "confirmed",
 }: {
-    sdk: PumpFunSDK;
+    fomo: Fomo;
     seller: Keypair;
     mint: PublicKey;
-    amount: bigint;
-    priorityFee: PriorityFee;
+    amount: number;
+    priorityFee: number;
     allowOffCurve: boolean;
-    slippage: string;
+    slippage: number;
     connection: Connection;
+    currency: PurchaseCurrency;
+    commitment?:
+        | "processed"
+        | "confirmed"
+        | "finalized"
+        | "recent"
+        | "single"
+        | "singleGossip"
+        | "root"
+        | "max";
 }) => {
-    const sellResults = await sdk.sell(
-        seller,
+    const sellVersionedTx = await fomo.sellToken(
+        seller.publicKey,
         mint,
         amount,
-        BigInt(slippage),
-        priorityFee
+        slippage,
+        priorityFee,
+        currency || "token"
     );
-    if (sellResults.success) {
-        elizaLogger.log("Success:", `https://pump.fun/${mint.toBase58()}`);
+
+    const { blockhash, lastValidBlockHeight } =
+        await connection.getLatestBlockhash();
+    sellVersionedTx.message.recentBlockhash = blockhash;
+
+    const serializedTransaction = sellVersionedTx.serialize();
+    const serializedTransactionBase64 = Buffer.from(
+        serializedTransaction
+    ).toString("base64");
+
+    const deserializedTx = VersionedTransaction.deserialize(
+        Buffer.from(serializedTransactionBase64, "base64")
+    );
+
+    const txid = await connection.sendTransaction(deserializedTx, {
+        skipPreflight: false,
+        maxRetries: 3,
+        preflightCommitment: "confirmed",
+    });
+
+    elizaLogger.log("Transaction sent:", txid);
+
+    // Confirm transaction using the blockhash
+    const confirmation = await connection.confirmTransaction(
+        {
+            signature: txid,
+            blockhash: blockhash,
+            lastValidBlockHeight: lastValidBlockHeight,
+        },
+        commitment
+    );
+
+    if (!confirmation.value.err) {
+        elizaLogger.log(
+            "Success:",
+            `https://fomo.fund/token/${mint.toBase58()}`
+        );
         const ata = getAssociatedTokenAddressSync(
             mint,
             seller.publicKey,
@@ -233,23 +366,11 @@ export const sellToken = async ({
     }
 };
 
-// previous logic:
-// if (typeof window !== "undefined" && typeof window.confirm === "function") {
-//     return window.confirm(
-//         "Confirm the creation and purchase of the token?"
-//     );
-// }
-// return true;
 const promptConfirmation = async (): Promise<boolean> => {
     return true;
 };
 
-// Save the base64 data to a file
-import * as fs from "fs";
-import * as path from "path";
-import { getWalletKey } from "../keypairUtils.ts";
-
-const pumpfunTemplate = `Respond with a JSON markdown block containing only the extracted values. Use null for any values that cannot be determined.
+const fomoTemplate = `Respond with a JSON markdown block containing only the extracted values. Use null for any values that cannot be determined.
 
 Example response:
 \`\`\`json
@@ -260,7 +381,8 @@ Example response:
         "description": "A test token",
         "image_description": "create an image of a rabbit"
     },
-    "buyAmountSol": "0.00069"
+    "buyAmountSol": "0.00069",
+    "requiredLiquidity": "85"
 }
 \`\`\`
 
@@ -306,24 +428,24 @@ export default {
         // Generate structured content from natural language
         const pumpContext = composeContext({
             state,
-            template: pumpfunTemplate,
+            template: fomoTemplate,
         });
 
-        const content = await generateObjectDeprecated({
+        const content = await generateObject({
             runtime,
             context: pumpContext,
             modelClass: ModelClass.LARGE,
         });
 
         // Validate the generated content
-        if (!isCreateAndBuyContent(runtime, content)) {
+        if (!isCreateAndBuyContentForFomo(content)) {
             elizaLogger.error(
                 "Invalid content for CREATE_AND_BUY_TOKEN action."
             );
             return false;
         }
 
-        const { tokenMetadata, buyAmountSol } = content;
+        const { tokenMetadata, buyAmountSol, requiredLiquidity } = content;
         /*
             // Generate image if tokenMetadata.file is empty or invalid
             if (!tokenMetadata.file || tokenMetadata.file.length < 100) {  // Basic validation
@@ -358,34 +480,29 @@ export default {
             runtime
         );
 
-        tokenMetadata.image_description = imageResult.data[0].replace(
-            /^data:image\/[a-z]+;base64,/,
-            ""
-        );
+        const imageBuffer = Buffer.from(imageResult.data[0], "base64");
+        const formData = new FormData();
+        const blob = new Blob([imageBuffer], { type: "image/png" });
+        formData.append("file", blob, `${tokenMetadata.name}.png`);
+        formData.append("name", tokenMetadata.name);
+        formData.append("symbol", tokenMetadata.symbol);
+        formData.append("description", tokenMetadata.description);
 
-        // Convert base64 string to Blob
-        const base64Data = tokenMetadata.image_description;
-        const outputPath = path.join(
-            process.cwd(),
-            `generated_image_${Date.now()}.txt`
-        );
-        fs.writeFileSync(outputPath, base64Data);
-        elizaLogger.log(`Base64 data saved to: ${outputPath}`);
-
-        const byteCharacters = atob(base64Data);
-        const byteNumbers = new Array(byteCharacters.length);
-        for (let i = 0; i < byteCharacters.length; i++) {
-            byteNumbers[i] = byteCharacters.charCodeAt(i);
-        }
-        const byteArray = new Uint8Array(byteNumbers);
-        const blob = new Blob([byteArray], { type: "image/png" });
-
+        // FIXME: does fomo.fund have an ipfs call?
+        const metadataResponse = await fetch("https://pump.fun/api/ipfs", {
+            method: "POST",
+            body: formData,
+        });
+        const metadataResponseJSON = (await metadataResponse.json()) as {
+            name: string;
+            symbol: string;
+            metadataUri: string;
+        };
         // Add the default decimals and convert file to Blob
         const fullTokenMetadata: CreateTokenMetadata = {
             name: tokenMetadata.name,
             symbol: tokenMetadata.symbol,
-            description: tokenMetadata.description,
-            file: blob,
+            uri: metadataResponseJSON.metadataUri,
         };
 
         // Default priority fee for high network load
@@ -396,13 +513,14 @@ export default {
         const slippage = "2000";
         try {
             // Get private key from settings and create deployer keypair
-            const { keypair: deployerKeypair } = await getWalletKey(
-                runtime,
-                true
-            );
+            const privateKeyString =
+                runtime.getSetting("SOLANA_PRIVATE_KEY") ??
+                runtime.getSetting("WALLET_PRIVATE_KEY");
+            const secretKey = bs58.decode(privateKeyString);
+            const deployerKeypair = Keypair.fromSecretKey(secretKey) as any;
 
             // Generate new mint keypair
-            const mintKeypair = Keypair.generate();
+            const mintKeypair = Keypair.generate() as any;
             elizaLogger.log(
                 `Generated mint address: ${mintKeypair.publicKey.toBase58()}`
             );
@@ -410,15 +528,11 @@ export default {
             // Setup connection and SDK
             const connection = new Connection(settings.SOLANA_RPC_URL!, {
                 commitment: "confirmed",
-                confirmTransactionInitialTimeout: 500000, // 120 seconds
+                confirmTransactionInitialTimeout: 500000,
                 wsEndpoint: settings.SOLANA_RPC_URL!.replace("https", "wss"),
             });
 
-            const wallet = new Wallet(deployerKeypair);
-            const provider = new AnchorProvider(connection, wallet, {
-                commitment: "confirmed",
-            });
-            const sdk = new PumpFunSDK(provider);
+            const sdk = new Fomo(connection as any, "devnet", deployerKeypair);
             // const slippage = runtime.getSetting("SLIPPAGE");
 
             const createAndBuyConfirmation = await promptConfirmation();
@@ -432,13 +546,14 @@ export default {
 
             elizaLogger.log("Executing create and buy transaction...");
             const result = await createAndBuyToken({
-                deployer: deployerKeypair,
-                mint: mintKeypair,
+                deployer: deployerKeypair as any,
+                mint: mintKeypair as any,
                 tokenMetadata: fullTokenMetadata,
                 buyAmountSol: BigInt(lamports),
-                priorityFee,
+                priorityFee: priorityFee.unitPrice,
+                requiredLiquidity: Number(requiredLiquidity),
                 allowOffCurve: false,
-                sdk,
+                fomo: sdk,
                 connection,
                 slippage,
             });
@@ -446,7 +561,7 @@ export default {
             if (callback) {
                 if (result.success) {
                     callback({
-                        text: `Token ${tokenMetadata.name} (${tokenMetadata.symbol}) created successfully!\nContract Address: ${result.ca}\nCreator: ${result.creator}\nView at: https://pump.fun/${result.ca}`,
+                        text: `Token ${tokenMetadata.name} (${tokenMetadata.symbol}) created successfully!\nURL: https://fomo.fund/token/${result.ca}\nCreator: ${result.creator}\nView at: https://fomo.fund/token/${result.ca}`,
                         content: {
                             tokenInfo: {
                                 symbol: tokenMetadata.symbol,
@@ -477,7 +592,7 @@ export default {
                 });
                 */
             // Log success message with token view URL
-            const successMessage = `Token created and purchased successfully! View at: https://pump.fun/${mintKeypair.publicKey.toBase58()}`;
+            const successMessage = `Token created and purchased successfully! View at: https://fomo.fund/token/${mintKeypair.publicKey.toBase58()}`;
             elizaLogger.log(successMessage);
             return result.success;
         } catch (error) {
@@ -496,13 +611,13 @@ export default {
             {
                 user: "{{user1}}",
                 content: {
-                    text: "Create a new token called GLITCHIZA with symbol GLITCHIZA and generate a description about it on pump.fun. Also come up with a description for it to use for image generation .buy 0.00069 SOL worth.",
+                    text: "Create a new token called GLITCHIZA with symbol GLITCHIZA and generate a description about it on fomo.fund. Also come up with a description for it to use for image generation .buy 0.00069 SOL worth.",
                 },
             },
             {
                 user: "{{user2}}",
                 content: {
-                    text: "Token GLITCHIZA (GLITCHIZA) created successfully on pump.fun!\nContract Address: 3kD5DN4bbA3nykb1abjS66VF7cYZkKdirX8bZ6ShJjBB\nCreator: 9jW8FPr6BSSsemWPV22UUCzSqkVdTp6HTyPqeqyuBbCa\nView at: https://pump.fun/EugPwuZ8oUMWsYHeBGERWvELfLGFmA1taDtmY8uMeX6r",
+                    text: "Token GLITCHIZA (GLITCHIZA) created successfully on fomo.fund!\nURL: https://fomo.fund/token/673247855e8012181f941f84\nCreator: Anonymous\nView at: https://fomo.fund/token/673247855e8012181f941f84",
                     action: "CREATE_AND_BUY_TOKEN",
                     content: {
                         tokenInfo: {

@@ -1,14 +1,14 @@
 import {
     type Action,
-    ActionExample,
+    type ActionExample,
     composeContext,
     elizaLogger,
     generateObjectDeprecated,
-    HandlerCallback,
-    IAgentRuntime,
-    Memory,
+    type HandlerCallback,
+    type IAgentRuntime,
+    type Memory,
     ModelClass,
-    State,
+    type State,
 } from "@elizaos/core";
 import { Percent } from "@uniswap/sdk-core";
 import { createMemecoin, launchOnEkubo } from "unruggable-sdk";
@@ -47,7 +47,7 @@ export function isDeployTokenContent(content: DeployTokenContent) {
     const validAddresses =
         content.name.length > 2 &&
         content.symbol.length > 2 &&
-        parseInt(content.initialSupply) > 0 &&
+        Number.parseInt(content.initialSupply) > 0 &&
         content.owner.startsWith("0x") &&
         content.owner.length === 66;
 

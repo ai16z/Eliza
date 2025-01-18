@@ -1,4 +1,4 @@
-import { elizaLogger, IAgentRuntime, settings, State } from "@elizaos/core";
+import { elizaLogger, type IAgentRuntime, settings, type State } from "@elizaos/core";
 import { PublicKey } from "@solana/web3.js";
 import { PROVIDER_CONFIG } from "./config";
 import { ANALYSIS_HISTORY_EXPIRY } from "./constants";

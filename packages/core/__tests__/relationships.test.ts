@@ -4,7 +4,7 @@ import {
     getRelationships,
     formatRelationships,
 } from "../src/relationships";
-import { IAgentRuntime, type Relationship, type UUID } from "../src/types";
+import type { IAgentRuntime, Relationship, UUID } from "../src/types";
 import { describe, expect, vi } from "vitest";
 
 // Mock runtime and databaseAdapter

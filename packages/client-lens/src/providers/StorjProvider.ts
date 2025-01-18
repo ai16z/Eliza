@@ -1,10 +1,10 @@
-import axios, { AxiosInstance } from "axios";
+import axios, { type AxiosInstance } from "axios";
 import FormData from "form-data";
 import type { IAgentRuntime } from "@elizaos/core";
 
 // ipfs pinning service: https://storj.dev/dcs/api/storj-ipfs-pinning
 class StorjProvider {
-    private STORJ_API_URL: string = "https://www.storj-ipfs.com";
+    private STORJ_API_URL = "https://www.storj-ipfs.com";
     private STORJ_API_USERNAME: string;
     private STORJ_API_PASSWORD: string;
     private baseURL: string;
@@ -73,8 +73,8 @@ class StorjProvider {
             headers: {
                 "Content-Type": `multipart/form-data; boundary=${formData.getBoundary()}`,
             },
-            maxContentLength: Infinity,
-            maxBodyLength: Infinity,
+            maxContentLength: Number.POSITIVE_INFINITY,
+            maxBodyLength: Number.POSITIVE_INFINITY,
         });
 
         return this.gatewayURL(response.data.Hash);

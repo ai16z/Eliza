@@ -4,7 +4,7 @@ import {
     formatEvaluatorExamples,
     formatEvaluatorExampleDescriptions,
 } from "../src/evaluators";
-import {
+import type {
     Evaluator,
     HandlerCallback,
     IAgentRuntime,
@@ -31,20 +31,20 @@ const mockEvaluators: Evaluator[] = [
             },
         ],
         similes: [],
-        handler: function (
+        handler: (
             _runtime: IAgentRuntime,
             _message: Memory,
             _state?: State,
             _options?: { [key: string]: unknown },
             _callback?: HandlerCallback
-        ): Promise<unknown> {
+        ): Promise<unknown> => {
             throw new Error("Function not implemented.");
         },
-        validate: function (
+        validate: (
             _runtime: IAgentRuntime,
             _message: Memory,
             _state?: State
-        ): Promise<boolean> {
+        ): Promise<boolean> => {
             throw new Error("Function not implemented.");
         },
     },
@@ -65,20 +65,20 @@ const mockEvaluators: Evaluator[] = [
             },
         ],
         similes: [],
-        handler: function (
+        handler: (
             _runtime: IAgentRuntime,
             _message: Memory,
             _state?: State,
             _options?: { [key: string]: unknown },
             _callback?: HandlerCallback
-        ): Promise<unknown> {
+        ): Promise<unknown> => {
             throw new Error("Function not implemented.");
         },
-        validate: function (
+        validate: (
             _runtime: IAgentRuntime,
             _message: Memory,
             _state?: State
-        ): Promise<boolean> {
+        ): Promise<boolean> => {
             throw new Error("Function not implemented.");
         },
     },

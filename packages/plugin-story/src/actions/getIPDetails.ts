@@ -2,15 +2,15 @@ import {
     composeContext,
     elizaLogger,
     generateObjectDeprecated,
-    HandlerCallback,
+    type HandlerCallback,
     ModelClass,
-    IAgentRuntime,
-    Memory,
-    State,
+    type IAgentRuntime,
+    type Memory,
+    type State,
 } from "@elizaos/core";
 import { getIPDetailsTemplate } from "../templates";
-import { Address } from "viem";
-import { Asset, RESOURCE_TYPE } from "../types/api";
+import type { Address } from "viem";
+import { type Asset, RESOURCE_TYPE } from "../types/api";
 import { API_URL, getResource } from "../lib/api";
 
 export { getIPDetailsTemplate };

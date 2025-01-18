@@ -1,4 +1,4 @@
-import { IAgentRuntime, Memory, Provider, State, elizaLogger } from "@elizaos/core";
+import { type IAgentRuntime, type Memory, type Provider, type State, elizaLogger } from "@elizaos/core";
 import axios from 'axios';
 import { getApiConfig, validateCoingeckoConfig } from '../environment';
 

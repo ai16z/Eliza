@@ -1,10 +1,10 @@
 import {
-    AccountInterface,
+    type AccountInterface,
     cairo,
     CallData,
-    Calldata,
+    type Calldata,
     Contract,
-    ProviderInterface,
+    type ProviderInterface,
 } from "starknet";
 import erc20Abi from "./erc20.json";
 

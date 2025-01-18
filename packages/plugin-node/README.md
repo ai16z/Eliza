@@ -54,6 +54,9 @@ AWS_SECRET_ACCESS_KEY=your_aws_secret_key
 AWS_REGION=your_aws_region
 AWS_S3_BUCKET=your_s3_bucket
 AWS_S3_UPLOAD_PATH=your_upload_path
+AWS_S3_ENDPOINT=an_alternative_endpoint
+AWS_S3_SSL_ENABLED=boolean(true|false)
+AWS_S3_FORCE_PATH_STYLE=boolean(true|false)
 ```
 
 ## Usage

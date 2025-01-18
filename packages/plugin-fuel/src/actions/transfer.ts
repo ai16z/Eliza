@@ -1,12 +1,12 @@
 import {
-    Action,
+    type Action,
     composeContext,
     generateObjectDeprecated,
-    IAgentRuntime,
+    type IAgentRuntime,
     ModelClass,
-    State,
+    type State,
 } from "@elizaos/core";
-import { initWalletProvider, WalletProvider } from "../providers/wallet";
+import { initWalletProvider, type WalletProvider } from "../providers/wallet";
 import { bn } from "fuels";
 import { transferTemplate } from "../templates";
 

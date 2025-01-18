@@ -1,12 +1,12 @@
 // src/actions/leaveVoice
 import { getVoiceConnection } from "@discordjs/voice";
 import {
-    Channel,
+    type Channel,
     ChannelType,
-    Client,
-    Message as DiscordMessage,
+    type Client,
+    type Message as DiscordMessage,
 } from "discord.js";
-import {
+import type {
     Action,
     ActionExample,
     IAgentRuntime,

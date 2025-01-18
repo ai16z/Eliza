@@ -1,4 +1,4 @@
-import { Customizations, SpheronComputeConfig } from "../types/index.ts";
+import type { Customizations, SpheronComputeConfig } from "../types/index.ts";
 
 interface TemplateDefinition {
     description: string;

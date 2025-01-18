@@ -1,5 +1,5 @@
-import { vi, expect, it, describe, beforeEach, Mock } from "vitest";
-import { Chain } from "@chain-registry/types";
+import { vi, expect, it, describe, beforeEach, type Mock } from "vitest";
+import type { Chain } from "@chain-registry/types";
 import { getChainByChainName } from "@chain-registry/utils";
 import { CosmosWallet } from "../shared/entities/cosmos-wallet.ts";
 import { getAvailableChains } from "../shared/helpers/cosmos-chains.ts";
@@ -15,6 +15,10 @@ vi.mock("@cosmjs/cosmwasm-stargate", () => ({
     SigningCosmWasmClient: {
         connectWithSigner: vi.fn(),
     },
+}));
+
+vi.mock("@skip-go/client", () => ({
+    SkipClient: vi.fn(() => ({})),
 }));
 
 vi.mock("../shared/entities/cosmos-wallet.ts", () => ({
@@ -74,6 +78,7 @@ describe("CosmosWalletChains", () => {
                 chain1: {
                     wallet: mockCosmosWalletCreate,
                     signingCosmWasmClient: {},
+                    skipClient: {},
                 },
             },
         };

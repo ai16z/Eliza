@@ -1,6 +1,6 @@
 import * as fs from "fs";
-import { parse, ParserOptions } from "@typescript-eslint/parser";
-import { ActionBounds, ActionMetadata } from "./types";
+import { parse, type ParserOptions } from "@typescript-eslint/parser";
+import { type ActionBounds, ActionMetadata } from "./types";
 
 /**
  * A class for parsing TypeScript files.

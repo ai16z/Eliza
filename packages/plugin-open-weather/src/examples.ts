@@ -1,4 +1,4 @@
-import { ActionExample } from "@elizaos/core";
+import type { ActionExample } from "@elizaos/core";
 
 export const getCurrentWeatherExamples: ActionExample[][] = [
     [

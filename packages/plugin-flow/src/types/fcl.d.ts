@@ -21,8 +21,8 @@ declare module "@onflow/config" {
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 declare module "@onflow/fcl" {
-    import * as ftypes from "@onflow/types";
-    import { FlowConfig } from "@onflow/config";
+    import type * as ftypes from "@onflow/types";
+    import type { FlowConfig } from "@onflow/config";
     import type {
         Account,
         CompositeSignature,

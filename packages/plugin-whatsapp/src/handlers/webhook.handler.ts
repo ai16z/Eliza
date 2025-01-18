@@ -1,5 +1,5 @@
-import { WhatsAppClient } from "../client";
-import { WhatsAppWebhookEvent } from "../types";
+import type { WhatsAppClient } from "../client";
+import type { WhatsAppWebhookEvent } from "../types";
 
 export class WebhookHandler {
     constructor(private client: WhatsAppClient) {}

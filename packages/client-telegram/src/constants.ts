@@ -23,7 +23,6 @@ export const RESPONSE_CHANCES = {
 export const TEAM_COORDINATION = {
     KEYWORDS: [
         "team",
-        "everyone",
         "all agents",
         "team update",
         "gm team",

@@ -1,5 +1,5 @@
-import React from "react";
-import { StatCardProps } from "./Contributions";
+import type React from "react";
+import type { StatCardProps } from "./Contributions";
 
 export const StatCard: React.FC<StatCardProps> = ({ title, value, style }) => {
     return (

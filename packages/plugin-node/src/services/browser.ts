@@ -1,12 +1,12 @@
-import { generateText, IBrowserService, trimTokens } from "@elizaos/core";
+import { generateText, type IBrowserService, trimTokens } from "@elizaos/core";
 import { parseJSONObjectFromText } from "@elizaos/core";
 import { Service } from "@elizaos/core";
 import { settings } from "@elizaos/core";
-import { IAgentRuntime, ModelClass, ServiceType } from "@elizaos/core";
+import { type IAgentRuntime, ModelClass, ServiceType } from "@elizaos/core";
 import { stringToUuid } from "@elizaos/core";
 import { PlaywrightBlocker } from "@cliqz/adblocker-playwright";
 import CaptchaSolver from "capsolver-npm";
-import { Browser, BrowserContext, chromium, Page } from "playwright";
+import { type Browser, type BrowserContext, chromium, type Page } from "playwright";
 import { elizaLogger } from "@elizaos/core";
 
 async function generateSummary(

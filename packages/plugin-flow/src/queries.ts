@@ -1,5 +1,5 @@
 import { scripts } from "./assets/script.defs";
-import { FlowAccountBalanceInfo, IFlowScriptExecutor } from "./types";
+import type { FlowAccountBalanceInfo, IFlowScriptExecutor } from "./types";
 
 /**
  * Query the balance of an EVM ERC20 token
@@ -34,7 +34,7 @@ export async function queryEvmERC20Decimals(
         (arg, t) => [arg(evmContractAddress, t.String)],
         "0"
     );
-    return parseInt(ret);
+    return Number.parseInt(ret);
 }
 
 /**
@@ -73,8 +73,8 @@ export async function queryAccountBalanceInfo(
     }
     return {
         address: ret.address,
-        balance: parseFloat(ret.balance),
+        balance: Number.parseFloat(ret.balance),
         coaAddress: ret.coaAddress,
-        coaBalance: ret.coaBalance ? parseFloat(ret.coaBalance) : undefined,
+        coaBalance: ret.coaBalance ? Number.parseFloat(ret.coaBalance) : undefined,
     };
 }

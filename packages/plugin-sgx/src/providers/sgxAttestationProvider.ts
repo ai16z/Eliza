@@ -1,5 +1,5 @@
-import { IAgentRuntime, Memory, Provider, State } from "@elizaos/core";
-import { SgxAttestation } from "../types/attestation";
+import type { IAgentRuntime, Memory, Provider, State } from "@elizaos/core";
+import type { SgxAttestation } from "../types/attestation";
 import { promises as fs } from 'fs';
 import { createHash } from 'crypto';
 

@@ -1,4 +1,3 @@
-// biome-ignore lint/suspicious/noExplicitAny: <explanation>
 export const idlFactory = ({ IDL }: { IDL: any }) => {
     const Account = IDL.Record({
         owner: IDL.Principal,
@@ -294,7 +293,7 @@ export const idlFactory = ({ IDL }: { IDL: any }) => {
         transfer_fee: IDL.Func([IDL.Record({})], [TransferFee], ["query"]),
     });
 };
-// biome-ignore lint/suspicious/noExplicitAny: <explanation>
+
 export const init = ({ IDL }: { IDL: any }) => {
     const Account = IDL.Record({
         owner: IDL.Principal,

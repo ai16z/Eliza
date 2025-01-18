@@ -1,9 +1,9 @@
 import {
-    Action,
-    HandlerCallback,
-    AgentRuntime as IAgentRuntime,
-    Memory,
-    State,
+    type Action,
+    type HandlerCallback,
+    type AgentRuntime as IAgentRuntime,
+    type Memory,
+    type State,
     elizaLogger,
 } from "@elizaos/core";
 import { getObsidian }  from "../helper";

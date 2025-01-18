@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { Content } from "@elizaos/core";
+import type { Content } from "@elizaos/core";
 import * as viemChains from "viem/chains";
 
 const _SupportedChainList = Object.keys(viemChains);

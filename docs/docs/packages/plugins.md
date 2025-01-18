@@ -469,7 +469,7 @@ const provider = new DeriveKeyProvider();
 // Derive a raw key
 try {
     const rawKey = await provider.rawDeriveKey(
-        "/path/to/derive",
+        "/path/to/derive", // This is what the WALLET_SECRET_SALT is used for
         "subject-identifier",
     );
     // rawKey is a DeriveKeyResponse that can be used for further processing
@@ -482,7 +482,7 @@ try {
 // Derive a Solana keypair (Ed25519)
 try {
     const solanaKeypair = await provider.deriveEd25519Keypair(
-        "/path/to/derive",
+        "/path/to/derive", // This is what the WALLET_SECRET_SALT is used for
         "subject-identifier",
     );
     // solanaKeypair can now be used for Solana operations
@@ -493,7 +493,7 @@ try {
 // Derive an Ethereum keypair (ECDSA)
 try {
     const evmKeypair = await provider.deriveEcdsaKeypair(
-        "/path/to/derive",
+        "/path/to/derive", // This is what the WALLET_SECRET_SALT is used for
         "subject-identifier",
     );
     // evmKeypair can now be used for Ethereum operations

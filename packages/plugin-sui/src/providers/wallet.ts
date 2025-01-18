@@ -1,4 +1,4 @@
-import {
+import type {
     IAgentRuntime,
     ICacheManager,
     Memory,
@@ -33,7 +33,7 @@ type SuiNetwork = "mainnet" | "testnet" | "devnet" | "localnet";
 
 export class WalletProvider {
     private cache: NodeCache;
-    private cacheKey: string = "sui/wallet";
+    private cacheKey = "sui/wallet";
 
     constructor(
         private suiClient: SuiClient,

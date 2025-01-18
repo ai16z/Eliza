@@ -1,12 +1,12 @@
 import type { Action } from "@elizaos/core";
 import {
-    ActionExample,
-    Content,
-    HandlerCallback,
-    IAgentRuntime,
-    Memory,
+    type ActionExample,
+    type Content,
+    type HandlerCallback,
+    type IAgentRuntime,
+    type Memory,
     ModelClass,
-    State,
+    type State,
     elizaLogger,
     composeContext,
     generateObject,
@@ -14,8 +14,7 @@ import {
 import { validateAbstractConfig } from "../environment";
 
 import {
-    Address,
-    createWalletClient,
+    type Address,
     erc20Abi,
     http,
     parseEther,
@@ -25,6 +24,7 @@ import {
 } from "viem";
 import { abstractTestnet, mainnet } from "viem/chains";
 import { normalize } from "viem/ens";
+import { createAbstractClient } from "@abstract-foundation/agw-client";
 import { z } from "zod";
 import { ValidateContext } from "../utils";
 import { ETH_ADDRESS, ERC20_OVERRIDE_INFO } from "../constants";
@@ -39,12 +39,14 @@ const TransferSchema = z.object({
     tokenAddress: z.string(),
     recipient: z.string(),
     amount: z.string(),
+    useAGW: z.boolean(),
 });
 
 export interface TransferContent extends Content {
     tokenAddress: string;
     recipient: string;
     amount: string | number;
+    useAGW: boolean;
 }
 
 const transferTemplate = `Respond with a JSON markdown block containing only the extracted values. Use null for any values that cannot be determined.
@@ -58,16 +60,21 @@ Example response:
 {
     "tokenAddress": "0x5A7d6b2F92C77FAD6CCaBd7EE0624E64907Eaf3E",
     "recipient": "0xCCa8009f5e09F8C5dB63cb0031052F9CB635Af62",
-    "amount": "1000"
+    "amount": "1000",
+    "useAGW": true
 }
 \`\`\`
 
-{{recentMessages}}
+User message:
+"{{currentMessage}}"
 
-Given the recent messages, extract the following information about the requested token transfer:
+Given the message, extract the following information about the requested token transfer:
 - Token contract address
 - Recipient wallet address
 - Amount to transfer
+- Whether to use Abstract Global Wallet aka AGW
+
+If the user did not specify "global wallet", "AGW", "agw", or "abstract global wallet" in their message, set useAGW to false, otherwise set it to true.
 
 Respond with a JSON markdown block containing only the extracted values.`;
 
@@ -104,6 +111,7 @@ export const transferAction: Action = {
         }
 
         // Compose transfer context
+        state.currentMessage = `${state.recentMessagesData[1].content.text}`;
         const transferContext = composeContext({
             state,
             template: transferTemplate,
@@ -138,7 +146,7 @@ export const transferAction: Action = {
 
         // Validate transfer content
         if (!ValidateContext.transferAction(content)) {
-            console.error("Invalid content for TRANSFER_TOKEN action.");
+            elizaLogger.error("Invalid content for TRANSFER_TOKEN action.");
             if (callback) {
                 callback({
                     text: "Unable to process transfer request. Invalid content provided.",
@@ -150,40 +158,76 @@ export const transferAction: Action = {
 
         try {
             const account = useGetAccount(runtime);
-            const walletClient = useGetWalletClient();
-
             let hash;
-
-            // Check if the token is native
-            if (
-                content.tokenAddress.toLowerCase() !== ETH_ADDRESS.toLowerCase()
-            ) {
-                // Convert amount to proper token decimals
-                const tokenInfo =
-                    ERC20_OVERRIDE_INFO[content.tokenAddress.toLowerCase()];
-                const decimals = tokenInfo?.decimals ?? 18; // Default to 18 decimals if not specified
-                const tokenAmount = parseUnits(
-                    content.amount.toString(),
-                    decimals
-                );
-
-                // Execute ERC20 transfer
-                hash = await walletClient.writeContract({
-                    account,
+            if (content.useAGW) {
+                const abstractClient = await createAbstractClient({
                     chain: abstractTestnet,
-                    address: content.tokenAddress as Address,
-                    abi: erc20Abi,
-                    functionName: "transfer",
-                    args: [content.recipient as Address, tokenAmount],
+                    signer: account,
                 });
+
+                // Handle AGW transfer based on token type
+                if (
+                    content.tokenAddress.toLowerCase() !==
+                    ETH_ADDRESS.toLowerCase()
+                ) {
+                    const tokenInfo =
+                        ERC20_OVERRIDE_INFO[content.tokenAddress.toLowerCase()];
+                    const decimals = tokenInfo?.decimals ?? 18;
+                    const tokenAmount = parseUnits(
+                        content.amount.toString(),
+                        decimals
+                    );
+
+                    // @ts-ignore - will fix later
+                    hash = await abstractClient.writeContract({
+                        chain: abstractTestnet,
+                        address: content.tokenAddress as Address,
+                        abi: erc20Abi,
+                        functionName: "transfer",
+                        args: [content.recipient as Address, tokenAmount],
+                    });
+                } else {
+                    // @ts-ignore
+                    hash = await abstractClient.sendTransaction({
+                        chain: abstractTestnet,
+                        to: content.recipient as Address,
+                        value: parseEther(content.amount.toString()),
+                        kzg: undefined,
+                    });
+                }
             } else {
-                hash = await walletClient.sendTransaction({
-                    account: account,
-                    chain: abstractTestnet,
-                    to: content.recipient as Address,
-                    value: parseEther(content.amount.toString()),
-                    kzg: undefined,
-                });
+                const walletClient = useGetWalletClient();
+
+                // Handle regular wallet transfer based on token type
+                if (
+                    content.tokenAddress.toLowerCase() !==
+                    ETH_ADDRESS.toLowerCase()
+                ) {
+                    const tokenInfo =
+                        ERC20_OVERRIDE_INFO[content.tokenAddress.toLowerCase()];
+                    const decimals = tokenInfo?.decimals ?? 18;
+                    const tokenAmount = parseUnits(
+                        content.amount.toString(),
+                        decimals
+                    );
+
+                    hash = await walletClient.writeContract({
+                        account,
+                        chain: abstractTestnet,
+                        address: content.tokenAddress as Address,
+                        abi: erc20Abi,
+                        functionName: "transfer",
+                        args: [content.recipient as Address, tokenAmount],
+                    });
+                } else {
+                    hash = await walletClient.sendTransaction({
+                        account,
+                        chain: abstractTestnet,
+                        to: content.recipient as Address,
+                        value: parseEther(content.amount.toString()),
+                        kzg: undefined,
+                    });
+                }
             }
 
             elizaLogger.success(
@@ -230,6 +274,27 @@ export const transferAction: Action = {
                 user: "{{agent}}",
                 content: {
                     text: "Successfully sent 0.01 ETH to 0x114B242D931B47D5cDcEe7AF065856f70ee278C4\nTransaction: 0xdde850f9257365fffffc11324726ebdcf5b90b01c6eec9b3e7ab3e81fde6f14b",
+                },
+            },
+        ],
+        [
+            {
+                user: "{{user1}}",
+                content: {
+                    text: "Send 0.01 ETH to 0x114B242D931B47D5cDcEe7AF065856f70ee278C4 using your abstract global wallet",
+                },
+            },
+            {
+                user: "{{agent}}",
+                content: {
+                    text: "Sure, I'll send 0.01 ETH to that address now using my AGW.",
+                    action: "SEND_TOKEN",
+                },
+            },
+            {
+                user: "{{agent}}",
+                content: {
+                    text: "Successfully sent 0.01 ETH to 0x114B242D931B47D5cDcEe7AF065856f70ee278C4\nTransaction: 0xdde850f9257365fffffc11324726ebdcf5b90b01c6eec9b3e7ab3e81fde6f14b using my AGW",
                 },
             },
         ],

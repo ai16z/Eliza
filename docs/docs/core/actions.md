@@ -164,7 +164,7 @@ interface Action {
 - **validate**: Determines if the action can be executed
 - **handler**: Implements the action's behavior
 - **examples**: Demonstrates proper usage patterns
-- **suppressInitialMessage**: When true, suppresses the initial response message before processing the action. Useful for actions that generate their own responses (like image generation)
+- **suppressInitialMessage**: When true, suppress the initial response message before processing the action. Useful for actions that generate their own responses (like image generation)
 
 ---
 
@@ -179,7 +179,7 @@ const continueAction: Action = {
     name: "CONTINUE",
     similes: ["ELABORATE", "KEEP_TALKING"],
     description:
-        "Used when the message requires a follow-up. Don't use when the conversation is finished.",
+        "Used when the message requires a follow-up. Don't use it when the conversation is finished.",
     validate: async (runtime, message) => {
         // Validation logic
         return true;

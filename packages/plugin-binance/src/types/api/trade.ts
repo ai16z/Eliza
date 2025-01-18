@@ -1,4 +1,4 @@
-import { ORDER_SIDES, ORDER_TYPES, TIME_IN_FORCE } from "../../constants/api";
+import type { ORDER_SIDES, ORDER_TYPES, TIME_IN_FORCE } from "../../constants/api";
 
 export type OrderType = (typeof ORDER_TYPES)[keyof typeof ORDER_TYPES];
 export type OrderSide = (typeof ORDER_SIDES)[keyof typeof ORDER_SIDES];

@@ -102,6 +102,36 @@ Yes
 
 4. Action executed.
 
+### Token IBC Transfer
+
+This plugin supports a token transfer action, which allows users to transfer tokens between addresses on Cosmos-compatible blockchains between different chains.
+
+#### Example Prompts
+
+Below are examples of how the ibc transfer action can be initiated and confirmed:
+
+**Example**
+
+1. User input:
+
+```
+Make an IBC transfer 0.0001 OSMO to neutron1nk3uuw6zt5t5aqw5fvujkd54sa4uws9xg2nk82 from osmosistestnet to neutrontestnet
+```
+
+2. Plugin response:
+
+```
+Before making the IBC transfer, I would like to confirm the details. You would like to transfer 0.0001 OSMO from osmosistestnet to neutrontestnet, specifically to the address neutron1nk3uuw6zt5t5aqw5fvujkd54sa4uws9xg2nk82, is that correct?
+```
+
+3. User confirmation:
+
+```
+Yes
+```
+
+4. Action executed.
+
 ---
 
 ## Contribution

@@ -1,5 +1,5 @@
 import handlebars from "handlebars";
-import { type State, type TemplateType } from "./types.ts";
+import type { State, TemplateType } from "./types.ts";
 import { names, uniqueNamesGenerator } from "unique-names-generator";
 
 /**

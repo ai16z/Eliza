@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeAll, beforeEach } from "vitest";
 import { generatePrivateKey, privateKeyToAccount } from "viem/accounts";
-import { arthera, Chain } from "viem/chains";
+import { arthera, type Chain } from "viem/chains";
 
 import { WalletProvider } from "../providers/wallet";
 

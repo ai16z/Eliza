@@ -1,13 +1,13 @@
 import {
-    IAgentRuntime,
-    Memory,
-    Provider,
-    State,
+    type IAgentRuntime,
+    type Memory,
+    type Provider,
+    type State,
     elizaLogger,
-    ICacheManager,
+    type ICacheManager,
     settings,
 } from "@elizaos/core";
-import {
+import type {
     DexScreenerData,
     DexScreenerPair,
     HolderData,
@@ -21,7 +21,7 @@ import {
 import NodeCache from "node-cache";
 import * as path from "path";
 import { toBN } from "../bignumber.ts";
-import { WalletProvider, Item } from "./wallet.ts";
+import { WalletProvider, type Item } from "./wallet.ts";
 import { Connection } from "@solana/web3.js";
 import { getWalletKey } from "../keypairUtils.ts";
 
@@ -44,7 +44,7 @@ const PROVIDER_CONFIG = {
 
 export class TokenProvider {
     private cache: NodeCache;
-    private cacheKey: string = "solana/tokens";
+    private cacheKey = "solana/tokens";
     private NETWORK_ID = 1399811149;
     private GRAPHQL_ENDPOINT = "https://graph.codex.io/graphql";
 
@@ -818,7 +818,7 @@ export class TokenProvider {
 
                 data.result.token_accounts.forEach((account: any) => {
                     const owner = account.owner;
-                    const balance = parseFloat(account.amount);
+                    const balance = Number.parseFloat(account.amount);
 
                     if (allHoldersMap.has(owner)) {
                         allHoldersMap.set(

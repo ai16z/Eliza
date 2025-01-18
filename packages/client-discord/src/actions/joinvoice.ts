@@ -2,22 +2,22 @@
 // @ts-nocheck
 // src/actions/joinVoice
 import {
-    Action,
-    ActionExample,
+    type Action,
+    type ActionExample,
     composeContext,
-    IAgentRuntime,
-    Memory,
-    State,
+    type IAgentRuntime,
+    type Memory,
+    type State,
     generateText,
     ModelClass,
 } from "@elizaos/core";
 import {
-    Channel,
+    type Channel,
     ChannelType,
-    Client,
-    Message as DiscordMessage,
-    Guild,
-    GuildMember,
+    type Client,
+    type Message as DiscordMessage,
+    type Guild,
+    type GuildMember,
 } from "discord.js";
 import { joinVoiceChannel } from "@discordjs/voice";
 

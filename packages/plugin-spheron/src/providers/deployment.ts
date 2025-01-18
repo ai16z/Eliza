@@ -1,8 +1,8 @@
 import {
-    IAgentRuntime,
-    Memory,
-    Provider,
-    State,
+    type IAgentRuntime,
+    type Memory,
+    type Provider,
+    type State,
     elizaLogger,
 } from "@elizaos/core";
 import { DEPLOYMENT_CONFIGS } from "../utils/constants.ts";

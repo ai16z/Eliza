@@ -1,6 +1,6 @@
-import { Service, IAgentRuntime, ServiceType } from "@elizaos/core";
+import { Service, type IAgentRuntime, ServiceType } from "@elizaos/core";
 import { WebClient } from "@slack/web-api";
-import { ISlackService } from "../types/slack-types";
+import type { ISlackService } from "../types/slack-types";
 
 export class SlackService extends Service implements ISlackService {
     public client: WebClient;

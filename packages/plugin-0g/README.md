@@ -194,7 +194,7 @@ Contributions are welcome! Please see the [CONTRIBUTING.md](CONTRIBUTING.md) fil
 
 This plugin integrates with and builds upon several key technologies:
 
-- [Zero Gravity (0G)](https://0g.xyz/): Decentralized file storage protocol
+- [Zero Gravity (0G)](https://0g.ai/): Decentralized file storage protocol
 - [IPFS](https://ipfs.tech/): InterPlanetary File System
 - [Filecoin](https://filecoin.io/): Decentralized storage network
 - [Flow](https://flow.com/): Blockchain for open worlds

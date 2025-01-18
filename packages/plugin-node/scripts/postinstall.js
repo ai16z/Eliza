@@ -55,10 +55,10 @@ if (!distro || !supportedDistros.some((name) => distro.includes(name))) {
 }
 
 try {
-    execSync("npx playwright install-deps && npx playwright install", {
+    execSync("npx playwright install", {
         stdio: "inherit"
     });
 } catch (err) {
-    console.error("Failed to install Playwright dependencies:", err.message);
+    console.error("Failed to install Playwright you may need to install playwright deps with 'sudo npx playwright install-deps'. Error: ", err.message);
     process.exit(1);
 }

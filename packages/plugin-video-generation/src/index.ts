@@ -1,5 +1,5 @@
 import { elizaLogger } from "@elizaos/core";
-import {
+import type {
     Action,
     HandlerCallback,
     IAgentRuntime,

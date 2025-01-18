@@ -1,6 +1,6 @@
 import { elizaLogger } from "@elizaos/core";
 import NodeCache from "node-cache";
-import { ProcessedTokenData, TokenSecurityData, TokenTradeData, DexScreenerPair } from "../types/token";
+import type { ProcessedTokenData, TokenSecurityData, TokenTradeData, DexScreenerPair } from "../types/token";
 import { toBN } from "../utils/bignumber";
 
 export class TokenProvider {

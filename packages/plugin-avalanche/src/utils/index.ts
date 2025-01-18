@@ -1,15 +1,15 @@
-import { IAgentRuntime, elizaLogger } from "@elizaos/core";
+import { type IAgentRuntime, elizaLogger } from "@elizaos/core";
 import {
     createPublicClient,
     createWalletClient,
-    Hash,
+    type Hash,
     http,
-    Address,
+    type Address,
     parseUnits,
 } from "viem";
 import { privateKeyToAccount } from "viem/accounts";
 import { avalanche } from "viem/chains";
-import { YakSwapQuote } from "../types";
+import type { YakSwapQuote } from "../types";
 import { YAK_SWAP_CONFIG } from "./constants";
 
 export const getAccount = (runtime: IAgentRuntime) => {

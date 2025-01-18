@@ -1,5 +1,5 @@
-import { parse, ParserOptions } from "@typescript-eslint/parser";
-import { AIService } from "./AIService/AIService.js";
+import { parse, type ParserOptions } from "@typescript-eslint/parser";
+import type { AIService } from "./AIService/AIService.js";
 
 export class JSDocValidator {
     private parserOptions: ParserOptions = {

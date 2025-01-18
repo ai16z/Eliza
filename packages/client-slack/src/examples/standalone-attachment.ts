@@ -1,7 +1,7 @@
 import { config } from "dotenv";
 import { SlackClientProvider } from "../providers/slack-client.provider";
 import { AttachmentManager } from "../attachments";
-import { SlackConfig } from "../types/slack-types";
+import type { SlackConfig } from "../types/slack-types";
 import path from "path";
 import { elizaLogger } from "@elizaos/core";
 

@@ -1,0 +1,60 @@
+name: Block Minified JavaScript/TypeScript
+
+on:
+  pull_request:
+    branches: ["main", "develop", "*"]
+  push:
+    branches: ["main", "develop", "*"]
+
+jobs:
+  block-minified-code:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v4
+
+      - name: Detect potential minified code
+        shell: bash
+        run: |
+          echo "Scanning for potential minified JS/TS code..."
+
+          # We'll look in .ts, .tsx, .js, .jsx files, skipping common build dirs.
+          FILES=$(find . \
+            \( -name 'node_modules' -prune \) -o \
+            \( -name 'dist' -prune \) -o \
+            \( -name 'build' -prune \) -o \
+            -type f \( -name '*.ts' -o -name '*.tsx' -o -name '*.js' -o -name '*.jsx' \) \
+            -print)
+
+          if [ -z "$FILES" ]; then
+            echo "No relevant JS/TS files found."
+            exit 0
+          fi
+
+          THRESHOLD=1000
+          VIOLATIONS=0
+
+          for file in $FILES; do
+            # Use grep -En to capture line number and text
+            # If any line is ≥ THRESHOLD chars, we store those lines in RESULTS
+            RESULTS=$(grep -En ".{${THRESHOLD},}" "$file" || true)
+            if [ -n "$RESULTS" ]; then
+              # We have potential minified lines
+              while IFS= read -r match; do
+                # 'match' will be something like "1234:the entire matched line"
+                LINENUM=$(echo "$match" | cut -d: -f1)
+                # If you want the text, you can do:
+                # MATCHED_LINE=$(echo "$match" | cut -d: -f2-)
+
+                echo "::error file=$file,line=$LINENUM::Detected potential minified code (≥ $THRESHOLD chars)."
+              done <<< "$RESULTS"
+              VIOLATIONS=1
+            fi
+          done
+
+          if [ "$VIOLATIONS" -eq 1 ]; then
+            echo "ERROR: Minified code detected. Please remove or exclude it."
+            exit 1
+          else
+            echo "No minified code detected."
+          fi

@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { CosmosTransferActionService } from "../actions/transfer/services/cosmos-transfer-action-service.ts";
-import { AssetList } from "@chain-registry/types";
+import type { AssetList } from "@chain-registry/types";
 
 vi.mock("@cosmjs/cosmwasm-stargate", () => ({
     SigningCosmWasmClient: {

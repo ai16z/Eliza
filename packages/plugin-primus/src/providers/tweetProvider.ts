@@ -1,4 +1,4 @@
-import {elizaLogger, IAgentRuntime, Memory, Provider, State} from "@elizaos/core";
+import {elizaLogger, type IAgentRuntime, type Memory, type Provider, type State} from "@elizaos/core";
 import {TwitterScraper} from "../util/twitterScraper.ts";
 
 const tweetProvider: Provider = {

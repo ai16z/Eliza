@@ -119,7 +119,7 @@ export function escapeMarkdown(text: string): string {
 /**
  * Splits a message into chunks that fit within Telegram's message length limit
  */
-export function splitMessage(text: string, maxLength: number = 4096): string[] {
+export function splitMessage(text: string, maxLength = 4096): string[] {
     const chunks: string[] = [];
     let currentChunk = "";
 

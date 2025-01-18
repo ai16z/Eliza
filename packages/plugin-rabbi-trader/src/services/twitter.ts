@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { elizaLogger } from "@elizaos/core";
 import { MAX_TWEETS_PER_HOUR } from "../constants";
-import { MarketData } from "../types";
+import type { MarketData } from "../types";
 
 export const TwitterConfigSchema = z.object({
   enabled: z.boolean(),

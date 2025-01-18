@@ -1,6 +1,6 @@
 import { API_PREFIX } from '../constants';
-import { RESTBase } from './rest-base';
-import {
+import type { RESTBase } from './rest-base';
+import type {
     CommitConvertTradeRequest,
     CommitConvertTradeResponse,
     CreateConvertQuoteRequest,

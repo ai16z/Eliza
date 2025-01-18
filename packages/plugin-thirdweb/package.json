@@ -1,6 +1,6 @@
 {
     "name": "@elizaos/plugin-thirdweb",
-    "version": "0.1.8+build.1",
+    "version": "0.1.9-alpha.1",
     "main": "dist/index.js",
     "type": "module",
     "types": "dist/index.d.ts",
@@ -11,8 +11,7 @@
     },
     "scripts": {
         "build": "tsup --format esm --dts",
-        "dev": "tsup --format esm --dts --watch",
-        "lint": "eslint --fix  --cache ."
+        "dev": "tsup --format esm --dts --watch"
     },
     "peerDependencies": {
         "whatwg-url": "7.1.0"

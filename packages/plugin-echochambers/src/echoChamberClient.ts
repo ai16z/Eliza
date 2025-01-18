@@ -1,5 +1,5 @@
-import { elizaLogger, IAgentRuntime } from "@elizaos/core";
-import {
+import { elizaLogger, type IAgentRuntime } from "@elizaos/core";
+import type {
     ChatMessage,
     ChatRoom,
     EchoChamberConfig,
@@ -18,8 +18,7 @@ export class EchoChamberClient {
     private config: EchoChamberConfig;
     private apiUrl: string;
     private modelInfo: ModelInfo;
-    private pollInterval: NodeJS.Timeout | null = null;
-    private watchedRoom: string | null = null;
+    private watchedRooms: Set<string> = new Set();
 
     constructor(runtime: IAgentRuntime, config: EchoChamberConfig) {
         this.runtime = runtime;
@@ -50,9 +49,8 @@ export class EchoChamberClient {
         };
     }
 
-    public async setWatchedRoom(roomId: string): Promise<void> {
+    public async addWatchedRoom(roomId: string): Promise<void> {
         try {
-            // Verify room exists
             const rooms = await this.listRooms();
             const room = rooms.find((r) => r.id === roomId);
 
@@ -60,18 +58,21 @@ export class EchoChamberClient {
                 throw new Error(`Room ${roomId} not found`);
             }
 
-            // Set new watched room
-            this.watchedRoom = roomId;
-
+            this.watchedRooms.add(roomId);
             elizaLogger.success(`Now watching room: ${room.name}`);
         } catch (error) {
-            elizaLogger.error("Error setting watched room:", error);
+            elizaLogger.error("Error adding watched room:", error);
             throw error;
         }
     }
 
-    public getWatchedRoom(): string | null {
-        return this.watchedRoom;
+    public removeWatchedRoom(roomId: string): void {
+        this.watchedRooms.delete(roomId);
+        elizaLogger.success(`Stopped watching room: ${roomId}`);
+    }
+
+    public getWatchedRooms(): string[] {
+        return Array.from(this.watchedRooms);
     }
 
     private async retryOperation<T>(
@@ -94,16 +95,18 @@ export class EchoChamberClient {
     public async start(): Promise<void> {
         elizaLogger.log("🚀 Starting EchoChamber client...");
         try {
-            // Verify connection by listing rooms
             await this.retryOperation(() => this.listRooms());
-            elizaLogger.success(
-                `✅ EchoChamber client successfully started for ${this.modelInfo.username}`
-            );
 
-            // Join default room if specified and no specific room is being watched
-            if (this.config.defaultRoom && !this.watchedRoom) {
-                await this.setWatchedRoom(this.config.defaultRoom);
+            for (const room of this.config.rooms) {
+                await this.addWatchedRoom(room);
             }
+
+            elizaLogger.success(
+                `✅ EchoChamber client started for ${this.modelInfo.username}`
+            );
+            elizaLogger.info(
+                `Watching rooms: ${Array.from(this.watchedRooms).join(", ")}`
+            );
         } catch (error) {
             elizaLogger.error("❌ Failed to start EchoChamber client:", error);
             throw error;
@@ -111,23 +114,7 @@ export class EchoChamberClient {
     }
 
     public async stop(): Promise<void> {
-        if (this.pollInterval) {
-            clearInterval(this.pollInterval);
-            this.pollInterval = null;
-        }
-
-        // Leave watched room if any
-        if (this.watchedRoom) {
-            try {
-                this.watchedRoom = null;
-            } catch (error) {
-                elizaLogger.error(
-                    `Error leaving room ${this.watchedRoom}:`,
-                    error
-                );
-            }
-        }
-
+        this.watchedRooms.clear();
         elizaLogger.log("Stopping EchoChamber client...");
     }
 
@@ -188,5 +175,44 @@ export class EchoChamberClient {
             const data = (await response.json()) as MessageResponse;
             return data.message;
         });
+    }
+
+    public async shouldInitiateConversation(room: ChatRoom): Promise<boolean> {
+        try {
+            const history = await this.getRoomHistory(room.id);
+            if (!history?.length) return true; // Empty room is good to start
+
+            const recentMessages = history
+                .filter((msg) => msg != null) // Filter out null messages
+                .sort(
+                    (a, b) =>
+                        new Date(b.timestamp).getTime() -
+                        new Date(a.timestamp).getTime()
+                );
+
+            if (!recentMessages.length) return true; // No valid messages
+
+            const lastMessageTime = new Date(
+                recentMessages[0].timestamp
+            ).getTime();
+            const timeSinceLastMessage = Date.now() - lastMessageTime;
+
+            const quietPeriodSeconds = Number(
+                this.runtime.getSetting("ECHOCHAMBERS_QUIET_PERIOD") || 300 // 5 minutes in seconds
+            );
+            const quietPeriod = quietPeriodSeconds * 1000; // Convert to milliseconds
+
+            if (timeSinceLastMessage < quietPeriod) {
+                elizaLogger.debug(
+                    `Room ${room.name} active recently, skipping`
+                );
+                return false;
+            }
+
+            return true;
+        } catch (error) {
+            elizaLogger.error(`Error checking conversation state: ${error}`);
+            return false;
+        }
     }
 }

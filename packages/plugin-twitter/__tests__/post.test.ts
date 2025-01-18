@@ -1,9 +1,9 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { postAction } from '../src/actions/post';
-import { ModelClass, IAgentRuntime, Memory, State, generateObject } from '@elizaos/core';
+import { ModelClass, type IAgentRuntime, type Memory, type State, generateObject } from '@elizaos/core';
 import { TweetContent, TweetSchema } from '../src/types';
 import { tweetTemplate } from '../src/templates';
-import { UUID } from '../../core/src/types';
+import type { UUID } from '../../core/src/types';
 
 // Mock @elizaos/core
 vi.mock('@elizaos/core', async () => {

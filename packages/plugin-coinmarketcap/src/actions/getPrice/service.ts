@@ -1,5 +1,5 @@
 import axios from "axios";
-import { ApiResponse, PriceData } from "./types";
+import type { ApiResponse, PriceData } from "./types";
 
 const BASE_URL = "https://pro-api.coinmarketcap.com/v1";
 

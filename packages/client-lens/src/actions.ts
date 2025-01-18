@@ -8,8 +8,8 @@ import {
 } from "@elizaos/core";
 import { textOnly } from "@lens-protocol/metadata";
 import { createPublicationMemory } from "./memory";
-import { AnyPublicationFragment } from "@lens-protocol/client";
-import StorjProvider from "./providers/StorjProvider";
+import type { AnyPublicationFragment } from "@lens-protocol/client";
+import type StorjProvider from "./providers/StorjProvider";
 
 export async function sendPublication({
     client,

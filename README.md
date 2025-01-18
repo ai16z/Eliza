@@ -12,7 +12,7 @@
 
 ## 🌍 README Translations
 
-[中文说明](./README_CN.md) | [日本語の説明](./README_JA.md) | [한국어 설명](./README_KOR.md) | [Persian](./README_FA.md) | [Français](./README_FR.md) | [Português](./README_PTBR.md) | [Türkçe](./README_TR.md) | [Русский](./README_RU.md) | [Español](./README_ES.md) | [Italiano](./README_IT.md) | [ไทย](./README_TH.md) | [Deutsch](./README_DE.md) | [Tiếng Việt](./README_VI.md) | [עִברִית](https://github.com/elizaos/Elisa/blob/main/README_HE.md) | [Tagalog](./README_TG.md) | [Polski](./README_PL.md) | [Arabic](./README_AR.md) | [Hungarian](./README_HU.md) | [Srpski](./README_RS.md) | [Română](./README_RO.md) | [Nederlands](./README_NL.md)
+[中文说明](i18n/readme/README_CN.md) | [日本語の説明](i18n/readme/README_JA.md) | [한국어 설명](i18n/readme/README_KOR.md) | [Persian](i18n/readme/README_FA.md) | [Français](i18n/readme/README_FR.md) | [Português](i18n/readme/README_PTBR.md) | [Türkçe](i18n/readme/README_TR.md) | [Русский](i18n/readme/README_RU.md) | [Español](i18n/readme/README_ES.md) | [Italiano](i18n/readme/README_IT.md) | [ไทย](i18n/readme/README_TH.md) | [Deutsch](i18n/readme/README_DE.md) | [Tiếng Việt](i18n/readme/README_VI.md) | [עִברִית](i18n/readme/README_HE.md) | [Tagalog](i18n/readme/README_TG.md) | [Polski](i18n/readme/README_PL.md) | [Arabic](i18n/readme/README_AR.md) | [Hungarian](i18n/readme/README_HU.md) | [Srpski](i18n/readme/README_RS.md) | [Română](i18n/readme/README_RO.md) | [Nederlands](i18n/readme/README_NL.md) | [Ελληνικά](i18n/readme/README_GR.md)
 
 ## 🚩 Overview
 
@@ -23,12 +23,11 @@
 ## ✨ Features
 
 - 🛠️ Full-featured Discord, Twitter and Telegram connectors
-- 🔗 Support for every model (Llama, Grok, OpenAI, Anthropic, etc.)
+- 🔗 Support for every model (Llama, Grok, OpenAI, Anthropic, Gemini, etc.)
 - 👥 Multi-agent and room support
 - 📚 Easily ingest and interact with your documents
 - 💾 Retrievable memory and document store
 - 🚀 Highly extensible - create your own actions and clients
-- ☁️ Supports many models (local Llama, OpenAI, Anthropic, Groq, etc.)
 - 📦 Just works!
 
 ## Video Tutorials
@@ -62,33 +61,21 @@ cp .env.example .env
 pnpm i && pnpm build && pnpm start
 ```
 
-Once the agent is running, you should see the message to run "pnpm start:client" at the end.
-Open another terminal and move to same directory and then run below command and follow the URL to chat to your agent.
-
-```bash
-pnpm start:client
-```
-
-Then read the [Documentation](https://elizaos.github.io/eliza/) to learn how to customize your Eliza.
-
 ### Manually Start Eliza (Only recommended if you know what you are doing)
+
+#### Checkout the latest release
 
 ```bash
 # Clone the repository
 git clone https://github.com/elizaos/eliza.git
 
-# Checkout the latest release
 # This project iterates fast, so we recommend checking out the latest release
 git checkout $(git describe --tags --abbrev=0)
 # If the above doesn't checkout the latest release, this should work:
 # git checkout $(git describe --tags `git rev-list --tags --max-count=1`)
 ```
 
-### Start Eliza with Gitpod
-
-[![Open in Gitpod](https://gitpod.io/button/open-in-gitpod.svg)](https://gitpod.io/#https://github.com/elizaos/eliza/tree/main)
-
-### Edit the .env file
+#### Edit the .env file
 
 Copy .env.example to .env and fill in the appropriate values.
 
@@ -98,25 +85,7 @@ cp .env.example .env
 
 Note: .env is optional. If you're planning to run multiple distinct agents, you can pass secrets through the character JSON
 
-### Automatically Start Eliza
-
-This will run everything to set up the project and start the bot with the default character.
-
-```bash
-sh scripts/start.sh
-```
-
-### Edit the character file
-
-1. Open `packages/core/src/defaultCharacter.ts` to modify the default character. Uncomment and edit.
-
-2. To load custom characters:
-    - Use `pnpm start --characters="path/to/your/character.json"`
-    - Multiple character files can be loaded simultaneously
-3. Connect with X (Twitter)
-    - change `"clients": []` to `"clients": ["twitter"]` in the character file to connect with X
-
-### Manually Start Eliza
+#### Start Eliza
 
 ```bash
 pnpm i
@@ -127,6 +96,46 @@ pnpm start
 pnpm clean
 ```
 
+### Interact via Browser
+
+Once the agent is running, you should see the message to run "pnpm start:client" at the end.
+
+Open another terminal, move to same directory, run the command below, then follow the URL to chat with your agent.
+
+```bash
+pnpm start:client
+```
+
+Then read the [Documentation](https://elizaos.github.io/eliza/) to learn how to customize your Eliza.
+
+---
+
+### Automatically Start Eliza
+
+The start script provides an automated way to set up and run Eliza:
+
+```bash
+sh scripts/start.sh
+```
+
+For detailed instructions on using the start script, including character management and troubleshooting, see our [Start Script Guide](./docs/docs/guides/start-script.md).
+
+> **Note**: The start script handles all dependencies, environment setup, and character management automatically.
+
+---
+
+### Modify Character
+
+1. Open `packages/core/src/defaultCharacter.ts` to modify the default character. Uncomment and edit.
+
+2. To load custom characters:
+    - Use `pnpm start --characters="path/to/your/character.json"`
+    - Multiple character files can be loaded simultaneously
+3. Connect with X (Twitter)
+    - change `"clients": []` to `"clients": ["twitter"]` in the character file to connect with X
+
+---
+
 #### Additional Requirements
 
 You may need to install Sharp. If you see an error when starting up, try installing it with the following command:
@@ -134,6 +143,14 @@ You may need to install Sharp. If you see an error when starting up, try install
 ```
 pnpm install --include=optional sharp
 ```
+
+---
+
+### Start Eliza with Gitpod
+
+[![Open in Gitpod](https://gitpod.io/button/open-in-gitpod.svg)](https://gitpod.io/#https://github.com/elizaos/eliza/tree/main)
+
+---
 
 ### Community & contact
 

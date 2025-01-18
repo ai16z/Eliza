@@ -74,7 +74,7 @@ export function analyzePair(pair: DexScreenerResponse['pairs'][0]) {
     if (Math.abs(pair.priceChange.h1) > priceChangeThreshold) {
         return {
             symbol: pair.baseToken.symbol,
-            price: parseFloat(pair.priceUsd),
+            price: Number.parseFloat(pair.priceUsd),
             priceChange: pair.priceChange.h1,
             volume24h: pair.volume.h24,
             buyCount: pair.txns.h1.buys,

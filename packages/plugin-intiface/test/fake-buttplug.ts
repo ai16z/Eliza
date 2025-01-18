@@ -100,7 +100,7 @@ export class LovenseNora extends SimulatedDevice {
     private vibrateCmdLog: Record<number, string> = {};
     private rotateCmdLog: Record<number, string> = {};
 
-    constructor(port: number = 54817) {
+    constructor(port = 54817) {
         super(port, "Lovense Nora", "696969696969");
     }
 
@@ -117,7 +117,7 @@ export class LovenseNora extends SimulatedDevice {
         } else if (message.startsWith("Vibrate:")) {
             const match = message.match(/Vibrate:(\d+);/);
             if (match) {
-                const speed = parseInt(match[1]);
+                const speed = Number.parseInt(match[1]);
                 if (
                     speed === 0 &&
                     Object.keys(this.vibrateCmdLog).length === 0
@@ -132,7 +132,7 @@ export class LovenseNora extends SimulatedDevice {
         } else if (message.startsWith("Rotate:")) {
             const match = message.match(/Rotate:(\d+);/);
             if (match) {
-                const speed = parseInt(match[1]);
+                const speed = Number.parseInt(match[1]);
                 if (
                     speed === 0 &&
                     Object.keys(this.rotateCmdLog).length === 0

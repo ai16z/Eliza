@@ -1,5 +1,5 @@
 import { SlackClientProvider } from "../providers/slack-client.provider";
-import { SlackConfig } from "../types/slack-types";
+import type { SlackConfig } from "../types/slack-types";
 import { EventHandler } from "../events";
 import { config } from "dotenv";
 import { resolve } from "path";
@@ -107,7 +107,7 @@ async function runExample() {
 
         // Create Express app
         const app = express();
-        const basePort = parseInt(process.env.PORT || "3000");
+        const basePort = Number.parseInt(process.env.PORT || "3000");
 
         // Mount the event handler
         app.use("/slack/events", events.expressMiddleware());

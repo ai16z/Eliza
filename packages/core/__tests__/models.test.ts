@@ -18,6 +18,8 @@ vi.mock("../settings", () => {
             LLAMACLOUD_MODEL_LARGE: "mock-llama-large",
             TOGETHER_MODEL_SMALL: "mock-together-small",
             TOGETHER_MODEL_LARGE: "mock-together-large",
+            LIVEPEER_GATEWAY_URL: "http://gateway.test-gateway",
+            IMAGE_LIVEPEER_MODEL: "ByteDance/SDXL-Lightning",
         },
         loadEnv: vi.fn(),
     };
@@ -125,6 +127,26 @@ describe("Model Provider Configuration", () => {
             );
         });
     });
+    describe("Livepeer Provider", () => {
+        test("should have correct endpoint configuration", () => {
+            expect(models[ModelProviderName.LIVEPEER].endpoint).toBe("http://gateway.test-gateway");
+        });
+
+        test("should have correct model mappings", () => {
+            const livepeerModels = models[ModelProviderName.LIVEPEER].model;
+            expect(livepeerModels[ModelClass.SMALL]).toBe("meta-llama/Meta-Llama-3.1-8B-Instruct");
+            expect(livepeerModels[ModelClass.MEDIUM]).toBe("meta-llama/Meta-Llama-3.1-8B-Instruct");
+            expect(livepeerModels[ModelClass.LARGE]).toBe("meta-llama/Meta-Llama-3.1-8B-Instruct");
+            expect(livepeerModels[ModelClass.IMAGE]).toBe("ByteDance/SDXL-Lightning");
+        });
+
+        test("should have correct settings configuration", () => {
+            const settings = models[ModelProviderName.LIVEPEER].settings;
+            expect(settings.maxInputTokens).toBe(128000);
+            expect(settings.maxOutputTokens).toBe(8192);
+            expect(settings.temperature).toBe(0);
+        });
+    });
 });
 
 describe("Model Retrieval Functions", () => {
@@ -222,5 +244,18 @@ describe("Environment Variable Integration", () => {
         expect(togetherConfig.model[ModelClass.SMALL].name).toBe(
             "meta-llama/Llama-3.2-3B-Instruct-Turbo"
         );
+    });
+});
+
+describe("Generation with Livepeer", () => {
+    test("should have correct image generation settings", () => {
+        const livepeerConfig = models[ModelProviderName.LIVEPEER];
+        expect(livepeerConfig.model[ModelClass.IMAGE]).toBe("ByteDance/SDXL-Lightning");
+        expect(livepeerConfig.settings.temperature).toBe(0);
+    });
+
+    test("should use default image model", () => {
+        delete process.env.IMAGE_LIVEPEER_MODEL;
+        expect(models[ModelProviderName.LIVEPEER].model[ModelClass.IMAGE]).toBe("ByteDance/SDXL-Lightning");
     });
 });

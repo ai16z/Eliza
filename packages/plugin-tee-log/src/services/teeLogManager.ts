@@ -1,9 +1,9 @@
 import {
-    TEEMode,
+    type TEEMode,
     RemoteAttestationProvider as TdxAttestationProvider,
 } from "@elizaos/plugin-tee";
 import { SgxAttestationProvider } from "@elizaos/plugin-sgx";
-import { TeeType, TeeLogDAO, TeeAgent, TeeLog, TeeLogQuery, PageQuery } from "../types";
+import { TeeType, type TeeLogDAO, type TeeAgent, type TeeLog, type TeeLogQuery, type PageQuery } from "../types";
 import elliptic from "elliptic";
 import { v4 } from "uuid";
 
@@ -98,7 +98,7 @@ export class TeeLogManager {
             const sgxAttestation = await sgxAttestationProvider.generateAttestation(userReport);
             return JSON.stringify(sgxAttestation);
         } else if (this.teeType === TeeType.TDX_DSTACK) {
-            const tdxAttestationProvider = new TdxAttestationProvider();
+            const tdxAttestationProvider = new TdxAttestationProvider(this.teeMode);
             const tdxAttestation = await tdxAttestationProvider.generateAttestation(userReport);
             return JSON.stringify(tdxAttestation);
         } else {

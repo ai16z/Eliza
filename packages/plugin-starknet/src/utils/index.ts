@@ -1,5 +1,5 @@
-import { elizaLogger, IAgentRuntime } from "@elizaos/core";
-import { Fraction, Percent } from "@uniswap/sdk-core";
+import { elizaLogger, type IAgentRuntime } from "@elizaos/core";
+import { type Fraction, Percent } from "@uniswap/sdk-core";
 import { Account, Contract, RpcProvider } from "starknet";
 
 export const getTokenBalance = async (
@@ -38,11 +38,11 @@ export const getPercent = (amount: string | number, decimals: number) => {
     return new Percent(amount, decimals);
 };
 
-export const parseFormatedAmount = (amount: string) => amount.replace(/,/g, "");
+export const parseFormattedAmount = (amount: string) => amount.replace(/,/g, "");
 
 export const PERCENTAGE_INPUT_PRECISION = 2;
 
-export const parseFormatedPercentage = (percent: string) =>
+export const parseFormattedPercentage = (percent: string) =>
     new Percent(
         +percent * 10 ** PERCENTAGE_INPUT_PRECISION,
         100 * 10 ** PERCENTAGE_INPUT_PRECISION
@@ -65,12 +65,12 @@ export const formatCurrenyAmount = (
 };
 
 export const formatPercentage = (percentage: Percent) => {
-    const formatedPercentage = +percentage.toFixed(2);
+    const formattedPercentage = +percentage.toFixed(2);
     const exact = percentage.equalTo(
-        new Percent(Math.round(formatedPercentage * 100), 10000)
+        new Percent(Math.round(formattedPercentage * 100), 10000)
     );
 
-    return `${exact ? "" : "~"}${formatedPercentage}%`;
+    return `${exact ? "" : "~"}${formattedPercentage}%`;
 };
 
 export type RetryConfig = {

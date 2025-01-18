@@ -2,8 +2,8 @@ import { Coinbase } from "@coinbase/coinbase-sdk";
 import { z } from "zod";
 import {
     WebhookEventType,
-    WebhookEventFilter,
-    WebhookEventTypeFilter,
+    type WebhookEventFilter,
+    type WebhookEventTypeFilter,
 } from "@coinbase/coinbase-sdk/dist/client";
 
 export const ChargeSchema = z.object({

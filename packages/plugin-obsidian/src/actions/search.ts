@@ -1,9 +1,9 @@
 import {
-    Action,
-    HandlerCallback,
-    IAgentRuntime,
-    Memory,
-    State,
+    type Action,
+    type HandlerCallback,
+    type IAgentRuntime,
+    type Memory,
+    type State,
     elizaLogger,
 } from "@elizaos/core";
 import { getObsidian, markdownToPlaintext, processUserInput }  from "../helper";
@@ -26,7 +26,7 @@ export const searchAction: Action = {
         "FULL_SEARCH_VAULT",
         "FULL_SEARCH_NOTES",
         "FULL_SEARCH_FILES",
-        "SERCH_ALL",
+        "SEARCH_ALL",
         "SEARCH_ALL_NOTES",
         "SEARCH_ALL_FILES",
         "SEARCH_VAULT",

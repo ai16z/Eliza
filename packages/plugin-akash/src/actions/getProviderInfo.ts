@@ -1,5 +1,5 @@
-import { Action, elizaLogger } from "@elizaos/core";
-import { IAgentRuntime, Memory, State, HandlerCallback, Content, ActionExample } from "@elizaos/core";
+import { type Action, elizaLogger } from "@elizaos/core";
+import type { IAgentRuntime, Memory, State, HandlerCallback, Content, ActionExample } from "@elizaos/core";
 import { QueryProviderRequest, QueryClientImpl as ProviderQueryClient } from "@akashnetwork/akash-api/akash/provider/v1beta3";
 import { getRpc } from "@akashnetwork/akashjs/build/rpc";
 import { AkashError, AkashErrorCode } from "../error/error";

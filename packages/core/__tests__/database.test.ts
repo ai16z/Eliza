@@ -1,19 +1,31 @@
 /* eslint-disable no-dupe-class-members */
 import { DatabaseAdapter } from "../src/database.ts";
 import {
-    Memory,
-    Actor,
-    Account,
-    Goal,
+    type Memory,
+    type Actor,
+    type Account,
+    type Goal,
     GoalStatus,
-    Participant,
-    Relationship,
-    UUID,
+    type Participant,
+    type Relationship,
+    type UUID,
 } from "../src/types.ts";
 
 class MockDatabaseAdapter extends DatabaseAdapter {
     getMemoryById(_id: UUID): Promise<Memory | null> {
         throw new Error("Method not implemented.");
+    }
+    async getMemoriesByIds(
+        memoryIds: UUID[],
+        _tableName?: string
+    ): Promise<Memory[]> {
+        return memoryIds.map((id) => ({
+            id: id,
+            content: { text: "Test Memory" },
+            roomId: "room-id" as UUID,
+            userId: "user-id" as UUID,
+            agentId: "agent-id" as UUID,
+        })) as Memory[];
     }
     log(_params: {
         body: { [key: string]: unknown };

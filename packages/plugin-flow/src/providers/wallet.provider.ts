@@ -1,15 +1,15 @@
 import {
     elizaLogger,
-    IAgentRuntime,
-    Memory,
-    Provider,
-    State,
+    type IAgentRuntime,
+    type Memory,
+    type Provider,
+    type State,
 } from "@elizaos/core";
 import NodeCache from "node-cache";
 import * as fcl from "@onflow/fcl";
 import type { CompositeSignature, Account } from "@onflow/typedefs";
 import type { FlowConnector } from "./utils/flow.connector";
-import { IFlowScriptExecutor, IFlowSigner } from "../types";
+import type { IFlowScriptExecutor, IFlowSigner } from "../types";
 import { getFlowConnectorInstance } from "./connector.provider";
 import PureSigner from "./utils/pure.signer";
 import Exception from "../types/exception";

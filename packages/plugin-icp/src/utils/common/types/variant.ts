@@ -17,7 +17,6 @@ type Variant6<A, B, C, D, E, F> = Record<
 >;
 
 // Unwrap and extract only the key
-// biome-ignore lint/suspicious/noExplicitAny: <explanation>
 export const unwrapVariantKey = <T extends string>(
     v: Record<string, any>
 ): T => {

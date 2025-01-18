@@ -4,16 +4,16 @@ import {
     parseJSONObjectFromText,
 } from "@elizaos/core";
 import {
-    IAgentRuntime,
-    IImageDescriptionService,
-    IPdfService,
-    ITranscriptionService,
-    IVideoService,
-    Media,
+    type IAgentRuntime,
+    type IImageDescriptionService,
+    type IPdfService,
+    type ITranscriptionService,
+    type IVideoService,
+    type Media,
     ModelClass,
     ServiceType,
 } from "@elizaos/core";
-import { WebClient } from "@slack/web-api";
+import type { WebClient } from "@slack/web-api";
 import ffmpeg from "fluent-ffmpeg";
 import fs from "fs";
 

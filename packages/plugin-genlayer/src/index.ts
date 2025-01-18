@@ -1,4 +1,4 @@
-import { Plugin } from "@elizaos/core";
+import type { Plugin } from "@elizaos/core";
 import { clientProvider } from "./providers/client";
 import { readContractAction } from "./actions/readContract";
 import { writeContractAction } from "./actions/writeContract";

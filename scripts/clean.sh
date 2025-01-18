@@ -15,3 +15,4 @@ rm -rf ./packages/core/cache
 rm ./pnpm-lock.yaml
 
 echo "Cleanup completed."
+exit 0

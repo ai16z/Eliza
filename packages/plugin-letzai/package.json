@@ -1,6 +1,6 @@
 {
     "name": "@elizaos/plugin-letzai",
-    "version": "0.1.8+build.1",
+    "version": "0.1.9-alpha.1",
     "author": "LetzAI",
     "description": "Enables Image Generation through LetzAI API",
     "main": "dist/index.js",
@@ -12,7 +12,6 @@
     },
     "scripts": {
         "build": "tsup --format esm --dts",
-        "dev": "tsup --format esm --dts --watch",
-        "lint": "eslint --fix  --cache ."
+        "dev": "tsup --format esm --dts --watch"
     }
 }
