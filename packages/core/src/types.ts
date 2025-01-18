@@ -652,6 +652,7 @@ export enum Clients {
     SLACK = "slack",
     GITHUB = "github",
     INSTAGRAM = "instagram",
+    DEVA = "deva",
 }
 
 export interface IAgentConfig {
@@ -753,6 +754,7 @@ export type Character = {
         discordMessageHandlerTemplate?: TemplateType;
         slackMessageHandlerTemplate?: TemplateType;
         slackShouldRespondTemplate?: TemplateType;
+        devaPostTemplate?: string;
     };
 
     /** Character biography */
@@ -1588,7 +1590,6 @@ export enum ActionTimelineType {
     ForYou = "foryou",
     Following = "following",
 }
-
 export enum KnowledgeScope {
     SHARED = "shared",
     PRIVATE = "private",

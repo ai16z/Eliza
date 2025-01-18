@@ -97,6 +97,7 @@
         "@elizaos/plugin-obsidian": "workspace:*",
         "@elizaos/plugin-arthera": "workspace:*",
         "@elizaos/plugin-allora": "workspace:*",
+        "@elizaos/client-deva": "workspace:*",
         "@elizaos/plugin-opacity": "workspace:*",
         "@elizaos/plugin-hyperliquid": "workspace:*",
         "@elizaos/plugin-akash": "workspace:*",
