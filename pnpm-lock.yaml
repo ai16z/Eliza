@@ -364,6 +364,9 @@ importers:
       '@elizaos/plugin-ton':
         specifier: workspace:*
         version: link:../packages/plugin-ton
+      '@elizaos/plugin-treasure':
+        specifier: workspace:*
+        version: link:../packages/plugin-treasure
       '@elizaos/plugin-twitter':
         specifier: workspace:*
         version: link:../packages/plugin-twitter
@@ -3220,6 +3223,21 @@ importers:
       tsup:
         specifier: 8.3.5
         version: 8.3.5(@swc/core@1.10.7(@swc/helpers@0.5.15))(jiti@2.4.2)(postcss@8.5.1)(tsx@4.19.2)(typescript@5.7.3)(yaml@2.7.0)
+      whatwg-url:
+        specifier: 7.1.0
+        version: 7.1.0
+
+  packages/plugin-treasure:
+    dependencies:
+      '@elizaos/core':
+        specifier: workspace:*
+        version: link:../core
+      tsup:
+        specifier: ^8.3.5
+        version: 8.3.5(@swc/core@1.10.6(@swc/helpers@0.5.15))(jiti@2.4.2)(postcss@8.4.49)(tsx@4.19.2)(typescript@5.7.2)(yaml@2.7.0)
+      web3:
+        specifier: ^4.15.0
+        version: 4.16.0(bufferutil@4.0.9)(encoding@0.1.13)(typescript@5.7.2)(utf-8-validate@5.0.10)(zod@3.24.1)
       whatwg-url:
         specifier: 7.1.0
         version: 7.1.0
