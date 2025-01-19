@@ -62,6 +62,7 @@
         "@elizaos/plugin-massa": "workspace:*",
         "@elizaos/plugin-nft-generation": "workspace:*",
         "@elizaos/plugin-node": "workspace:*",
+        "@elizaos/plugin-quick-intel": "workspace:*",
         "@elizaos/plugin-solana": "workspace:*",
         "@elizaos/plugin-injective": "workspace:*",
         "@elizaos/plugin-solana-agent-kit": "workspace:*",
