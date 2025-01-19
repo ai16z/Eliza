@@ -1,0 +1,28 @@
+{
+    "compilerOptions": {
+        "outDir": "./dist",
+        "rootDir": "./src",
+        "target": "ESNext",
+        "module": "ESNext",
+        "moduleResolution": "bundler",
+        "declaration": true,
+        "declarationMap": true,
+        "emitDeclarationOnly": true,
+        "skipLibCheck": true,
+        "esModuleInterop": true,
+        "strict": true,
+        "isolatedModules": true,
+        "lib": [
+            "ESNext"
+        ]
+    },
+    "include": [
+        "src/**/*.ts",
+        "src/**/*.d.ts"
+    ],
+    "exclude": [
+        "node_modules",
+        "dist",
+        "scripts"
+    ]
+}
