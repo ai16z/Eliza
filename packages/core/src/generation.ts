@@ -1348,8 +1348,8 @@ export async function generateShouldRespond({
  */
 export async function splitChunks(
     content: string,
-    chunkSize = 512,
-    bleed = 20
+    chunkSize = 1500,
+    bleed = 100
 ): Promise<string[]> {
     elizaLogger.debug(`[splitChunks] Starting text split`);
 
