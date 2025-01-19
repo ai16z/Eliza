@@ -512,7 +512,12 @@ export class TwitterInteractionClient {
                     }
 
                     await this.runtime.processActions(
-                        message,
+                        {...message,
+                            content: {
+                                ...message.content,
+                                tweet,
+                            }
+                        },
                         responseMessages,
                         state,
                         callback
