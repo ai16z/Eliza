@@ -14,6 +14,7 @@ import { FarcasterClientInterface } from "@elizaos/client-farcaster";
 import { DirectClient } from "@elizaos/client-direct";
 // import { ReclaimAdapter } from "@elizaos/plugin-reclaim";
 import { PrimusAdapter } from "@elizaos/plugin-primus";
+import { lightningPlugin } from "@elizaos/plugin-lightning";
 import { elizaCodeinPlugin, onchainJson } from "@elizaos/plugin-iq6900";
 
 import {
@@ -1038,6 +1039,11 @@ export async function createAgent(
             getSecret(character, "PYTH_MAINNET_PROGRAM_KEY")
                 ? pythDataPlugin
                 : null,
+                getSecret(character, "LND_TLS_CERT") &&
+                getSecret(character, "LND_MACAROON") &&
+                getSecret(character, "LND_SOCKET")
+                    ? lightningPlugin
+                    : null
         ].filter(Boolean),
         providers: [],
         actions: [],

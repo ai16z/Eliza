@@ -102,6 +102,7 @@
         "@elizaos/plugin-hyperliquid": "workspace:*",
         "@elizaos/plugin-akash": "workspace:*",
         "@elizaos/plugin-quai": "workspace:*",
+        "@elizaos/plugin-lightning": "workspace:*",
         "@elizaos/plugin-b2": "workspace:*",
         "@elizaos/plugin-nft-collections": "workspace:*",
         "@elizaos/plugin-pyth-data": "workspace:*",
