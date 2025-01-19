@@ -1,0 +1,20 @@
+{
+  "name": "@elizaos/plugin-dad-joke",
+  "version": "0.1.0",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "type": "module",
+  "scripts": {
+    "build": "tsup --format esm --dts",
+    "dev": "tsc -w",
+    "lint": "eslint src --ext .ts"
+  },
+  "author": "pann0x",
+  "license": "MIT",
+  "dependencies": {
+    "@ai16z/client-direct": "0.1.6-alpha.4",
+    "@ai16z/eliza": "0.1.6-alpha.4",
+    "@ai16z/plugin-0g": "0.1.6-alpha.4",
+    "dotenv": "^16.4.7"
+  }
+}
