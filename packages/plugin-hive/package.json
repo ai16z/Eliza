@@ -1,0 +1,40 @@
+{
+    "name": "@elizaos/plugin-hive",
+    "version": "0.1.0",
+    "main": "dist/index.js",
+    "type": "module",
+    "types": "dist/index.d.ts",
+    "dependencies": {
+        "@elizaos/core": "workspace:*",
+        "@hiveio/dhive": "^1.2.7",
+        "bignumber.js": "^9.1.2",
+        "node-cache": "^5.1.2"
+    },
+    "devDependencies": {
+        "tsup": "8.3.5",
+        "@types/node": "^20.0.0",
+        "@types/node-cache": "^4.2.5",
+        "typescript": "^5.0.0",
+        "jest": "^29.0.0",
+        "@types/jest": "^29.0.0",
+        "ts-jest": "^29.0.0"
+    },
+    "scripts": {
+        "build": "tsup --format esm --dts",
+        "dev": "tsup --format esm --dts --watch",
+        "lint": "eslint --fix --cache .",
+        "test": "jest",
+        "test:watch": "jest --watch",
+        "prepublishOnly": "pnpm run build"
+    },
+    "keywords": [
+        "hive",
+        "blockchain",
+        "cryptocurrency",
+        "social",
+        "elizaos",
+        "plugin"
+    ],
+    "author": "@helo",
+    "license": "MIT"
+}

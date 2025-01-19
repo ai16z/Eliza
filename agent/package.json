@@ -52,6 +52,7 @@
         "@elizaos/plugin-echochambers": "workspace:*",
         "@elizaos/plugin-flow": "workspace:*",
         "@elizaos/plugin-gitbook": "workspace:*",
+        "@elizaos/plugin-hive": "workspace:*",
         "@elizaos/plugin-story": "workspace:*",
         "@elizaos/plugin-gitcoin-passport": "workspace:*",
         "@elizaos/plugin-goat": "workspace:*",
