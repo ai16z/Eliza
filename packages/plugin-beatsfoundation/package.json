@@ -1,0 +1,25 @@
+{
+  "name": "@elizaos/plugin-beatsfoundation",
+  "version": "0.0.1",
+  "description": "Beats Foundation plugin for ElizaOS",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "clean": "rimraf dist",
+    "dev": "tsc -w",
+    "lint": "eslint src --ext .ts",
+    "test": "jest"
+  },
+  "dependencies": {
+    "@elizaos/core": "workspace:*",
+    "axios": "^1.6.7"
+  },
+  "devDependencies": {
+    "@types/node": "^20.11.19",
+    "typescript": "^5.3.3"
+  },
+  "peerDependencies": {
+    "@elizaos/core": "workspace:*"
+  }
+}
