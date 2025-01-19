@@ -1,0 +1,17 @@
+name: Validate Package Structure
+
+on:
+  pull_request:
+    branches: [ develop ]
+    paths:
+      - 'packages/**'
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Validate package structure
+      run: ./scripts/validate-package-structure.sh
