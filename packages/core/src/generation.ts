@@ -366,7 +366,7 @@ export async function generateText({
         return "";
     }
 
-    elizaLogger.log("Generating text...");
+    elizaLogger.log("Generating text...", context);
 
     elizaLogger.info("Generating text with options:", {
         modelProvider: runtime.modelProvider,
@@ -2237,7 +2237,7 @@ async function handleAnthropic({
     schema,
     schemaName,
     schemaDescription,
-    mode = "json",
+    //mode = "json",
     modelOptions,
     runtime,
 }: ProviderOptions): Promise<GenerateObjectResult<unknown>> {
@@ -2246,12 +2246,12 @@ async function handleAnthropic({
     elizaLogger.debug("Anthropic handleAnthropic baseURL:", { baseURL });
 
     const anthropic = createAnthropic({ apiKey, baseURL });
+    elizaLogger.info("**** Im here!");
     return await aiGenerateObject({
         model: anthropic.languageModel(model),
         schema,
         schemaName,
         schemaDescription,
-        mode,
         ...modelOptions,
     });
 }

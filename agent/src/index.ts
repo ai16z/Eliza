@@ -109,6 +109,7 @@ import { pythDataPlugin } from "@elizaos/plugin-pyth-data";
 import { openaiPlugin } from '@elizaos/plugin-openai';
 
 import { zksyncEraPlugin } from "@elizaos/plugin-zksync-era";
+import { zxPlugin } from "@elizaos/plugin-0x";
 import Database from "better-sqlite3";
 import fs from "fs";
 import net from "net";
@@ -1045,6 +1046,7 @@ export async function createAgent(
             getSecret(character, "RESERVOIR_API_KEY")
                 ? createNFTCollectionsPlugin()
                 : null,
+            getSecret(character, "ZERO_EX_API_KEY") ? zxPlugin : null,
             getSecret(character, "PYTH_TESTNET_PROGRAM_KEY") ||
             getSecret(character, "PYTH_MAINNET_PROGRAM_KEY")
                 ? pythDataPlugin
