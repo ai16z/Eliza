@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { composeContext } from "../src/context.ts";
 import handlebars from "handlebars";
-import { State } from "../src/types.ts";
+import type { State } from "../src/types.ts";
 
 describe("composeContext", () => {
     const baseState: State = {
@@ -217,9 +217,7 @@ describe("composeContext", () => {
 
         it("should handle complex handlebars template", () => {
             // Register the 'gt' helper before running tests
-            handlebars.registerHelper("gt", function (a, b) {
-                return a > b;
-            });
+            handlebars.registerHelper("gt", (a, b) => a > b);
 
             const state = {
                 ...baseState,

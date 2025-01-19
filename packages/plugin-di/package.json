@@ -1,0 +1,40 @@
+{
+    "name": "@elizaos/plugin-di",
+    "version": "0.1.9-alpha.1",
+    "type": "module",
+    "main": "dist/index.js",
+    "module": "dist/index.js",
+    "types": "dist/index.d.ts",
+    "exports": {
+        "./package.json": "./package.json",
+        ".": {
+            "import": {
+                "@elizaos/source": "./src/index.ts",
+                "types": "./dist/index.d.ts",
+                "default": "./dist/index.js"
+            }
+        }
+    },
+    "files": [
+        "dist"
+    ],
+    "dependencies": {
+        "@elizaos/core": "workspace:*",
+        "inversify": "^6.2.1",
+        "reflect-metadata": "^0.2.2",
+        "uuid": "11.0.3",
+        "zod": "3.23.8"
+    },
+    "devDependencies": {
+        "@types/node": "^20.0.0",
+        "@types/uuid": "10.0.0",
+        "tsup": "8.3.5",
+        "vitest": "2.1.4"
+    },
+    "scripts": {
+        "build": "tsup --format esm --dts",
+        "dev": "tsup --format esm --dts --watch",
+        "lint": "eslint --fix  --cache .",
+        "test": "vitest run"
+    }
+}

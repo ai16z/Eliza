@@ -1,8 +1,8 @@
 import {
-    Provider,
-    IAgentRuntime,
-    Memory,
-    State,
+    type Provider,
+    type IAgentRuntime,
+    type Memory,
+    type State,
     elizaLogger,
 } from "@elizaos/core";
 

@@ -1,22 +1,22 @@
-import { Coinbase, Wallet } from "@coinbase/coinbase-sdk";
+import { Coinbase, type Wallet } from "@coinbase/coinbase-sdk";
 import {
     composeContext,
     elizaLogger,
     generateObject,
     ModelClass,
-    Action,
-    IAgentRuntime,
-    Memory,
-    Provider,
-    State,
-    HandlerCallback,
-    Plugin,
+    type Action,
+    type IAgentRuntime,
+    type Memory,
+    type Provider,
+    type State,
+    type HandlerCallback,
+    type Plugin,
 } from "@elizaos/core";
 import {
     TransferSchema,
     isTransferContent,
-    TransferContent,
-    Transaction,
+    type TransferContent,
+    type Transaction,
 } from "../types";
 import { transferTemplate } from "../templates";
 import { readFile } from "fs/promises";
@@ -86,7 +86,7 @@ export const massPayoutProvider: Provider = {
             return {
                 currentTransactions: records.map((record: any) => ({
                     address: record["Address"] || undefined,
-                    amount: parseFloat(record["Amount"]) || undefined,
+                    amount: Number.parseFloat(record["Amount"]) || undefined,
                     status: record["Status"] || undefined,
                     errorCode: record["Error Code"] || "",
                     transactionUrl: record["Transaction URL"] || "",

@@ -1,24 +1,24 @@
 import {
     elizaLogger,
-    IAgentRuntime,
-    Memory,
-    Provider,
+    type IAgentRuntime,
+    type Memory,
+    type Provider,
     settings,
-    State,
+    type State,
 } from "@elizaos/core";
 import {
-    RecommenderMetrics,
-    TokenPerformance,
-    TokenRecommendation,
-    TradePerformance,
+    type RecommenderMetrics,
+    type TokenPerformance,
+    type TokenRecommendation,
+    type TradePerformance,
     TrustScoreDatabase,
 } from "@elizaos/plugin-trustdb";
 import { getAssociatedTokenAddress } from "@solana/spl-token";
 import { Connection, PublicKey } from "@solana/web3.js";
 import { v4 as uuidv4 } from "uuid";
-import { ProcessedTokenData, TokenSecurityData } from "../types/token.ts";
+import type { ProcessedTokenData, TokenSecurityData } from "../types/token.ts";
 import { SimulationSellingService } from "./simulationSellingService.ts";
-import { TokenProvider } from "./token.ts";
+import type { TokenProvider } from "./token.ts";
 import { WalletProvider } from "./wallet.ts";
 
 const Wallet = settings.MAIN_WALLET_ADDRESS;
@@ -90,7 +90,7 @@ export class TrustScoreManager {
             const tokenBalInfo =
                 await this.connection.getTokenAccountBalance(tokenAta);
             const tokenBalance = tokenBalInfo.value.amount;
-            const balance = parseFloat(tokenBalance);
+            const balance = Number.parseFloat(tokenBalance);
             return balance;
         } catch (error) {
             elizaLogger.error("Error fetching balance", error);
@@ -374,7 +374,7 @@ export class TrustScoreManager {
         let tokensBalance = 0;
         const prices = await wallet.fetchPrices(runtime);
         const solPrice = prices.solana.usd;
-        const buySol = data.buy_amount / parseFloat(solPrice);
+        const buySol = data.buy_amount / Number.parseFloat(solPrice);
         const buy_value_usd = data.buy_amount * processedData.tradeData.price;
         const token = await this.tokenProvider.fetchTokenTradeData();
         const tokenCodex = await this.tokenProvider.fetchTokenCodex();
@@ -547,7 +547,7 @@ export class TrustScoreManager {
         );
         const prices = await wallet.fetchPrices(runtime);
         const solPrice = prices.solana.usd;
-        const sellSol = sellDetails.sell_amount / parseFloat(solPrice);
+        const sellSol = sellDetails.sell_amount / Number.parseFloat(solPrice);
         const sell_value_usd =
             sellDetails.sell_amount * processedData.tradeData.price;
         const trade = await this.trustScoreDb.getLatestTradePerformance(

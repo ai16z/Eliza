@@ -2,7 +2,7 @@ import { getOnChainTools } from "@goat-sdk/adapter-vercel-ai";
 import { MODE, USDC, erc20 } from "@goat-sdk/plugin-erc20";
 import { kim } from "@goat-sdk/plugin-kim";
 import { sendETH } from "@goat-sdk/wallet-evm";
-import { WalletClientBase } from "@goat-sdk/core";
+import type { WalletClientBase } from "@goat-sdk/core";
 
 import {
     generateText,

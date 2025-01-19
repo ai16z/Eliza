@@ -1,8 +1,8 @@
 import {
     elizaLogger,
     composeContext,
-    Content,
-    HandlerCallback,
+    type Content,
+    type HandlerCallback,
     ModelClass,
     generateObject,
     type IAgentRuntime,
@@ -13,7 +13,7 @@ import { z } from "zod";
 
 import {
     initWalletProvider,
-    WalletProvider,
+    type WalletProvider,
     nativeWalletProvider,
 } from "../providers/wallet";
 import { internal } from "@ton/ton";

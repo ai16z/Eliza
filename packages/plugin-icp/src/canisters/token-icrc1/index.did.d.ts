@@ -294,7 +294,6 @@ export interface _SERVICE {
     send_dfx: ActorMethod<[SendArgs], bigint>;
     symbol: ActorMethod<[], Symbol>;
     transfer: ActorMethod<[TransferArgs], Result_5>;
-    // biome-ignore lint/complexity/noBannedTypes: <explanation>
     transfer_fee: ActorMethod<[{}], TransferFee>;
 }
 export declare const idlFactory: IDL.InterfaceFactory;

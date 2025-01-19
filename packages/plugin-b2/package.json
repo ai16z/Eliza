@@ -1,0 +1,36 @@
+{
+    "name": "@elizaos/plugin-b2",
+    "version": "0.1.9-alpha.1",
+    "type": "module",
+    "main": "dist/index.js",
+    "module": "dist/index.js",
+    "types": "dist/index.d.ts",
+    "exports": {
+        "./package.json": "./package.json",
+        ".": {
+            "import": {
+                "@elizaos/source": "./src/index.ts",
+                "types": "./dist/index.d.ts",
+                "default": "./dist/index.js"
+            }
+        }
+    },
+    "files": [
+        "dist"
+    ],
+    "dependencies": {
+        "@elizaos/core": "workspace:*",
+        "tsup": "8.3.5"
+    },
+    "devDependencies": {
+        "tsup": "8.3.5"
+    },
+    "scripts": {
+        "build": "tsup src/index.ts --format esm --no-dts",
+        "dev": "tsup --format esm --dts --watch",
+        "test": "vitest run"
+    },
+    "peerDependencies": {
+        "whatwg-url": "7.1.0"
+    }
+}

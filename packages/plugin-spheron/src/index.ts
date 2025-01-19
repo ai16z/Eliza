@@ -1,4 +1,4 @@
-import { Plugin } from "@elizaos/core";
+import type { Plugin } from "@elizaos/core";
 import escrow from "./actions/escrow.ts";
 import deployment from "./actions/deployment.ts";
 import { tokensProvider } from "./providers/tokens.ts";

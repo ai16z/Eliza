@@ -1,16 +1,16 @@
 // src/providers/wallet.ts
-import { Actor, ActorSubclass, HttpAgent } from "@dfinity/agent";
+import { Actor, type ActorSubclass, HttpAgent } from "@dfinity/agent";
 import { Ed25519KeyIdentity } from "@dfinity/identity";
-import { IDL } from "@dfinity/candid";
-import { Principal } from "@dfinity/principal";
-import { IAgentRuntime, Memory, Provider, State } from "@elizaos/core";
+import type { IDL } from "@dfinity/candid";
+import type { Principal } from "@dfinity/principal";
+import type { IAgentRuntime, Memory, Provider, State } from "@elizaos/core";
 
 export class WalletProvider {
     private privateKey: string;
     private identity: Ed25519KeyIdentity;
     private host: string;
 
-    constructor(privateKey: string, host: string = "https://ic0.app") {
+    constructor(privateKey: string, host = "https://ic0.app") {
         this.privateKey = privateKey;
         this.host = host;
         this.identity = this.createIdentity();
@@ -102,7 +102,7 @@ export const icpWalletProvider: Provider = {
 export const createAnonymousActor = async <T>(
     idlFactory: IDL.InterfaceFactory,
     canisterId: string,
-    host: string = "https://ic0.app",
+    host = "https://ic0.app",
     fetchRootKey = false
 ): Promise<ActorSubclass<T>> => {
     const anonymousAgent = new HttpAgent({

@@ -3,20 +3,20 @@
 import {
     ActionExample,
     composeContext,
-    Content,
+    type Content,
     elizaLogger,
     generateObjectDeprecated,
-    HandlerCallback,
-    IAgentRuntime,
-    Memory,
+    type HandlerCallback,
+    type IAgentRuntime,
+    type Memory,
     ModelClass,
-    State,
+    type State,
     type Action,
 } from "@elizaos/core";
 import axios from "axios";
 import { debugLog } from "../utils/debug";
 import { validateGiphyConfig } from "../environment";
-import { GifResponse, Gif } from "../types";
+import type { GifResponse, Gif } from "../types";
 import fs from "fs";
 import path from "path";
 import crypto from "crypto";

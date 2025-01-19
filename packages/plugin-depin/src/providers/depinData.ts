@@ -4,7 +4,7 @@ import {
     type Memory,
     type State,
     elizaLogger,
-    ICacheManager,
+    type ICacheManager,
 } from "@elizaos/core";
 import NodeCache from "node-cache";
 import * as path from "path";
@@ -17,7 +17,7 @@ export const DEPIN_PROJECTS_URL = "https://metrics-api.w3bstream.com/project";
 
 export class DePINScanProvider {
     private cache: NodeCache;
-    private cacheKey: string = "depin/metrics";
+    private cacheKey = "depin/metrics";
 
     constructor(private cacheManager: ICacheManager) {
         this.cache = new NodeCache({ stdTTL: 3600 });
@@ -102,7 +102,7 @@ export class DePINScanProvider {
             num = value;
         } else if (typeof value === "string") {
             // Parse string to number
-            num = parseFloat(value);
+            num = Number.parseFloat(value);
         } else {
             return ""; // Handle unexpected types gracefully
         }

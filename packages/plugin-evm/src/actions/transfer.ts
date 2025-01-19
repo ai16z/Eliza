@@ -1,16 +1,16 @@
-import { ByteArray, formatEther, parseEther, type Hex } from "viem";
+import { type ByteArray, formatEther, parseEther, type Hex } from "viem";
 import {
-    Action,
+    type Action,
     composeContext,
     generateObjectDeprecated,
-    HandlerCallback,
+    type HandlerCallback,
     ModelClass,
     type IAgentRuntime,
     type Memory,
     type State,
 } from "@elizaos/core";
 
-import { initWalletProvider, WalletProvider } from "../providers/wallet";
+import { initWalletProvider, type WalletProvider } from "../providers/wallet";
 import type { Transaction, TransferParams } from "../types";
 import { transferTemplate } from "../templates";
 
@@ -40,13 +40,13 @@ export class TransferAction {
                 value: parseEther(params.amount),
                 data: params.data as Hex,
                 kzg: {
-                    blobToKzgCommitment: function (_: ByteArray): ByteArray {
+                    blobToKzgCommitment: (_: ByteArray): ByteArray => {
                         throw new Error("Function not implemented.");
                     },
-                    computeBlobKzgProof: function (
+                    computeBlobKzgProof: (
                         _blob: ByteArray,
                         _commitment: ByteArray
-                    ): ByteArray {
+                    ): ByteArray => {
                         throw new Error("Function not implemented.");
                     },
                 },

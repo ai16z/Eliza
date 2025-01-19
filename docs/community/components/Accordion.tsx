@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from "react";
-import { GitHubItem } from "./Contributions";
+import type { GitHubItem } from "./Contributions";
 import { GITHUB_PAGE_LIMIT } from "./Contributors";
 
 interface AccordionProps {

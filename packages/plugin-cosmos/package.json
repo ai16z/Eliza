@@ -1,6 +1,6 @@
 {
     "name": "@elizaos/plugin-cosmos",
-    "version": "0.1.8+build.1",
+    "version": "0.1.9-alpha.1",
     "main": "dist/index.js",
     "type": "module",
     "types": "dist/index.d.ts",
@@ -10,6 +10,8 @@
         "@cosmjs/cosmwasm-stargate": "^0.32.4",
         "@cosmjs/proto-signing": "^0.32.4",
         "@cosmjs/stargate": "^0.32.4",
+        "@skip-go/client": "^0.16.3",
+        "axios": "^1.7.9",
         "bignumber.js": "9.1.2",
         "chain-registry": "^1.69.68",
         "tsup": "8.3.5",
@@ -19,7 +21,6 @@
     "scripts": {
         "build": "tsup --format esm --dts",
         "dev": "tsup --format esm --dts --watch",
-        "lint": "eslint --fix  --cache .",
         "test": "vitest run"
     },
     "devDependencies": {

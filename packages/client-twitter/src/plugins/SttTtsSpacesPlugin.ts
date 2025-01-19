@@ -1,9 +1,9 @@
 // src/plugins/SttTtsPlugin.ts
 
 import { spawn } from "child_process";
-import { ITranscriptionService, elizaLogger } from "@elizaos/core";
-import { Space, JanusClient, AudioDataWithUser } from "agent-twitter-client";
-import { Plugin } from "@elizaos/core";
+import { type ITranscriptionService, elizaLogger } from "@elizaos/core";
+import type { Space, JanusClient, AudioDataWithUser } from "agent-twitter-client";
+import type { Plugin } from "@elizaos/core";
 
 interface PluginConfig {
     openAiApiKey?: string; // for STT & ChatGPT

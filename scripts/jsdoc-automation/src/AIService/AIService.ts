@@ -1,6 +1,6 @@
 import { ChatOpenAI } from "@langchain/openai";
 import dotenv from "dotenv";
-import { Configuration } from "../Configuration.js";
+import type { Configuration } from "../Configuration.js";
 import { TypeScriptParser } from "../TypeScriptParser.js";
 import { CodeFormatter } from "./utils/CodeFormatter.js";
 import { DocumentOrganizer } from "./utils/DocumentOrganizer.js";
@@ -39,7 +39,7 @@ export class AIService {
      * @param {string} prompt - The prompt for which to generate a comment
      * @returns {Promise<string>} The generated comment
      */
-    public async generateComment(prompt: string, isFAQ: boolean = false): Promise<string> {
+    public async generateComment(prompt: string, isFAQ = false): Promise<string> {
         try {
             // First try with generous limit
             let finalPrompt = prompt;

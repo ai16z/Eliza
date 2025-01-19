@@ -1,6 +1,6 @@
 import * as fs from "fs";
 import * as path from "path";
-import { Configuration } from "./Configuration.js";
+import type { Configuration } from "./Configuration.js";
 
 /**
  * DirectoryTraversal class for traversing through directories and files.

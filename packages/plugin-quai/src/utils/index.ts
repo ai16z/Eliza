@@ -1,4 +1,4 @@
-import { Content, IAgentRuntime } from "@elizaos/core";
+import type { Content, IAgentRuntime } from "@elizaos/core";
 import { JsonRpcProvider, Wallet } from "quais";
 
 export const validateSettings = (runtime: IAgentRuntime) => {

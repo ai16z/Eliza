@@ -1,19 +1,19 @@
 import {
-    ActionExample,
+    type ActionExample,
     composeContext,
     elizaLogger,
     generateObject,
-    HandlerCallback,
-    IAgentRuntime,
-    Memory,
+    type HandlerCallback,
+    type IAgentRuntime,
+    type Memory,
     ModelClass,
-    State,
+    type State,
     type Action,
 } from "@elizaos/core";
 import { z } from "zod";
 import { topicsProvider } from "../providers/topics";
 import { getInferenceTemplate } from "../templates";
-import { AlloraAPIClient, ChainSlug } from "@alloralabs/allora-sdk";
+import { AlloraAPIClient, type ChainSlug } from "@alloralabs/allora-sdk";
 
 interface InferenceFields {
     topicId: number | null;

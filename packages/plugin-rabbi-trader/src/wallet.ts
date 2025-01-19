@@ -1,4 +1,4 @@
-import { elizaLogger, IAgentRuntime } from "@elizaos/core";
+import { elizaLogger, type IAgentRuntime } from "@elizaos/core";
 import { Connection, Keypair, VersionedTransaction } from "@solana/web3.js";
 import { decodeBase58 } from "./utils";
 import { SAFETY_LIMITS } from "./constants";

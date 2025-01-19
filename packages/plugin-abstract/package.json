@@ -1,6 +1,6 @@
 {
     "name": "@elizaos/plugin-abstract",
-    "version": "0.1.8+build.1",
+    "version": "0.1.9-alpha.1",
     "type": "module",
     "main": "dist/index.js",
     "module": "dist/index.js",
@@ -19,6 +19,7 @@
         "dist"
     ],
     "dependencies": {
+        "@abstract-foundation/agw-client": "^0.1.7",
         "@elizaos/core": "workspace:*",
         "tsup": "^8.3.5",
         "viem": "2.22.2"

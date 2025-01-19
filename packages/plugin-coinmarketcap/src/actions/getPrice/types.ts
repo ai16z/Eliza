@@ -1,4 +1,4 @@
-import { Content } from "@elizaos/core";
+import type { Content } from "@elizaos/core";
 
 export interface GetPriceContent extends Content {
     symbol: string;

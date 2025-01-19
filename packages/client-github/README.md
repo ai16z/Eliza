@@ -47,7 +47,6 @@ const client = await GitHubClientInterface.start(runtime);
 // Convert repository files to agent memories
 await client.createMemoriesFromFiles();
 
-typescript
 // Convert repository files to agent memories
 await client.createMemoriesFromFiles();
 ```
@@ -67,8 +66,6 @@ await client.createPullRequest(
     "Implements new functionality with tests"
 );
 
-
-typescript
 await client.createPullRequest(
 "Feature: Add new functionality",
 "feature/new-feature",
@@ -94,8 +91,6 @@ await client.createCommit(
         }
     ]
 );
-
-
 ```
 
 ## API Reference

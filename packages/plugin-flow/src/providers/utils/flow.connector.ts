@@ -1,6 +1,6 @@
 import * as fcl from "@onflow/fcl";
 import type { Account, TransactionStatus } from "@onflow/typedefs";
-import { IFlowScriptExecutor } from "../../types";
+import type { IFlowScriptExecutor } from "../../types";
 import Exception from "../../types/exception";
 
 export type NetworkType = "mainnet" | "testnet" | "emulator";

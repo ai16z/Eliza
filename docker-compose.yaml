@@ -1,5 +1,5 @@
 services:
-    tee:
+    eliza:
         build:
             context: .
             dockerfile: Dockerfile
@@ -7,8 +7,8 @@ services:
         tty: true
         volumes:
             - /var/run/tappd.sock:/var/run/tappd.sock
-            - tee:/app/packages/client-twitter/src/tweetcache
-            - tee:/app/db.sqlite
+            - eliza:/app/packages/client-twitter/src/tweetcache
+            - eliza:/app/db.sqlite
         environment:
             - OPENAI_API_KEY=
             - REDPILL_API_KEY=
@@ -32,9 +32,11 @@ services:
             - HELIUS_API_KEY=
             - SERVER_PORT=3000
             - WALLET_SECRET_SALT=secret_salt
+            # Refer to: https://github.com/elizaOS/eliza/blob/develop/.env.example for all available environment variables
         ports:
             - "3000:3000"
+            - "5173:5173"
         restart: always
 
 volumes:
-    tee:
+    eliza:

@@ -1,6 +1,6 @@
-import { Action, elizaLogger } from "@elizaos/core";
-import { IAgentRuntime, Memory, State, HandlerCallback, Content, ActionExample } from "@elizaos/core";
-import { DirectSecp256k1HdWallet, Registry, EncodeObject } from "@cosmjs/proto-signing";
+import { type Action, elizaLogger } from "@elizaos/core";
+import type { IAgentRuntime, Memory, State, HandlerCallback, Content, ActionExample } from "@elizaos/core";
+import { DirectSecp256k1HdWallet, Registry, type EncodeObject } from "@cosmjs/proto-signing";
 import { SigningStargateClient } from "@cosmjs/stargate";
 import { MsgCloseDeployment } from "@akashnetwork/akash-api/akash/deployment/v1beta3";
 import { getAkashTypeRegistry, getTypeUrl } from "@akashnetwork/akashjs/build/stargate";

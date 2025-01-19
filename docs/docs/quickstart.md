@@ -97,6 +97,12 @@ Eliza supports multiple AI models:
 - **OpenAI**: Set `OPENAI_API_KEY` to your OpenAI API key and set `modelProvider: "openai"` in your character file
 - **Livepeer**: Set `LIVEPEER_IMAGE_MODEL` to your chosen Livepeer image model, available models [here](https://livepeer-eliza.com/)
 
+- **Llama**: Set `XAI_MODEL=meta-llama/Meta-Llama-3.1-70B-Instruct-Turbo`
+- **Grok**: Set `XAI_MODEL=grok-beta`
+- **OpenAI**: Set `XAI_MODEL=gpt-4o-mini` or `gpt-4o`
+- **Livepeer**: Set `SMALL_LIVEPEER_MODEL`,`MEDIUM_LIVEPEER_MODEL`,`LARGE_LIVEPEER_MODEL` and `IMAGE_LIVEPEER_MODEL` to your desired models listed [here](https://livepeer-eliza.com/).
+
+
 You set which model to use inside the character JSON file
 
 ### Local inference
@@ -130,7 +136,7 @@ You set which model to use inside the character JSON file
     pnpm start --character="characters/trump.character.json"
     ```
 
-    You can also load multiple characters with the characters option with a comma separated list:
+    You can also load multiple characters with the characters option with a comma-separated list:
 
     ```bash
     pnpm start --characters="characters/trump.character.json,characters/tate.character.json"

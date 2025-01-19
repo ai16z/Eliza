@@ -1,7 +1,7 @@
-import { IAgentRuntime, elizaLogger } from "@elizaos/core";
+import { type IAgentRuntime, elizaLogger } from "@elizaos/core";
 import { SpheronSDK } from "@spheron/protocol-sdk";
 import { validateSpheronConfig } from "../environment.ts";
-import {
+import type {
     BalanceInfo,
     DeploymentDetails,
     SpheronComputeConfig,
@@ -352,7 +352,7 @@ function parseDuration(duration: string): number {
     }
 
     const [, value, unit] = match;
-    const numValue = parseFloat(value);
+    const numValue = Number.parseFloat(value);
 
     switch (unit) {
         case "min":

@@ -1,8 +1,8 @@
 export function getWavHeader(
     audioLength: number,
     sampleRate: number,
-    channelCount: number = 1,
-    bitsPerSample: number = 16
+    channelCount = 1,
+    bitsPerSample = 16
 ): Buffer {
     const wavHeader = Buffer.alloc(44);
     wavHeader.write("RIFF", 0);

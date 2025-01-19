@@ -1,12 +1,12 @@
 import { elizaLogger } from "@elizaos/core";
 import {
-    ActionExample,
-    Content,
-    HandlerCallback,
-    IAgentRuntime,
-    Memory,
+    type ActionExample,
+    type Content,
+    type HandlerCallback,
+    type IAgentRuntime,
+    type Memory,
     ModelClass,
-    State,
+    type State,
     type Action,
 } from "@elizaos/core";
 import { composeContext } from "@elizaos/core";
@@ -16,7 +16,7 @@ import {
     Aptos,
     AptosConfig,
     Ed25519PrivateKey,
-    Network,
+    type Network,
     PrivateKey,
     PrivateKeyVariants,
 } from "@aptos-labs/ts-sdk";

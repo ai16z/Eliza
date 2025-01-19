@@ -4,11 +4,10 @@
     "sideEffects": false,
     "type": "module",
     "scripts": {
-        "extract-version": "./version.sh",
+        "extract-version": "sh version.sh",
         "dev": "pnpm run extract-version && vite",
         "build": "pnpm run extract-version && tsc -b && vite build",
-        "preview": "vite preview",
-        "lint": "eslint ."
+        "preview": "vite preview"
     },
     "dependencies": {
         "@elizaos/core": "workspace:*",

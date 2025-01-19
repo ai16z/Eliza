@@ -1,7 +1,7 @@
 import {
     elizaLogger,
     getEmbeddingZeroVector,
-    IAgentRuntime,
+    type IAgentRuntime,
     stringToUuid,
     type Memory,
     type UUID,
@@ -9,14 +9,16 @@ import {
 import type { Cast } from "./types";
 import { toHex } from "viem";
 import { castUuid } from "./utils";
-import { FarcasterClient } from "./client";
+import type { FarcasterClient } from "./client";
 
 export function createCastMemory({
     roomId,
+    senderId,
     runtime,
     cast,
 }: {
     roomId: UUID;
+    senderId: UUID;
     runtime: IAgentRuntime;
     cast: Cast;
 }): Memory {
@@ -33,7 +35,7 @@ export function createCastMemory({
             agentId: runtime.agentId,
         }),
         agentId: runtime.agentId,
-        userId: runtime.agentId,
+        userId: senderId,
         content: {
             text: cast.text,
             source: "farcaster",
@@ -75,7 +77,7 @@ export async function buildConversationThread({
         if (!memory) {
             elizaLogger.log("Creating memory for cast", currentCast.hash);
 
-            const userId = stringToUuid(currentCast.profile.username);
+            const userId = stringToUuid(currentCast.authorFid.toString());
 
             await runtime.ensureConnection(
                 userId,
@@ -88,6 +90,7 @@ export async function buildConversationThread({
             await runtime.messageManager.createMemory(
                 createCastMemory({
                     roomId,
+                    senderId: userId,
                     runtime,
                     cast: currentCast,
                 })

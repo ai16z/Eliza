@@ -1,13 +1,13 @@
 import {
-    ActionExample,
+    type ActionExample,
     composeContext,
     elizaLogger,
     generateObjectDeprecated,
-    HandlerCallback,
-    IAgentRuntime,
-    Memory,
+    type HandlerCallback,
+    type IAgentRuntime,
+    type Memory,
     ModelClass,
-    State,
+    type State,
     type Action,
 } from "@elizaos/core";
 import { BinanceService } from "../services";
@@ -76,7 +76,7 @@ export const spotTrade: Action = {
 
             // Convert quantity to number if it's a string
             if (content && typeof content.quantity === "string") {
-                content.quantity = parseFloat(content.quantity);
+                content.quantity = Number.parseFloat(content.quantity);
             }
 
             const parseResult = SpotTradeSchema.safeParse(content);

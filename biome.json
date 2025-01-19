@@ -1,0 +1,88 @@
+{
+    "$schema": "https://biomejs.dev/schemas/1.5.3/schema.json",
+    "organizeImports": {
+      "enabled": false
+    },
+    "linter": {
+      "enabled": true,
+      "rules": {
+        "recommended": true,
+        "suspicious": {
+          "noExplicitAny": "warn",
+          "noArrayIndexKey": "warn",
+          "noPrototypeBuiltins": "warn",
+          "noDuplicateObjectKeys": "warn",
+          "noGlobalIsNan": "warn",
+          "noDuplicateFontNames": "warn",
+          "noSelfCompare": "warn",
+          "noDoubleEquals": "warn",
+          "noImplicitAnyLet": "warn",
+          "noAssignInExpressions": "warn",
+          "noExportsInTest": "warn",
+          "noConstEnum": "warn",
+          "noEmptyInterface": "warn"
+        },
+        "correctness": {
+          "noUnusedVariables": "warn",
+          "noUnreachable": "warn",
+          "useExhaustiveDependencies": "warn",
+          "noSwitchDeclarations": "warn",
+          "noUnnecessaryContinue": "warn",
+          "noInnerDeclarations": "warn"
+        },
+        "style": {
+          "useConst": "warn",
+          "useTemplate": "warn",
+          "useImportType": "warn",
+          "useNodejsImportProtocol": "warn",
+          "noUselessElse": "warn",
+          "useSelfClosingElements": "warn",
+          "useNumberNamespace": "warn",
+          "noUnusedTemplateLiteral": "warn",
+          "noInferrableTypes": "warn",
+          "noNonNullAssertion": "warn",
+          "noParameterAssign": "warn",
+          "useDefaultParameterLast": "warn",
+          "useExponentiationOperator": "warn",
+          "noVar": "warn",
+          "useSingleVarDeclarator": "warn",
+          "useExportType": "warn"
+        },
+        "a11y": {
+          "useAltText": "warn",
+          "useFocusableInteractive": "warn",
+          "useMediaCaption": "warn",
+          "noSvgWithoutTitle": "warn",
+          "useKeyWithClickEvents": "warn"
+        },
+        "complexity": {
+          "noForEach": "warn",
+          "useOptionalChain": "warn",
+          "useArrowFunction": "warn",
+          "useFlatMap": "warn",
+          "useLiteralKeys": "warn",
+          "noBannedTypes": "warn",
+          "noStaticOnlyClass": "warn",
+          "noThisInStatic": "warn",
+          "noUselessConstructor": "warn",
+          "noUselessTernary": "warn",
+          "noUselessSwitchCase": "warn",
+          "noUselessCatch": "warn"
+        },
+        "performance": {
+          "noDelete": "warn",
+          "noAccumulatingSpread": "warn"
+        }
+      },
+      "ignore": ["**/dist/**", "**/node_modules/**", "**/coverage/**", "**/*.json"]
+    },
+    "formatter": {
+      "enabled": false
+    },
+    "javascript": {
+      "formatter": {
+        "quoteStyle": "double",
+        "semicolons": "always"
+      }
+    }
+  }

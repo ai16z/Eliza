@@ -1,6 +1,6 @@
 import { describe, it, expect, vi } from 'vitest';
 import { validateTwitterConfig } from '../src/environment';
-import { IAgentRuntime } from '@elizaos/core';
+import type { IAgentRuntime } from '@elizaos/core';
 
 describe('Twitter Environment Configuration', () => {
     const mockRuntime: IAgentRuntime = {

@@ -1,11 +1,15 @@
-import { describe, it, expect, vi, beforeEach, Mock } from "vitest";
-import { SigningCosmWasmClient } from "@cosmjs/cosmwasm-stargate";
+import { describe, it, expect, vi, beforeEach, type Mock } from "vitest";
+import type { SigningCosmWasmClient } from "@cosmjs/cosmwasm-stargate";
 import { CosmosTransactionFeeEstimator } from "../shared/services/cosmos-transaction-fee-estimator";
 
 vi.mock("@cosmjs/cosmwasm-stargate", () => ({
     SigningCosmWasmClient: {
         simulate: vi.fn(),
     },
+}));
+
+vi.mock("../shared/helpers/cosmos-messages", () => ({
+    generateIbcTransferMessage: vi.fn(),
 }));
 
 describe("FeeEstimator", () => {

@@ -1,10 +1,10 @@
-import { Action, elizaLogger } from "@elizaos/core";
-import { IAgentRuntime, Memory, State, HandlerCallback, Content, ActionExample } from "@elizaos/core";
+import { type Action, elizaLogger } from "@elizaos/core";
+import type { IAgentRuntime, Memory, State, HandlerCallback, Content, ActionExample } from "@elizaos/core";
 import { DirectSecp256k1HdWallet } from "@cosmjs/proto-signing";
 import { SigningStargateClient } from "@cosmjs/stargate";
 import * as cert from "@akashnetwork/akashjs/build/certificates";
 import { certificateManager } from "@akashnetwork/akashjs/build/certificates/certificate-manager";
-import { CertificatePem } from "@akashnetwork/akashjs/build/certificates/certificate-manager/CertificateManager";
+import type { CertificatePem } from "@akashnetwork/akashjs/build/certificates/certificate-manager/CertificateManager";
 import { getAkashTypeRegistry } from "@akashnetwork/akashjs/build/stargate";
 import { validateAkashConfig } from "../environment";
 import { AkashError, AkashErrorCode, withRetry } from "../error/error";

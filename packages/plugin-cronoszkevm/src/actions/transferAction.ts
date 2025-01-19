@@ -1,12 +1,12 @@
 import type { Action } from "@elizaos/core";
 import {
-    ActionExample,
-    Content,
-    HandlerCallback,
-    IAgentRuntime,
-    Memory,
+    type ActionExample,
+    type Content,
+    type HandlerCallback,
+    type IAgentRuntime,
+    type Memory,
     ModelClass,
-    State,
+    type State,
     elizaLogger,
     composeContext,
     generateObject,
@@ -14,7 +14,7 @@ import {
 import { validateCronosZkevmConfig } from "../enviroment";
 
 import {
-    Address,
+    type Address,
     createPublicClient,
     erc20Abi,
     http,

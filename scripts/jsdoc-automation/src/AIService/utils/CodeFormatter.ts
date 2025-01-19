@@ -1,4 +1,4 @@
-import { FileDocsGroup } from "../types";
+import type { FileDocsGroup } from "../types";
 
 export class CodeFormatter {
 
@@ -154,7 +154,7 @@ export class CodeFormatter {
         return docSection;
     }
 
-    public truncateCodeBlock(code: string, maxLength: number = 8000): string {
+    public truncateCodeBlock(code: string, maxLength = 8000): string {
         if (code.length <= maxLength) return code;
 
         // Extract code blocks

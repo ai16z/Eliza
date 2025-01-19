@@ -24,7 +24,7 @@ export interface ChatRoom {
 export interface EchoChamberConfig {
     apiUrl: string; // Base URL for the EchoChambers API
     apiKey: string; // Required API key for authenticated endpoints
-    defaultRoom?: string; // Optional default room to join on startup
+    rooms: string[]; // list of rooms to listen on startup
     username?: string; // Optional custom username (defaults to agent-{agentId})
     model?: string; // Optional model name (defaults to runtime.modelProvider)
 }

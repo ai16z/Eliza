@@ -1,6 +1,6 @@
 {
     "name": "@elizaos/plugin-rabbi-trader",
-    "version": "0.1.8+build.1",
+    "version": "0.1.9-alpha.1",
     "main": "dist/index.js",
     "type": "module",
     "types": "dist/index.d.ts",
@@ -9,7 +9,7 @@
         "@elizaos/client-twitter": "workspace:*",
         "@elizaos/plugin-solana": "workspace:*",
         "@elizaos/plugin-trustdb": "workspace:*",
-        "@solana/web3.js": "^1.87.6",
+        "@solana/web3.js": "1.95.8",
         "zod": "3.23.8",
         "@goat-sdk/core": "0.3.8",
         "@goat-sdk/plugin-erc20": "0.1.7",
@@ -21,9 +21,16 @@
         "tsup": "8.3.5",
         "ws": "^8.0.0"
     },
+    "devDependencies": {
+        "vitest": "^1.2.1",
+        "@vitest/coverage-v8": "^1.2.1"
+    },
     "scripts": {
         "build": "tsup --format esm --dts",
-        "dev": "tsup --format esm --dts --watch"
+        "dev": "tsup --format esm --dts --watch",
+        "test": "vitest run",
+        "test:watch": "vitest watch",
+        "test:coverage": "vitest run --coverage"
     },
     "peerDependencies": {
         "whatwg-url": "7.1.0"

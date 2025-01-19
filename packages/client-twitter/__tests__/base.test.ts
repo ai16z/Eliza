@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { ClientBase } from '../src/base';
-import { IAgentRuntime } from '@elizaos/core';
-import { TwitterConfig } from '../src/environment';
+import type { IAgentRuntime } from '@elizaos/core';
+import type { TwitterConfig } from '../src/environment';
 
 describe('Twitter Client Base', () => {
     let mockRuntime: IAgentRuntime;

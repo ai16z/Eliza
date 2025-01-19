@@ -1,7 +1,7 @@
 {
     "name": "Dobby",
     "clients": [],
-    "modelProvider": "anthropic",
+    "modelProvider": "openai",
     "settings": {
         "voice": {
             "model": "en_GB-danny-low"

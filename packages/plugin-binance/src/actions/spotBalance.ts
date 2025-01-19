@@ -1,18 +1,18 @@
 import {
-    ActionExample,
+    type ActionExample,
     composeContext,
     elizaLogger,
     generateObjectDeprecated,
-    HandlerCallback,
-    IAgentRuntime,
-    Memory,
+    type HandlerCallback,
+    type IAgentRuntime,
+    type Memory,
     ModelClass,
-    State,
+    type State,
     type Action,
 } from "@elizaos/core";
 import { validateBinanceConfig } from "../environment";
 import { BinanceService } from "../services";
-import { BalanceCheckRequest } from "../types";
+import type { BalanceCheckRequest } from "../types";
 
 const spotBalanceTemplate = `Look at ONLY your LAST RESPONSE message in this conversation, where you just confirmed which cryptocurrency balance to check.
 Based on ONLY that last message, extract the cryptocurrency symbol.
@@ -47,7 +47,7 @@ export const spotBalance: Action = {
         try {
             await validateBinanceConfig(runtime);
             return true;
-        } catch (error) {
+        } catch {
             return false;
         }
     },

@@ -1,7 +1,7 @@
 import { VALIDATION } from "../constants/defaults";
 import { ERROR_MESSAGES } from "../constants/errors";
-import { BinanceTickerResponse } from "../types/api/price";
-import { PriceCheckRequest, PriceResponse } from "../types/internal/config";
+import type { BinanceTickerResponse } from "../types/api/price";
+import type { PriceCheckRequest, PriceResponse } from "../types/internal/config";
 import { BinanceError } from "../types/internal/error";
 import { BaseService } from "./base";
 
@@ -47,7 +47,7 @@ export class PriceService extends BaseService {
      * Format price for display
      */
     static formatPrice(price: number | string): string {
-        const numPrice = typeof price === "string" ? parseFloat(price) : price;
+        const numPrice = typeof price === "string" ? Number.parseFloat(price) : price;
         return new Intl.NumberFormat("en-US", {
             style: "decimal",
             minimumFractionDigits: 2,

@@ -1,11 +1,11 @@
 import {
-    ActionExample,
-    HandlerCallback,
+    type ActionExample,
+    type HandlerCallback,
     elizaLogger,
-    IAgentRuntime,
-    Memory,
+    type IAgentRuntime,
+    type Memory,
     ModelClass,
-    State,
+    type State,
     type Action,
     composeContext,
     generateObject,
@@ -21,7 +21,7 @@ import {
     ONE_YOCTO_NEAR,
 } from "@ref-finance/ref-sdk";
 import { walletProvider } from "../providers/wallet";
-import { KeyPairString } from "near-api-js/lib/utils";
+import type { KeyPairString } from "near-api-js/lib/utils";
 
 async function checkStorageBalance(
     account: any,

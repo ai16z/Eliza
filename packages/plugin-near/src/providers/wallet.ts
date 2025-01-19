@@ -1,13 +1,13 @@
 import {
-    IAgentRuntime,
-    Memory,
-    Provider,
-    State,
+    type IAgentRuntime,
+    type Memory,
+    type Provider,
+    type State,
     elizaLogger,
 } from "@elizaos/core";
-import { KeyPair, keyStores, connect, Account, utils } from "near-api-js";
+import { KeyPair, keyStores, connect, type Account, utils } from "near-api-js";
 import BigNumber from "bignumber.js";
-import { KeyPairString } from "near-api-js/lib/utils";
+import type { KeyPairString } from "near-api-js/lib/utils";
 import NodeCache from "node-cache";
 
 const PROVIDER_CONFIG = {
@@ -20,7 +20,7 @@ const PROVIDER_CONFIG = {
     explorerUrl: `https://${process.env.NEAR_NETWORK || "testnet"}.nearblocks.io`,
     MAX_RETRIES: 3,
     RETRY_DELAY: 2000,
-    SLIPPAGE: process.env.NEAR_SLIPPAGE ? parseInt(process.env.NEAR_SLIPPAGE) : 1,
+    SLIPPAGE: process.env.NEAR_SLIPPAGE ? Number.parseInt(process.env.NEAR_SLIPPAGE) : 1,
 };
 
 export interface NearToken {

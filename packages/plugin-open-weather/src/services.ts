@@ -1,4 +1,4 @@
-import { WeatherResponse } from "./types";
+import type { WeatherResponse } from "./types";
 
 const BASE_URL = "https://api.openweathermap.org/data/2.5";
 

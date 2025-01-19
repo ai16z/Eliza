@@ -1,4 +1,4 @@
-import { PrimusCoreTLS,Attestation } from "@primuslabs/zktls-core-sdk";
+import { PrimusCoreTLS,type Attestation } from "@primuslabs/zktls-core-sdk";
 
 export const generateProof = async (
     endpoint: string,

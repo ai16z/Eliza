@@ -1,6 +1,6 @@
 {
     "name": "@elizaos/adapter-supabase",
-    "version": "0.1.8+build.1",
+    "version": "0.1.9-alpha.1",
     "type": "module",
     "main": "dist/index.js",
     "module": "dist/index.js",
@@ -23,12 +23,15 @@
         "@supabase/supabase-js": "2.46.2"
     },
     "devDependencies": {
-        "tsup": "8.3.5"
+        "@vitest/coverage-v8": "^3.0.2",
+        "tsup": "8.3.5",
+        "vitest": "^3.0.2"
     },
     "scripts": {
         "build": "tsup --format esm --dts",
         "dev": "tsup --format esm --dts --watch",
-        "lint": "eslint --fix  --cache ."
+        "test": "vitest run",
+        "test:coverage": "vitest run --coverage"
     },
     "peerDependencies": {
         "whatwg-url": "7.1.0"

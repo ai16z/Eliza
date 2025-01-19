@@ -22,11 +22,13 @@ jobs:
             - name: Install dependencies
               run: pnpm install -r --no-frozen-lockfile
 
-            - name: Run Prettier
-              run: pnpm run prettier --check .
+            - name: Setup Biome CLI
+              uses: biomejs/setup-biome@v2
+              with:
+                version: latest
 
-            - name: Run Linter
-              run: pnpm run lint
+            - name: Run Biome
+              run: biome ci
 
             - name: Create test env file
               run: |

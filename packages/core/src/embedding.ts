@@ -1,5 +1,5 @@
 import { getEmbeddingModelSettings, getEndpoint } from "./models.ts";
-import { IAgentRuntime, ModelProviderName } from "./types.ts";
+import { type IAgentRuntime, ModelProviderName } from "./types.ts";
 import settings from "./settings.ts";
 import elizaLogger from "./logger.ts";
 import LocalEmbeddingModelManager from "./localembeddingManager.ts";

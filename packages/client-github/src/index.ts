@@ -1,15 +1,15 @@
 import { Octokit } from "@octokit/rest";
 import { glob } from "glob";
-import simpleGit, { SimpleGit } from "simple-git";
+import simpleGit, { type SimpleGit } from "simple-git";
 import path from "path";
 import fs from "fs/promises";
 import { existsSync } from "fs";
 import { createHash } from "crypto";
 import {
     elizaLogger,
-    AgentRuntime,
-    Client,
-    IAgentRuntime,
+    type AgentRuntime,
+    type Client,
+    type IAgentRuntime,
     knowledge,
     stringToUuid,
 } from "@elizaos/core";

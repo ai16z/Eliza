@@ -1,9 +1,9 @@
 import {
     elizaLogger,
-    IAgentRuntime,
-    Memory,
-    Provider,
-    State, UUID,
+    type IAgentRuntime,
+    type Memory,
+    type Provider,
+    type State, type UUID,
 } from "@elizaos/core";
 import {validateAsteraiConfig} from "../environment.ts";
 import {getInitAsteraiClient} from "../index.ts";

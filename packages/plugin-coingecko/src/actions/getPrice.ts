@@ -1,14 +1,14 @@
 import {
-    ActionExample,
+    type ActionExample,
     composeContext,
-    Content,
+    type Content,
     elizaLogger,
     generateObject,
-    HandlerCallback,
-    IAgentRuntime,
-    Memory,
+    type HandlerCallback,
+    type IAgentRuntime,
+    type Memory,
     ModelClass,
-    State,
+    type State,
     type Action,
 } from "@elizaos/core";
 import axios from "axios";
@@ -120,7 +120,7 @@ export default {
 
             // Fetch price from CoinGecko
             const config = await validateCoingeckoConfig(runtime);
-            const { baseUrl, apiKey } = getApiConfig(config);
+            const { baseUrl, apiKey, headerKey } = getApiConfig(config);
 
             elizaLogger.log(`Fetching prices for ${coinIds} in ${vs_currencies}...`);
             elizaLogger.log("API request URL:", `${baseUrl}/simple/price`);
@@ -146,7 +146,7 @@ export default {
                     },
                     headers: {
                         'accept': 'application/json',
-                        'x-cg-pro-api-key': apiKey
+                        [headerKey]: apiKey
                     }
                 }
             );

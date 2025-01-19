@@ -1,4 +1,4 @@
-import { Plugin } from "@elizaos/core";
+import type { Plugin } from "@elizaos/core";
 import { getInferenceAction } from "./actions/getInference.ts";
 import { topicsProvider } from "./providers/topics.ts";
 

@@ -26,6 +26,7 @@ enum ModelProviderName {
     REDPILL,
     OPENROUTER,
     HEURIST,
+    LIVEPEER,
 }
 ```
 
@@ -272,24 +273,45 @@ const llamaLocalSettings = {
 
 ```typescript
 const heuristSettings = {
-    settings: {
-        stop: [],
-        maxInputTokens: 32768,
-        maxOutputTokens: 8192,
-        repetition_penalty: 0.0,
-        temperature: 0.7,
-    },
-    imageSettings: {
-        steps: 20,
-    },
-    endpoint: "https://llm-gateway.heurist.xyz",
-    model: {
-        [ModelClass.SMALL]: "hermes-3-llama3.1-8b",
-        [ModelClass.MEDIUM]: "mistralai/mixtral-8x7b-instruct",
-        [ModelClass.LARGE]: "nvidia/llama-3.1-nemotron-70b-instruct",
-        [ModelClass.EMBEDDING]: "", // Add later
-        [ModelClass.IMAGE]: "FLUX.1-dev",
-    },
+  settings: {
+    stop: [],
+    maxInputTokens: 32768,
+    maxOutputTokens: 8192,
+    repetition_penalty: 0.0,
+    temperature: 0.7,
+  },
+  imageSettings: {
+    steps: 20,
+  },
+  endpoint: "https://llm-gateway.heurist.xyz",
+  model: {
+    [ModelClass.SMALL]: "hermes-3-llama3.1-8b",
+    [ModelClass.MEDIUM]: "mistralai/mixtral-8x7b-instruct",
+    [ModelClass.LARGE]: "nvidia/llama-3.1-nemotron-70b-instruct",
+    [ModelClass.EMBEDDING]: "", // Add later
+    [ModelClass.IMAGE]: "FLUX.1-dev",
+  },
+};
+```
+
+### Livepeer Provider
+
+```typescript
+const livepeerSettings = {
+  settings: {
+    stop: [],
+    maxInputTokens: 128000,
+    maxOutputTokens: 8192,
+    repetition_penalty: 0.4,
+    temperature: 0.7,
+  },
+  endpoint: "https://dream-gateway.livepeer.cloud",
+  model: {
+    [ModelClass.SMALL]: "meta-llama/Meta-Llama-3.1-8B-Instruct",
+    [ModelClass.MEDIUM]: "meta-llama/Meta-Llama-3.1-8B-Instruct",
+    [ModelClass.LARGE]: "meta-llama/Llama-3.3-70B-Instruct",
+    [ModelClass.IMAGE]: "ByteDance/SDXL-Lightning",
+  },
 };
 ```
 

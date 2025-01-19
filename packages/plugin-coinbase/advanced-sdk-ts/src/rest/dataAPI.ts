@@ -1,8 +1,8 @@
 import { API_PREFIX } from '../constants';
-import { RESTBase } from './rest-base';
+import type { RESTBase } from './rest-base';
 
 import { method } from './types/request-types';
-import { GetAPIKeyPermissionsResponse } from './types/dataAPI-types';
+import type { GetAPIKeyPermissionsResponse } from './types/dataAPI-types';
 
 // [GET] Get API Key Permissions
 // Official Documentation: https://docs.cdp.coinbase.com/advanced-trade/reference/retailbrokerageapi_getapikeypermissions

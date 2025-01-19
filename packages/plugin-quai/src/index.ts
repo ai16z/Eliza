@@ -1,4 +1,4 @@
-import { Plugin } from "@elizaos/core";
+import type { Plugin } from "@elizaos/core";
 import transfer from "./actions/transfer";
 
 export const quaiPlugin: Plugin = {

@@ -1,11 +1,11 @@
 import {
-    Action,
-    HandlerCallback,
-    IAgentRuntime,
-    Memory,
+    type Action,
+    type HandlerCallback,
+    type IAgentRuntime,
+    type Memory,
     elizaLogger,
 } from "@elizaos/core";
-import { TransactionHash } from "genlayer-js/types";
+import type { TransactionHash } from "genlayer-js/types";
 import { ClientProvider } from "../providers/client";
 
 export const waitForTransactionReceiptAction: Action = {

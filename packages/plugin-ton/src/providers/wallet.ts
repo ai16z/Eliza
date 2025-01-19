@@ -1,4 +1,4 @@
-import {
+import type {
     IAgentRuntime,
     ICacheManager,
     Memory,
@@ -7,7 +7,7 @@ import {
 } from "@elizaos/core";
 
 import { TonClient, WalletContractV4 } from "@ton/ton";
-import { KeyPair, mnemonicToPrivateKey } from "@ton/crypto";
+import { type KeyPair, mnemonicToPrivateKey } from "@ton/crypto";
 
 import NodeCache from "node-cache";
 import * as path from "path";
@@ -39,7 +39,7 @@ export class WalletProvider {
     keypair: KeyPair;
     wallet: WalletContractV4;
     private cache: NodeCache;
-    private cacheKey: string = "ton/wallet";
+    private cacheKey = "ton/wallet";
 
     // reqiure hex private key
     constructor(

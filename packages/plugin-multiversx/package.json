@@ -1,6 +1,6 @@
 {
     "name": "@elizaos/plugin-multiversx",
-    "version": "0.1.8+build.1",
+    "version": "0.1.9-alpha.1",
     "type": "module",
     "main": "dist/index.js",
     "module": "dist/index.js",
@@ -31,8 +31,7 @@
     "scripts": {
         "build": "tsup --format esm --dts",
         "test": "vitest run",
-        "test:watch": "vitest",
-        "lint": "eslint . --fix"
+        "test:watch": "vitest"
     },
     "peerDependencies": {
         "whatwg-url": "7.1.0"

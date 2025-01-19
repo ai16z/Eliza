@@ -92,7 +92,7 @@ The character's display name for identification and in conversations.
 
 #### `modelProvider` (required)
 
-Specifies the AI model provider. Supported options from [ModelProviderName](/api/enumerations/modelprovidername) include `anthropic`, `llama_local`, `openai`, and others.
+Specifies the AI model provider. Supported options from [ModelProviderName](/api/enumerations/modelprovidername) include `anthropic`, `llama_local`, `openai`, `livepeer`, and others.
 
 #### `clients` (required)
 

@@ -166,7 +166,7 @@ Special thanks to:
 
 For more information about TTS capabilities:
 - [FAL.ai Documentation](https://fal.ai/docs)
-- [ElizaOS Documentation](https://docs.elizaos.com)
+- [ElizaOS Documentation](https://elizaos.github.io/eliza/)
 
 ## License
 

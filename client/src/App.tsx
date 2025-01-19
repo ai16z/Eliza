@@ -13,7 +13,7 @@ import useVersion from "./hooks/use-version";
 const queryClient = new QueryClient({
     defaultOptions: {
         queries: {
-            staleTime: Infinity,
+            staleTime: Number.POSITIVE_INFINITY,
         },
     },
 });

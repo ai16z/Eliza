@@ -1,4 +1,4 @@
-import { Plugin } from "@elizaos/core";
+import type { Plugin } from "@elizaos/core";
 import { TeeLogService } from "../services/teeLogService";
 
 export const teeLogPlugin: Plugin = {

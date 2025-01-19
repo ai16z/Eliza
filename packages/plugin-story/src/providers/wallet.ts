@@ -1,4 +1,4 @@
-import { IAgentRuntime, Provider, Memory, State } from "@elizaos/core";
+import type { IAgentRuntime, Provider, Memory, State } from "@elizaos/core";
 import {
     createPublicClient,
     createWalletClient,
@@ -9,13 +9,13 @@ import {
     type Chain,
     type HttpTransport,
     type Address,
-    Account,
-    Transport,
+    type Account,
+    type Transport,
 } from "viem";
 import { storyOdyssey } from "viem/chains";
 import type { SupportedChain, ChainMetadata } from "../types";
 import { privateKeyToAccount } from "viem/accounts";
-import { StoryClient, StoryConfig } from "@story-protocol/core-sdk";
+import { StoryClient, type StoryConfig } from "@story-protocol/core-sdk";
 
 export const DEFAULT_CHAIN_CONFIGS: Record<SupportedChain, ChainMetadata> = {
     odyssey: {

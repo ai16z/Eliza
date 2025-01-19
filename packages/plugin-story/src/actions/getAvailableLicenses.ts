@@ -2,15 +2,15 @@ import {
     composeContext,
     elizaLogger,
     generateObjectDeprecated,
-    HandlerCallback,
+    type HandlerCallback,
     ModelClass,
-    IAgentRuntime,
-    Memory,
-    State,
+    type IAgentRuntime,
+    type Memory,
+    type State,
 } from "@elizaos/core";
 import { getAvailableLicensesTemplate, licenseIPTemplate } from "../templates";
-import { Address } from "viem";
-import { IPLicenseDetails, RESOURCE_TYPE } from "../types/api";
+import type { Address } from "viem";
+import { type IPLicenseDetails, RESOURCE_TYPE } from "../types/api";
 import { API_KEY, API_URL } from "../lib/api";
 import { storyOdyssey } from "viem/chains";
 

@@ -12,7 +12,7 @@ import {
 import BigNumber from "bignumber.js";
 import { WalletProvider } from "../providers/wallet";
 
-import { mnemonicNew, mnemonicToPrivateKey, KeyPair } from "@ton/crypto";
+import { mnemonicNew, mnemonicToPrivateKey, type KeyPair } from "@ton/crypto";
 
 // Mock NodeCache
 vi.mock("node-cache", () => {

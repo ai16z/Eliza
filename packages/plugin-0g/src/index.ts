@@ -1,4 +1,4 @@
-import { Plugin } from "@elizaos/core";
+import type { Plugin } from "@elizaos/core";
 import { zgUpload } from "./actions/upload";
 
 export const zgPlugin: Plugin = {

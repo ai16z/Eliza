@@ -1,6 +1,6 @@
-import { type UUID, type Character } from "@elizaos/core";
+import type { UUID, Character } from "@elizaos/core";
 
-const BASE_URL = "http://localhost:3000";
+const BASE_URL = `http://localhost:${import.meta.env.VITE_SERVER_PORT ?? 3000}`;
 
 const fetcher = async ({
     url,
@@ -25,7 +25,7 @@ const fetcher = async ({
 
     if (method === "POST") {
         if (body instanceof FormData) {
-            // @ts-expect-error - Supressing potentially undefined options header
+            // @ts-expect-error - Suppressing potentially undefined options header
             delete options.headers["Content-Type"];
             options.body = body;
         } else {

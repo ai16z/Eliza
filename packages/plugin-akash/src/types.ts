@@ -1,10 +1,10 @@
-import { DirectSecp256k1HdWallet} from "@cosmjs/proto-signing";
-import { SigningStargateClient } from "@cosmjs/stargate";
+import type { DirectSecp256k1HdWallet} from "@cosmjs/proto-signing";
+import type { SigningStargateClient } from "@cosmjs/stargate";
 // import { Provider } from "@elizaos/core";
-import { IAgentRuntime, Memory } from "@elizaos/core";
-import { SDL } from "@akashnetwork/akashjs/build/sdl";
-import { MsgCreateDeployment } from "@akashnetwork/akash-api/akash/deployment/v1beta3";
-import { MsgCreateLease} from "@akashnetwork/akash-api/akash/market/v1beta4";
+import type { IAgentRuntime, Memory } from "@elizaos/core";
+import type { SDL } from "@akashnetwork/akashjs/build/sdl";
+import type { MsgCreateDeployment } from "@akashnetwork/akash-api/akash/deployment/v1beta3";
+import type { MsgCreateLease} from "@akashnetwork/akash-api/akash/market/v1beta4";
 
 // Core wallet state type
 export interface AkashWalletState {

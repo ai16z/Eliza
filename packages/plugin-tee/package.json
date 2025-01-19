@@ -1,6 +1,6 @@
 {
     "name": "@elizaos/plugin-tee",
-    "version": "0.1.8+build.1",
+    "version": "0.1.9-alpha.1",
     "type": "module",
     "main": "dist/index.js",
     "module": "dist/index.js",
@@ -32,7 +32,7 @@
     "scripts": {
         "build": "tsup --format esm --dts",
         "dev": "tsup --format esm --dts --watch",
-        "lint": "eslint --fix  --cache ."
+        "test": "vitest run"
     },
     "peerDependencies": {
         "whatwg-url": "7.1.0"

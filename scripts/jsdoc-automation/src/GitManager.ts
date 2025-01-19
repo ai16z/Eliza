@@ -1,5 +1,5 @@
 import { Octokit } from "@octokit/rest";
-import { PrModeFileChange, Repository } from "./types/index.js";
+import type { PrModeFileChange, Repository } from "./types/index.js";
 import dotenv from "dotenv";
 
 dotenv.config();

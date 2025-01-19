@@ -229,6 +229,6 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 
 For support, please:
 
-1. Check the [documentation](https://docs.elizaos.com)
+1. Check the [documentation](https://elizaos.github.io/eliza/)
 2. Open an issue in the repository
 3. Join our [Discord community](https://discord.gg/elizaos)

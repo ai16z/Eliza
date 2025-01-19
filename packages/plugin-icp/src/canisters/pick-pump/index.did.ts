@@ -1,4 +1,3 @@
-// biome-ignore lint/suspicious/noExplicitAny: <explanation>
 export const idlFactory = ({ IDL }: { IDL: any }) => {
     const Result = IDL.Variant({ Ok: IDL.Nat, Err: IDL.Text });
     const CreateMemeTokenArg = IDL.Record({

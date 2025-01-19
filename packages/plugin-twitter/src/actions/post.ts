@@ -1,8 +1,8 @@
 import {
-    Action,
-    IAgentRuntime,
-    Memory,
-    State,
+    type Action,
+    type IAgentRuntime,
+    type Memory,
+    type State,
     composeContext,
     elizaLogger,
     ModelClass,

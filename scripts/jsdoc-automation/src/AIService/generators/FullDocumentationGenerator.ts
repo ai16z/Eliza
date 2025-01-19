@@ -1,11 +1,11 @@
-import { ASTQueueItem, EnvUsage, PluginDocumentation, TodoItem, TodoSection } from "../../types";
-import { Configuration } from "../../Configuration.js";
+import type { ASTQueueItem, EnvUsage, PluginDocumentation, TodoItem, TodoSection } from "../../types";
+import type { Configuration } from "../../Configuration.js";
 import { TypeScriptParser } from "../../TypeScriptParser.js";
 import { CodeFormatter } from "../utils/CodeFormatter.js";
 import { DocumentOrganizer } from "../utils/DocumentOrganizer.js";
 import path from "path";
 import { PROMPT_TEMPLATES } from "../../utils/prompts";
-import { FileDocsGroup, OrganizedDocs } from "../types";
+import type { FileDocsGroup, OrganizedDocs } from "../types";
 import { AIService } from "../AIService.js";
 import { promises as fs } from "fs";
 
@@ -169,7 +169,7 @@ export class FullDocumentationGenerator {
             this.configuration.absolutePath,
             "src/index.ts"
         );
-        let mainExport = "plugin";
+        const mainExport = "plugin";
         let exportName = packageJson.name.split("/").pop() + "Plugin";
 
         try {

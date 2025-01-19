@@ -1,9 +1,9 @@
 import {
     elizaLogger,
-    HandlerCallback,
-    IAgentRuntime,
-    Memory,
-    State,
+    type HandlerCallback,
+    type IAgentRuntime,
+    type Memory,
+    type State,
     type Action,
 } from "@elizaos/core";
 

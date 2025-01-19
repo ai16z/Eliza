@@ -121,3 +121,75 @@ Note that {{agentName}} is capable of reading/seeing/hearing various forms of me
 
 # Instructions: Write the next message for {{agentName}}. Include an action, if appropriate. {{actionNames}}
 ` + messageCompletionFooter;
+
+export const discordAutoPostTemplate =
+    `# Action Examples
+NONE: Respond but perform no additional action. This is the default if the agent is speaking and not doing anything additional.
+
+# Task: Generate an engaging community message as {{agentName}}.
+About {{agentName}}:
+{{bio}}
+{{lore}}
+
+Examples of {{agentName}}'s dialog and actions:
+{{characterMessageExamples}}
+
+{{messageDirections}}
+
+# Recent Chat History:
+{{recentMessages}}
+
+# Instructions: Write a natural, engaging message to restart community conversation. Focus on:
+- Community engagement
+- Educational topics
+- General discusions
+- Support queries
+- Keep message warm and inviting
+- Maximum 3 lines
+- Use 1-2 emojis maximum
+- Avoid financial advice
+- Stay within known facts
+- No team member mentions
+- Be hyped, not repetitive
+- Be natural, act like a human, connect with the community
+- Don't sound so robotic like
+- Randomly grab the most recent 5 messages for some context. Validate the context randomly and use that as a reference point for your next message, but not always, only when relevant.
+- If the recent messages are mostly from {{agentName}}, make sure to create conversation starters, given there is no messages from others to reference.
+- DO NOT REPEAT THE SAME thing that you just said from your recent chat history, start the message different each time, and be organic, non reptitive.
+
+# Instructions: Write the next message for {{agentName}}. Include the "NONE" action only, as the only valid action for auto-posts is "NONE".
+` + messageCompletionFooter;
+
+export const discordAnnouncementHypeTemplate =
+    `# Action Examples
+NONE: Respond but perform no additional action. This is the default if the agent is speaking and not doing anything additional.
+
+# Task: Generate announcement hype message as {{agentName}}.
+About {{agentName}}:
+{{bio}}
+{{lore}}
+
+Examples of {{agentName}}'s dialog and actions:
+{{characterMessageExamples}}
+
+{{messageDirections}}
+
+# Announcement Content:
+{{announcementContent}}
+
+# Instructions: Write an exciting message to bring attention to the announcement. Requirements:
+- Reference the announcement channel using <#{{announcementChannelId}}>
+- Reference the announcement content to get information about the announcement to use where appropriate to make the message dynamic vs a static post
+- Create genuine excitement
+- Encourage community participation
+- If there are links like Twitter/X posts, encourage users to like/retweet/comment to spread awarenress, but directly say that, wrap that into the post so its natural.
+- Stay within announced facts only
+- No additional promises or assumptions
+- No team member mentions
+- Start the message differently each time. Don't start with the same word like "hey", "hey hey", etc. be dynamic
+- Address everyone, not as a direct reply to whoever made the announcement or wrote it, but you can reference them
+- Maximum 3-7 lines formatted nicely if needed, based on the context of the announcement
+- Use 1-2 emojis maximum
+
+# Instructions: Write the next message for {{agentName}}. Include the "NONE" action only, as no other actions are appropriate for announcement hype.
+` + messageCompletionFooter;

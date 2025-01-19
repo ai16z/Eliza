@@ -1,4 +1,4 @@
-import { IAgentRuntime, Memory, Provider, State, elizaLogger } from "@elizaos/core";
+import { type IAgentRuntime, type Memory, type Provider, type State, elizaLogger } from "@elizaos/core";
 import axios from 'axios';
 import { getApiConfig, validateCoingeckoConfig } from '../environment';
 
@@ -13,14 +13,14 @@ const MAX_RETRIES = 3;
 
 async function fetchCategories(runtime: IAgentRuntime): Promise<CategoryItem[]> {
     const config = await validateCoingeckoConfig(runtime);
-    const { baseUrl, apiKey } = getApiConfig(config);
+    const { baseUrl, apiKey, headerKey } = getApiConfig(config);
 
     const response = await axios.get<CategoryItem[]>(
         `${baseUrl}/coins/categories/list`,
         {
             headers: {
                 'accept': 'application/json',
-                'x-cg-pro-api-key': apiKey
+                [headerKey]: apiKey
             },
             timeout: 5000 // 5 second timeout
         }

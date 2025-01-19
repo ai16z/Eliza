@@ -1,12 +1,12 @@
 import { DirectSecp256k1HdWallet } from "@cosmjs/proto-signing";
 import { SigningStargateClient } from "@cosmjs/stargate";
-import { elizaLogger, IAgentRuntime, Memory } from "@elizaos/core";
+import { elizaLogger, type IAgentRuntime, type Memory } from "@elizaos/core";
 // import { IAgentRuntime, Memory } from "@elizaos/core/src/types";
 import { validateAkashConfig } from "../environment";
 import { getAkashTypeRegistry } from "@akashnetwork/akashjs/build/stargate";
 import {
-    AkashProvider,
-    AkashWalletState,
+    type AkashProvider,
+    type AkashWalletState,
     AkashError,
     AKASH_ERROR_CODES,
 } from "../types";

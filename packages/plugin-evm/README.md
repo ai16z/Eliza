@@ -111,6 +111,71 @@ Swap tokens on the same chain using LiFi:
 Swap 1 ETH for USDC on Base
 ```
 
+### 4. Propose
+
+Propose a proposal to a governor on a specific chain.
+
+- **Proposal**
+    - **Targets**
+    - **Values**
+    - **Calldatas**
+    - **Description**
+- **Chain**
+- **Governor**
+
+**Example usage:**
+
+```bash
+Propose a proposal to the 0xdeadbeef00000000000000000000000000000000 governor on Ethereum to transfer 1 ETH to 0xRecipient.
+```
+
+### 5. Vote
+
+Vote on a proposal to a governor on a specific chain.
+
+- **Proposal ID**
+- **Support**
+- **Chain**
+- **Governor**
+
+**Example usage:**
+
+```bash
+Vote on the proposal with ID 1 to support the proposal on the 0xdeadbeef00000000000000000000000000000000 governor on Ethereum.
+```
+
+### 6. Queue
+
+Queue a proposal to a governor on a specific chain.
+
+- **Proposal**
+    - **Targets**
+    - **Values**
+    - **Calldatas**
+    - **Description**
+- **Chain**
+- **Governor**
+
+**Example usage:**
+
+```bash
+Queue the proposal to the 0xdeadbeef00000000000000000000000000000000 governor on Ethereum.
+```
+
+### 7. Execute
+
+Execute a proposal to a governor on a specific chain.
+
+- **Proposal ID**
+- **Chain**
+- **Governor**
+
+**Example usage:**
+
+```bash
+Execute the proposal with ID 1 on the 0xdeadbeef00000000000000000000000000000000 governor on Ethereum.
+```
+
 ## Development
 
 1. Clone the repository

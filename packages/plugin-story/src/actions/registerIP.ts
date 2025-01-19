@@ -2,19 +2,19 @@ import {
     composeContext,
     elizaLogger,
     generateObjectDeprecated,
-    HandlerCallback,
+    type HandlerCallback,
     ModelClass,
-    IAgentRuntime,
-    Memory,
-    State,
+    type IAgentRuntime,
+    type Memory,
+    type State,
 } from "@elizaos/core";
 import pinataSDK from "@pinata/sdk";
-import { RegisterIpResponse } from "@story-protocol/core-sdk";
+import type { RegisterIpResponse } from "@story-protocol/core-sdk";
 import { createHash } from "crypto";
 import { uploadJSONToIPFS } from "../functions/uploadJSONToIPFS";
 import { WalletProvider } from "../providers/wallet";
 import { registerIPTemplate } from "../templates";
-import { RegisterIPParams } from "../types";
+import type { RegisterIPParams } from "../types";
 
 export { registerIPTemplate };
 

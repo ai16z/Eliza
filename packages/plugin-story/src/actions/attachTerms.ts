@@ -2,20 +2,20 @@ import {
     composeContext,
     elizaLogger,
     generateObjectDeprecated,
-    HandlerCallback,
+    type HandlerCallback,
     ModelClass,
-    IAgentRuntime,
-    Memory,
-    State,
+    type IAgentRuntime,
+    type Memory,
+    type State,
 } from "@elizaos/core";
 import { WalletProvider } from "../providers/wallet";
 import { attachTermsTemplate } from "../templates";
-import {
+import type {
     AttachLicenseTermsResponse,
     LicenseTerms,
     RegisterPILResponse,
 } from "@story-protocol/core-sdk";
-import { AttachTermsParams } from "../types";
+import type { AttachTermsParams } from "../types";
 import { zeroAddress } from "viem";
 
 export { attachTermsTemplate };

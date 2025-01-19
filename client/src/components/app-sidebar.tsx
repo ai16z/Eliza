@@ -15,7 +15,7 @@ import {
 } from "@/components/ui/sidebar";
 import { apiClient } from "@/lib/api";
 import { NavLink, useLocation } from "react-router";
-import { type UUID } from "@elizaos/core";
+import type { UUID } from "@elizaos/core";
 import { Book, Cog, User } from "lucide-react";
 import ConnectionStatus from "./connection-status";
 

@@ -1,4 +1,4 @@
-import { IAgentRuntime, Memory, Evaluator, elizaLogger } from "@elizaos/core";
+import { type IAgentRuntime, type Memory, type Evaluator, elizaLogger } from "@elizaos/core";
 import { TrustScoreProvider } from "../providers/trustScoreProvider";
 
 export const trustEvaluator: Evaluator = {

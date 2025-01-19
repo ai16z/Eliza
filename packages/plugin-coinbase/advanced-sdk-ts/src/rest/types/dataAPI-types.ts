@@ -1,4 +1,4 @@
-import { PortfolioType } from './common-types';
+import type { PortfolioType } from './common-types';
 
 // Get API Key Permissions
 export type GetAPIKeyPermissionsResponse = {

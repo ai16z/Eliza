@@ -1,5 +1,5 @@
 import {
-    Action,
+    type Action,
     composeContext,
     elizaLogger,
     generateText,

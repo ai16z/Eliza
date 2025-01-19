@@ -1,20 +1,20 @@
-import { Tweet } from "agent-twitter-client";
+import type { Tweet } from "agent-twitter-client";
 import {
     composeContext,
     generateText,
     getEmbeddingZeroVector,
-    IAgentRuntime,
+    type IAgentRuntime,
     ModelClass,
     stringToUuid,
-    TemplateType,
-    UUID,
+    type TemplateType,
+    type UUID,
     truncateToCompleteSentence,
 } from "@elizaos/core";
 import { elizaLogger } from "@elizaos/core";
-import { ClientBase } from "./base.ts";
+import type { ClientBase } from "./base.ts";
 import { postActionResponseFooter } from "@elizaos/core";
 import { generateTweetActions } from "@elizaos/core";
-import { IImageDescriptionService, ServiceType } from "@elizaos/core";
+import { type IImageDescriptionService, ServiceType } from "@elizaos/core";
 import { buildConversationThread } from "./utils.ts";
 import { twitterMessageHandlerTemplate } from "./interactions.ts";
 import { DEFAULT_MAX_TWEET_LENGTH } from "./environment.ts";
@@ -25,8 +25,8 @@ import {
     TextChannel,
     Partials,
 } from "discord.js";
-import { State } from "@elizaos/core";
-import { ActionResponse } from "@elizaos/core";
+import type { State } from "@elizaos/core";
+import type { ActionResponse } from "@elizaos/core";
 
 const MAX_TIMELINES_TO_FETCH = 15;
 
@@ -93,12 +93,12 @@ export class TwitterPostClient {
     client: ClientBase;
     runtime: IAgentRuntime;
     twitterUsername: string;
-    private isProcessing: boolean = false;
-    private lastProcessTime: number = 0;
-    private stopProcessingActions: boolean = false;
+    private isProcessing = false;
+    private lastProcessTime = 0;
+    private stopProcessingActions = false;
     private isDryRun: boolean;
     private discordClientForApproval: Client;
-    private approvalRequired: boolean = false;
+    private approvalRequired = false;
     private discordApprovalChannelId: string;
     private approvalCheckInterval: number;
 
@@ -155,7 +155,7 @@ export class TwitterPostClient {
             );
 
             const APPROVAL_CHECK_INTERVAL =
-                parseInt(
+                Number.parseInt(
                     this.runtime.getSetting("TWITTER_APPROVAL_CHECK_INTERVAL")
                 ) || 5 * 60 * 1000; // 5 minutes
 
@@ -647,7 +647,7 @@ export class TwitterPostClient {
     }
 
     // Helper method to ensure tweet length compliance
-    private trimTweetLength(text: string, maxLength: number = 280): string {
+    private trimTweetLength(text: string, maxLength = 280): string {
         if (text.length <= maxLength) return text;
 
         // Try to cut at last sentence

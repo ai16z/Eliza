@@ -1,7 +1,7 @@
 import { createEventAdapter } from "@slack/events-api";
-import { WebClient } from "@slack/web-api";
-import { SlackConfig } from "./types/slack-types";
-import { MessageManager } from "./messages";
+import type { WebClient } from "@slack/web-api";
+import type { SlackConfig } from "./types/slack-types";
+import type { MessageManager } from "./messages";
 import { elizaLogger } from "@elizaos/core";
 
 export class EventHandler {

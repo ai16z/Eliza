@@ -1,4 +1,4 @@
-import { Plugin } from "@elizaos/core";
+import type { Plugin } from "@elizaos/core";
 import { blockchainChatAction } from "./actions/chat";
 export * as actions from "./actions/index.ts";
 

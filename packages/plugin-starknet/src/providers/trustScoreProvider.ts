@@ -1,24 +1,24 @@
-import { ProcessedTokenData, TokenSecurityData } from "../types/trustDB.ts";
+import type { ProcessedTokenData, TokenSecurityData } from "../types/trustDB.ts";
 // import { Connection, PublicKey } from "@solana/web3.js";
 // import { getAssociatedTokenAddress } from "@solana/spl-token";
 // import { TokenProvider } from "./token.ts";
 import {
     elizaLogger,
-    IAgentRuntime,
-    Memory,
-    Provider,
+    type IAgentRuntime,
+    type Memory,
+    type Provider,
     settings,
-    State,
+    type State,
 } from "@elizaos/core";
 import {
-    RecommenderMetrics,
-    TokenPerformance,
-    TokenRecommendation,
-    TradePerformance,
+    type RecommenderMetrics,
+    type TokenPerformance,
+    type TokenRecommendation,
+    type TradePerformance,
     TrustScoreDatabase,
 } from "@elizaos/plugin-trustdb";
 import { getTokenBalance } from "../utils/index.ts";
-import { TokenProvider } from "./token.ts";
+import type { TokenProvider } from "./token.ts";
 import { WalletProvider } from "./portfolioProvider.ts";
 
 const _Wallet = settings.MAIN_WALLET_ADDRESS;
@@ -82,7 +82,7 @@ export class TrustScoreManager {
                 this.runtime,
                 recommenderWallet
             );
-            const balance = parseFloat(tokenBalance);
+            const balance = Number.parseFloat(tokenBalance);
             return balance;
         } catch (error) {
             elizaLogger.error("Error fetching balance", error);

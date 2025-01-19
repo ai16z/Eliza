@@ -2,12 +2,12 @@ import { composeContext } from "@elizaos/core";
 import { generateTrueOrFalse } from "@elizaos/core";
 import { booleanFooter } from "@elizaos/core";
 import {
-    Action,
-    ActionExample,
-    IAgentRuntime,
-    Memory,
+    type Action,
+    type ActionExample,
+    type IAgentRuntime,
+    type Memory,
     ModelClass,
-    State,
+    type State,
 } from "@elizaos/core";
 
 export const shouldFollowTemplate =

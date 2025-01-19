@@ -1,9 +1,9 @@
 import {
-    Action,
-    IAgentRuntime,
-    Memory,
-    State,
-    HandlerCallback,
+    type Action,
+    type IAgentRuntime,
+    type Memory,
+    type State,
+    type HandlerCallback,
     elizaLogger,
 } from "@elizaos/core";
 import { generateObject, composeContext, ModelClass } from "@elizaos/core";
@@ -13,8 +13,8 @@ import {
     http,
     parseEther,
     encodeFunctionData,
-    WalletClient,
-    Account,
+    type WalletClient,
+    type Account,
 } from "viem";
 import { privateKeyToAccount } from "viem/accounts";
 import { confluxESpaceTestnet } from "viem/chains";

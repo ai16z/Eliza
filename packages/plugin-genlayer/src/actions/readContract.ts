@@ -1,11 +1,11 @@
-import {
+import type {
     Action,
     HandlerCallback,
     IAgentRuntime,
     Memory,
     State,
 } from "@elizaos/core";
-import { ReadContractParams } from "../types";
+import type { ReadContractParams } from "../types";
 import { ClientProvider } from "../providers/client";
 import { getParamsWithLLM } from "../utils/llm";
 

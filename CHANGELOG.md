@@ -1312,7 +1312,7 @@
 - Add OLLAMA as Model Provider  [\#221](https://github.com/elizaOS/eliza/pull/221) ([o-on-x](https://github.com/o-on-x))
 - lazy load llama [\#220](https://github.com/elizaOS/eliza/pull/220) ([lalalune](https://github.com/lalalune))
 - Implement grok beta [\#216](https://github.com/elizaOS/eliza/pull/216) ([MeDott29](https://github.com/MeDott29))
-- Abstracts Eliza into a Package to enble publishing onto NPM along with plugin system [\#214](https://github.com/elizaOS/eliza/pull/214) ([ponderingdemocritus](https://github.com/ponderingdemocritus))
+- Abstracts Eliza into a Package to enable publishing onto NPM along with plugin system [\#214](https://github.com/elizaOS/eliza/pull/214) ([ponderingdemocritus](https://github.com/ponderingdemocritus))
 - add the template overrides [\#207](https://github.com/elizaOS/eliza/pull/207) ([lalalune](https://github.com/lalalune))
 - Shaw fix characters paths, .ts requirement and missings args [\#204](https://github.com/elizaOS/eliza/pull/204) ([lalalune](https://github.com/lalalune))
 - Fix Discord Voice and DMs [\#203](https://github.com/elizaOS/eliza/pull/203) ([lalalune](https://github.com/lalalune))

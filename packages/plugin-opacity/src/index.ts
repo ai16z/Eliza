@@ -1,7 +1,7 @@
 import {
-    IVerifiableInferenceAdapter,
-    VerifiableInferenceOptions,
-    VerifiableInferenceResult,
+    type IVerifiableInferenceAdapter,
+    type VerifiableInferenceOptions,
+    type VerifiableInferenceResult,
     VerifiableInferenceProvider,
     ModelProviderName,
     models,
@@ -43,7 +43,6 @@ export class OpacityAdapter implements IVerifiableInferenceAdapter {
         // Get provider-specific endpoint
         let endpoint;
         let authHeader;
-        let responseRegex;
 
         switch (provider) {
             case ModelProviderName.OPENAI:
@@ -97,7 +96,7 @@ export class OpacityAdapter implements IVerifiableInferenceAdapter {
             // Validate JSON before sending
             try {
                 JSON.parse(requestBody); // Verify the JSON is valid
-            } catch (e) {
+            } catch {
                 elizaLogger.error("Invalid JSON body:", body);
                 throw new Error("Failed to create valid JSON request body");
             }

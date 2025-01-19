@@ -10,11 +10,11 @@
 
 ### new MemoryCacheAdapter()
 
-> **new MemoryCacheAdapter**(`initalData`?): [`MemoryCacheAdapter`](MemoryCacheAdapter.md)
+> **new MemoryCacheAdapter**(`initialData`?): [`MemoryCacheAdapter`](MemoryCacheAdapter.md)
 
 #### Parameters
 
-• **initalData?**: `Map`\<`string`, `string`\>
+• **initialData?**: `Map`\<`string`, `string`\>
 
 #### Returns
 

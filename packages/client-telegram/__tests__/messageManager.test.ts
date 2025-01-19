@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { MessageManager } from '../src/messageManager';
-import { IAgentRuntime } from '@elizaos/core';
-import { Context, Telegraf } from 'telegraf';
+import type { IAgentRuntime } from '@elizaos/core';
+import { type Context, Telegraf } from 'telegraf';
 import { Message } from '@telegraf/types';
 
 // Mock Telegraf

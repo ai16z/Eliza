@@ -24,6 +24,15 @@ jobs:
                         { code: "TH", name: "Thai" },
                         { code: "TR", name: "Turkish" },
                         { code: "VI", name: "Vietnamese" },
+                        { code: "AR", name: "Arabic" },
+                        { code: "RS", name: "Srpski" },
+                        { code: "TG", name: "Tagalog" },
+                        { code: "PL", name: "Polski" },
+                        { code: "HU", name: "Hungarian" },
+                        { code: "FA", name: "Persian" },
+                        { code: "RO", name: "Romanian" },
+                        { code: "GR", name: "Greek" },
+                        { code: "NL", name: "Dutch" },
                     ]
         permissions:
             contents: write
@@ -53,7 +62,7 @@ jobs:
                             "content_path": "README.md"
                           }
                         ],
-                        "save_path": "README_${{ matrix.language.code }}.md",
+                        save_path: "i18n/readme/README_${{ matrix.language.code }}.md",
                         "model": "gpt-4o"
                       }
 

@@ -1,5 +1,5 @@
-import { Action, elizaLogger } from "@elizaos/core";
-import { IAgentRuntime, Memory, State, HandlerCallback, Content, ActionExample } from "@elizaos/core";
+import { type Action, elizaLogger } from "@elizaos/core";
+import type { IAgentRuntime, Memory, State, HandlerCallback, Content, ActionExample } from "@elizaos/core";
 import { SDL } from "@akashnetwork/akashjs/build/sdl";
 import { validateAkashConfig } from "../environment";
 import { AkashError, AkashErrorCode } from "../error/error";
@@ -90,7 +90,7 @@ const loadSDLFromFile = (filePath: string): string => {
     }
 };
 
-const validateSDL = (sdlContent: string, validationLevel: string = "strict"): boolean => {
+const validateSDL = (sdlContent: string, validationLevel = "strict"): boolean => {
     try {
         // First try to parse as YAML
         const parsed = yaml.load(sdlContent);

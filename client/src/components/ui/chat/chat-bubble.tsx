@@ -3,7 +3,7 @@ import { cva, type VariantProps } from "class-variance-authority";
 import { cn } from "@/lib/utils";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import MessageLoading from "./message-loading";
-import { Button, ButtonProps } from "../button";
+import { Button, type ButtonProps } from "../button";
 
 // ChatBubble
 const chatBubbleVariant = cva(
@@ -125,8 +125,7 @@ const ChatBubbleMessage = React.forwardRef<
 ChatBubbleMessage.displayName = "ChatBubbleMessage";
 
 // ChatBubbleTimestamp
-interface ChatBubbleTimestampProps
-    extends React.HTMLAttributes<HTMLDivElement> {
+interface ChatBubbleTimestampProps extends React.HTMLAttributes<HTMLDivElement> {
     timestamp: string;
 }
 

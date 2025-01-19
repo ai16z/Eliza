@@ -1,4 +1,4 @@
-import * as fcl from "@onflow/fcl";
+import type * as fcl from "@onflow/fcl";
 import type { Account } from "@onflow/typedefs";
 
 export interface IFlowScriptExecutor {

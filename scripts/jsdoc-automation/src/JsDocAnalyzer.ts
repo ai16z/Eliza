@@ -1,6 +1,6 @@
 import type { TSESTree } from "@typescript-eslint/types";
-import { TypeScriptParser } from "./TypeScriptParser.js";
-import { ASTQueueItem, EnvUsage, TodoItem } from "./types/index.js";
+import type { TypeScriptParser } from "./TypeScriptParser.js";
+import type { ASTQueueItem, EnvUsage, TodoItem } from "./types/index.js";
 
 type AST_NODE_TYPES = {
     ClassDeclaration: "ClassDeclaration";
@@ -79,7 +79,7 @@ export class JsDocAnalyzer {
     /**
      * Checks if a node spans more than the specified number of lines
      */
-    private isLongEnough(node: TSESTree.Node, minLines: number = 10): boolean {
+    private isLongEnough(node: TSESTree.Node, minLines = 10): boolean {
         if (!node.loc) return false;
         return (node.loc.end.line - node.loc.start.line) > minLines;
     }
@@ -755,7 +755,7 @@ export class JsDocAnalyzer {
         lineNumber: number
     ): TSESTree.Node | undefined {
         let nearestNode: TSESTree.Node | undefined;
-        let smallestDistance = Infinity;
+        let smallestDistance = Number.POSITIVE_INFINITY;
 
         const traverse = (node: TSESTree.Node | null) => {
             if (!node) return;

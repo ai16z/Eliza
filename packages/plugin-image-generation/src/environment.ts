@@ -1,4 +1,4 @@
-import { IAgentRuntime } from "@elizaos/core";
+import type { IAgentRuntime } from "@elizaos/core";
 import { z } from "zod";
 
 export const imageGenEnvSchema = z
@@ -10,6 +10,7 @@ export const imageGenEnvSchema = z
         FAL_API_KEY: z.string().optional(),
         OPENAI_API_KEY: z.string().optional(),
         VENICE_API_KEY: z.string().optional(),
+        LIVEPEER_GATEWAY_URL: z.string().optional(),
     })
     .refine(
         (data) => {
@@ -20,12 +21,13 @@ export const imageGenEnvSchema = z
                 data.HEURIST_API_KEY ||
                 data.FAL_API_KEY ||
                 data.OPENAI_API_KEY ||
-                data.VENICE_API_KEY
+                data.VENICE_API_KEY ||
+                data.LIVEPEER_GATEWAY_URL
             );
         },
         {
             message:
-                "At least one of ANTHROPIC_API_KEY, NINETEEN_AI_API_KEY, TOGETHER_API_KEY, HEURIST_API_KEY, FAL_API_KEY, OPENAI_API_KEY or VENICE_API_KEY is required",
+                "At least one of ANTHROPIC_API_KEY, NINETEEN_AI_API_KEY, TOGETHER_API_KEY, HEURIST_API_KEY, FAL_API_KEY, OPENAI_API_KEY, VENICE_API_KEY or LIVEPEER_GATEWAY_URL is required",
         }
     );
 
@@ -57,6 +59,9 @@ export async function validateImageGenConfig(
             VENICE_API_KEY:
                 runtime.getSetting("VENICE_API_KEY") ||
                 process.env.VENICE_API_KEY,
+            LIVEPEER_GATEWAY_URL:
+                runtime.getSetting("LIVEPEER_GATEWAY_URL") ||
+                process.env.LIVEPEER_GATEWAY_URL,
         };
 
         return imageGenEnvSchema.parse(config);

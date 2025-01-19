@@ -1,10 +1,10 @@
 import {
-    ActionExample,
-    HandlerCallback,
-    IAgentRuntime,
-    Memory,
+    type ActionExample,
+    type HandlerCallback,
+    type IAgentRuntime,
+    type Memory,
     ModelClass,
-    State,
+    type State,
     type Action,
     composeContext,
     generateObject,
@@ -14,7 +14,7 @@ import {
     isTransferContent,
     validateSettings,
 } from "../utils";
-import { formatUnits, TransactionRequest } from "quais";
+import { formatUnits, type TransactionRequest } from "quais";
 
 const transferTemplate = `Respond with a JSON markdown block containing only the extracted values. Use null for any values that cannot be determined.
 

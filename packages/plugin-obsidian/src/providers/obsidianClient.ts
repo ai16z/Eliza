@@ -1,19 +1,19 @@
-import { NoteContent, ResultNoteApi, ResultNoteSearchApi, ServerInfo } from "../types";
+import type { NoteContent, ResultNoteApi, ResultNoteSearchApi, ServerInfo } from "../types";
 import { createHash } from "crypto";
 import {
     elizaLogger,
-    AgentRuntime,
+    type AgentRuntime,
     knowledge,
     stringToUuid,
 } from "@elizaos/core";
 
 export class ObsidianProvider {
-    private connected: boolean = false;
+    private connected = false;
     private runtime: AgentRuntime;
     private static instance: ObsidianProvider | null = null;
 
     private constructor(
-        private port: number = 27123,
+        private port = 27123,
         private token: string,
         private host_url: string
     ) {}
@@ -30,7 +30,7 @@ export class ObsidianProvider {
         runtime: AgentRuntime,
         port: number,
         token: string,
-        host_url: string = `http://127.0.0.1:${port}`
+        host_url = `http://127.0.0.1:${port}`
     ): Promise<ObsidianProvider> {
         if (!this.instance) {
             this.instance = new ObsidianProvider(port, token, host_url);
@@ -182,7 +182,7 @@ export class ObsidianProvider {
     async saveNote(
         path: string,
         content: string,
-        createDirectories: boolean = true
+        createDirectories = true
     ): Promise<void> {
         if (!this.connected) {
             await this.connect();
@@ -355,7 +355,7 @@ export class ObsidianProvider {
     async saveFile(
         path: string,
         content: string,
-        createDirectories: boolean = true
+        createDirectories = true
     ): Promise<void> {
         if (!this.connected) {
             await this.connect();
@@ -394,7 +394,7 @@ export class ObsidianProvider {
     async patchFile(
         path: string,
         content: string,
-        lineNumber: number = 0
+        lineNumber = 0
     ): Promise<void> {
         if (!this.connected) {
             await this.connect();
@@ -600,7 +600,7 @@ export class ObsidianProvider {
      */
     async searchKeywords(
         query: string,
-        contextLength: number = 100
+        contextLength = 100
     ): Promise<ResultNoteApi[]> {
         if (!this.connected) {
             await this.connect();
@@ -660,7 +660,7 @@ export class ObsidianProvider {
      * @param directory - The directory to scan, empty string for root
      * @returns Array of file paths in format 'directory/file.md'
      */
-    private async scanDirectoryRecursively(directory: string = ''): Promise<string[]> {
+    private async scanDirectoryRecursively(directory = ''): Promise<string[]> {
         const allFiles: string[] = [];
         const dirsToProcess: string[] = [directory];
         const processedDirs = new Set<string>();

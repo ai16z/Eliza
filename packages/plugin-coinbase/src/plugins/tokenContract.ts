@@ -1,12 +1,12 @@
-import { Coinbase, readContract, SmartContract } from "@coinbase/coinbase-sdk";
+import { Coinbase, readContract, type SmartContract } from "@coinbase/coinbase-sdk";
 import {
-    Action,
-    Plugin,
+    type Action,
+    type Plugin,
     elizaLogger,
-    IAgentRuntime,
-    Memory,
-    HandlerCallback,
-    State,
+    type IAgentRuntime,
+    type Memory,
+    type HandlerCallback,
+    type State,
     composeContext,
     generateObject,
     ModelClass,

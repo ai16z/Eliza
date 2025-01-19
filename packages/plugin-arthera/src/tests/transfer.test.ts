@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach } from "vitest";
 import { generatePrivateKey } from "viem/accounts";
-import { Chain } from "viem";
+import type { Chain } from "viem";
 import { getEnvVariable } from "@elizaos/core";
 
 import { TransferAction } from "../actions/transfer";
