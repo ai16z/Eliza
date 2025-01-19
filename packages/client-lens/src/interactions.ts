@@ -23,7 +23,7 @@ import { publicationUuid } from "./utils";
 import { sendPublication } from "./actions";
 import type { AnyPublicationFragment } from "@lens-protocol/client";
 import type { Profile } from "./types";
-import type StorjProvider from "./providers/StorjProvider";
+import { StorageProvider } from "./providers/StorageProvider";
 
 export class LensInteractionManager {
     private timeout: NodeJS.Timeout | undefined;
@@ -32,7 +32,7 @@ export class LensInteractionManager {
         public runtime: IAgentRuntime,
         private profileId: string,
         public cache: Map<string, any>,
-        private ipfs: StorjProvider
+        private storage: StorageProvider
     ) {}
 
     public async start() {
@@ -250,7 +250,7 @@ export class LensInteractionManager {
                     content: content,
                     roomId: memory.roomId,
                     commentOn: publication.id,
-                    ipfs: this.ipfs,
+                    storage: this.storage,
                 });
                 if (!result.publication?.id)
                     throw new Error("publication not sent");

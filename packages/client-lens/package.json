@@ -22,6 +22,7 @@
         "@elizaos/core": "workspace:*",
         "@lens-protocol/client": "2.2.0",
         "@lens-protocol/metadata": "1.2.0",
+        "arweave": "1.15.5",
         "axios": "^1.7.9"
     },
     "devDependencies": {

@@ -11,7 +11,7 @@ import { formatTimeline, postTemplate } from "./prompts";
 import { publicationUuid } from "./utils";
 import { createPublicationMemory } from "./memory";
 import { sendPublication } from "./actions";
-import type StorjProvider from "./providers/StorjProvider";
+import { StorageProvider } from "./providers/StorageProvider";
 
 export class LensPostManager {
     private timeout: NodeJS.Timeout | undefined;
@@ -21,7 +21,7 @@ export class LensPostManager {
         public runtime: IAgentRuntime,
         private profileId: string,
         public cache: Map<string, any>,
-        private ipfs: StorjProvider
+        private storage: StorageProvider
     ) {}
 
     public async start() {
@@ -105,7 +105,7 @@ export class LensPostManager {
                     runtime: this.runtime,
                     roomId: generateRoomId,
                     content: { text: content },
-                    ipfs: this.ipfs,
+                    storage: this.storage,
                 });
 
                 if (!publication) throw new Error("failed to send publication");

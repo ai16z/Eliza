@@ -9,7 +9,7 @@ import {
 import { textOnly } from "@lens-protocol/metadata";
 import { createPublicationMemory } from "./memory";
 import type { AnyPublicationFragment } from "@lens-protocol/client";
-import type StorjProvider from "./providers/StorjProvider";
+import { StorageProvider } from "./providers/StorageProvider";
 
 export async function sendPublication({
     client,
@@ -17,18 +17,28 @@ export async function sendPublication({
     content,
     roomId,
     commentOn,
-    ipfs,
+    storage,
 }: {
     client: LensClient;
     runtime: IAgentRuntime;
     content: Content;
     roomId: UUID;
     commentOn?: string;
-    ipfs: StorjProvider;
+    storage: StorageProvider;
 }): Promise<{ memory?: Memory; publication?: AnyPublicationFragment }> {
     // TODO: arweave provider for content hosting
     const metadata = textOnly({ content: content.text });
-    const contentURI = await ipfs.pinJson(metadata);
+        let contentURI;
+
+    try {
+        const response = await storage.uploadJson(metadata);
+        contentURI = response.url;
+    } catch (e) {
+        elizaLogger.warn(
+            `Failed to upload metadata with storage provider: ${storage.provider}. Ensure your storage provider is configured correctly.`
+        );
+        throw e;
+    }
 
     const publication = await client.createPublication(
         contentURI,

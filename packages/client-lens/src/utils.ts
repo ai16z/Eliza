@@ -1,4 +1,7 @@
 import { stringToUuid } from "@elizaos/core";
+import {
+    ProfileMetadataFragment,
+} from "@lens-protocol/client";
 import type { BroadcastResult } from "./types";
 
 export function publicationId({
@@ -62,11 +65,23 @@ export const handleBroadcastResult = (
     }
 };
 
-export const getProfilePictureUri = (picture: any): string | undefined => {
-    if ("optimized" in picture) {
-        return picture.optimized?.uri || picture.raw?.uri || picture.uri;
-    } else {
-        return picture.uri;
+export const getProfilePictureUri = (
+    picture?: ProfileMetadataFragment["picture"]
+): string | undefined => {
+    if (!picture) {
+        return;
+    }
+
+    if (picture.__typename === "ImageSet") {
+        return (
+            picture.optimized?.uri || picture.raw?.uri || picture.thumbnail?.uri
+        );
+    } else if (picture.__typename === "NftImage") {
+        return (
+            picture.image.optimized?.uri ||
+            picture.image.raw?.uri ||
+            picture.image.thumbnail?.uri
+        );
     }
 };
 
