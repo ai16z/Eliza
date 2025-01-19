@@ -42,6 +42,8 @@ import { zgPlugin } from "@elizaos/plugin-0g";
 import { bootstrapPlugin } from "@elizaos/plugin-bootstrap";
 import { normalizeCharacter } from "@elizaos/plugin-di";
 import createGoatPlugin from "@elizaos/plugin-goat";
+import createZilliqaPlugin from "@elizaos/plugin-zilliqa";
+
 // import { intifacePlugin } from "@elizaos/plugin-intiface";
 import { ThreeDGenerationPlugin } from "@elizaos/plugin-3d-generation";
 import { abstractPlugin } from "@elizaos/plugin-abstract";
@@ -798,6 +800,12 @@ export async function createAgent(
         );
     }
 
+  let zilliqaPlugin: any | undefined;
+    if (getSecret(character, "EVM_PRIVATE_KEY")) {
+      zilliqaPlugin = await createZilliqaPlugin((secret) =>
+          getSecret(character, secret)
+        );
+    }
     // Initialize Reclaim adapter if environment variables are present
     // let verifiableInferenceAdapter;
     // if (
@@ -950,7 +958,10 @@ export async function createAgent(
             getSecret(character, "COINBASE_NOTIFICATION_URI")
                 ? webhookPlugin
                 : null,
-            goatPlugin,
+          goatPlugin,
+          getSecret(character, "ENABLE_ZILLIQA")
+                ? zilliqaPlugin
+                : null,
             getSecret(character, "COINGECKO_API_KEY") ||
             getSecret(character, "COINGECKO_PRO_API_KEY")
                 ? coingeckoPlugin
