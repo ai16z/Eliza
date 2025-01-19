@@ -113,7 +113,7 @@ if [ -d "./agent" ]; then
     WATCH_PATHS+=("--watch './packages/$FOLDER/dist'")
   done
 
-  COMMANDS+=("nodemon ${WATCH_PATHS[@]} -e js,json,map --delay 2 --exec 'pnpm --dir agent dev -- $*'")
+  COMMANDS+=("nodemon ${WATCH_PATHS[*]} -e js,json,map --delay 2 --exec 'pnpm --dir agent dev -- $*'")
 else
   echo "Warning: 'agent' directory not found."
 fi
