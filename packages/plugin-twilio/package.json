@@ -1,0 +1,39 @@
+{
+    "name": "@elizaos/plugin-twilio",
+    "version": "0.1.8+build.1",
+    "type": "module",
+    "main": "dist/index.js",
+    "module": "dist/index.js",
+    "types": "dist/index.d.ts",
+    "exports": {
+        "./package.json": "./package.json",
+        ".": {
+            "import": {
+                "@elizaos/source": "./src/index.ts",
+                "types": "./dist/index.d.ts",
+                "default": "./dist/index.js"
+            }
+        }
+    },
+    "files": [
+        "dist"
+    ],
+    "dependencies": {
+        "@elizaos/core": "workspace:*",
+        "@hono/node-server": "1.13.7",
+        "@ngrok/ngrok": "1.4.1",
+        "hono": "4.6.16",
+        "tsup": "8.3.5",
+        "twilio": "5.4.1",
+        "zod": "3.24.1"
+    },
+    "devDependencies": {
+        "vitest": "^1.0.0"
+    },
+    "scripts": {
+        "build": "tsup --format esm --dts",
+        "dev": "tsup --format esm --dts --watch",
+        "test": "vitest run",
+        "test:watch": "vitest"
+    }
+}

@@ -441,28 +441,30 @@ export class AgentRuntime implements IAgentRuntime {
     }
 
     async initialize() {
-        for (const [serviceType, service] of this.services.entries()) {
+        // Dedupe services such that we only initialize each service once
+        const combined = [...this.services.values()];
+
+        for (const other of this.plugins.flatMap(plugin => plugin.services ?? [])) {
+            if (!combined.some(item1 => Object.is(item1, other))) {
+                combined.push(other);
+            }
+        }
+
+        // Start initializing services
+        await Promise.all(Array.from(combined).map(async (service) => {
             try {
                 await service.initialize(this);
-                this.services.set(serviceType, service);
                 elizaLogger.success(
-                    `Service ${serviceType} initialized successfully`
+                    `Service ${service.serviceType} initialized successfully`
                 );
             } catch (error) {
                 elizaLogger.error(
-                    `Failed to initialize service ${serviceType}:`,
+                    `Failed to initialize service ${service.serviceType}:`,
                     error
                 );
                 throw error;
             }
-        }
-
-        for (const plugin of this.plugins) {
-            if (plugin.services)
-                await Promise.all(
-                    plugin.services?.map((service) => service.initialize(this))
-                );
-        }
+        }));
 
         if (
             this.character &&
