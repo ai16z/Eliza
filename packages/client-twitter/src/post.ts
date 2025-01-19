@@ -519,12 +519,14 @@ export class TwitterPostClient {
                 // If not JSON, clean the raw content
                 cleanedContent = newTweetContent
                     .replace(/^\s*{?\s*"text":\s*"|"\s*}?\s*$/g, "") // Remove JSON-like wrapper
-                    .replace(/^['"](.*)['"]$/g, "$1") // Remove quotes
+                    .replace(/^["']|["']$/g, "") // Remove leading/trailing quotes
                     .replace(/\\"/g, '"') // Unescape quotes
-                    .replace(/\\n/g, "\n\n") // Unescape newlines, ensures double spaces
+                    .replace(/\\n/g, "\n\n") // Unescape newlines
+                    .replace(/^\d+\.\s*/gm, "") // Remove all numbered list markers
+                    .replace(/\n+\s*$/, "") // Clean up trailing newlines
                     .trim();
             }
-
+                
             if (!cleanedContent) {
                 elizaLogger.error(
                     "Failed to extract valid content from response:",
