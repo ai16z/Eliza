@@ -1,7 +1,7 @@
 # Eliza 🤖
 
 <div align="center">
-  <img src="./docs/static/img/eliza_banner.jpg" alt="Eliza Banner" width="100%" />
+  <img src="https://github.com/elizaOS/eliza/raw/develop/docs/static/img/eliza_banner.jpg" alt="Eliza Banner" width="100%" />
 </div>
 
 <div align="center">
@@ -93,7 +93,7 @@ git checkout $(git describe --tags --abbrev=0)
 cp .env.example .env
 ```
 
-Σημείωση: Το .env είναι προαιρετικό. Αν σχεδιάζετε να τρέξετε πολλούς διαφορετικούς πράκτορες, μπορείτε να περάσετε τα secrets μέσω του JSON της χαρακτήρα.  
+Σημείωση: Το .env είναι προαιρετικό. Αν σχεδιάζετε να τρέξετε πολλούς διαφορετικούς πράκτορες, μπορείτε να περάσετε τα secrets μέσω του JSON της χαρακτήρα.
 
 ### Αυτόματη Εκκίνηση του Eliza
 
@@ -105,9 +105,9 @@ sh scripts/start.sh
 
 ### Τροποποίηση του αρχείου σχετικού με τον χαρακτήρα
 
-1. Ανοίξτε το `packages/core/src/defaultCharacter.ts` για να τροποποιήσετε τον προεπιλεγμένο χαρακτήρα. Αποσχολιάστε και επεξεργαστείτε.  
+1. Ανοίξτε το `packages/core/src/defaultCharacter.ts` για να τροποποιήσετε τον προεπιλεγμένο χαρακτήρα. Αποσχολιάστε και επεξεργαστείτε.
 
-2. Για να φορτώσετε προσαρμοσμένους χαρακτήρες:  
+2. Για να φορτώσετε προσαρμοσμένους χαρακτήρες:
    - Χρησιμοποιήστε `pnpm start --characters="path/to/your/character.json"`
    - Πολλά αρχεία χαρακτήρων μπορούν να φορτωθούν ταυτόχρονα
 
