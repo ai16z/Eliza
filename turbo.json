@@ -18,7 +18,8 @@
             "outputs": ["dist/**"],
             "dependsOn": [
                 "@elizaos/plugin-image-generation#build",
-                "@elizaos/plugin-tee-log#build"
+                "@elizaos/plugin-tee-log#build",
+                "@elizaos/plugin-tee-verifiable-log#build"
             ]
         },
         "@elizaos/plugin-solana#build": {
@@ -31,10 +32,6 @@
         "@elizaos/plugin-nft-generation#build": {
             "outputs": ["dist/**"],
             "dependsOn": ["@elizaos/plugin-node#build"]
-        },
-        "@elizaos/client-direct#build": {
-            "outputs": ["dist/**"],
-            "dependsOn": ["@elizaos/plugin-tee-verifiable-log#build"]
         },
         "@elizaos/plugin-tee-verifiable-log#build": {
             "outputs": ["dist/**"],
@@ -62,7 +59,7 @@
         },
         "dev": {
             "persistent": true,
-            "cache": false
+            "cache": true
         }
     }
 }
